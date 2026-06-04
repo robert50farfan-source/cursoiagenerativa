@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase 3 — Presentaciones, Apps y Proyecto Final</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --c1: #00F5A0;   /* verde — color dominante Clase 3 */
+    --c2: #43CBFF;
+    --c3: #6C63FF;
+    --c4: #FF6584;
+    --c5: #FFB347;
+    --dark: #0A0A14;
+    --glass: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.10);
+    --text: #E8E8F0;
+    --text2: #9898B8;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Inter',sans-serif; background:var(--dark); color:var(--text); overflow:hidden; height:100vh; width:100vw; }
+
+  /* ——— SLIDE ENGINE ——— */
+  #deck { width:100%; height:100%; position:relative; }
+  .slide { position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:3.5rem 5.5rem; opacity:0; pointer-events:none; transform:translateX(60px); transition:opacity .45s ease,transform .45s ease; }
+  .slide.active { opacity:1; pointer-events:all; transform:translateX(0); }
+  .slide.exit   { opacity:0; transform:translateX(-60px); }
+
+  /* ——— BACKGROUNDS ——— */
+  .bg-c3    { background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,245,160,.38) 0%, var(--dark) 65%); }
+  .bg-dark  { background: var(--dark); }
+  .bg-green { background: radial-gradient(ellipse 70% 55% at 15% 50%, rgba(0,245,160,.28) 0%, var(--dark) 65%); }
+  .bg-blue  { background: radial-gradient(ellipse 70% 55% at 85% 40%, rgba(67,203,255,.28) 0%, var(--dark) 65%); }
+  .bg-purple{ background: radial-gradient(ellipse 70% 55% at 80% 60%, rgba(108,99,255,.28) 0%, var(--dark) 65%); }
+  .bg-pink  { background: radial-gradient(ellipse 70% 55% at 30% 30%, rgba(255,101,132,.22) 0%, var(--dark) 65%); }
+  .bg-gold  { background: radial-gradient(ellipse 70% 55% at 20% 70%, rgba(255,179,71,.22) 0%, var(--dark) 65%); }
+  .bg-multi {
+    background:
+      radial-gradient(ellipse 50% 50% at 0%   0%,   rgba(0,245,160,.18)  0%, transparent 55%),
+      radial-gradient(ellipse 50% 50% at 100% 100%, rgba(108,99,255,.15) 0%, transparent 55%),
+      var(--dark);
+  }
+
+  /* ——— LAYOUT ——— */
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1.6rem; width:100%; }
+  .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.3rem; width:100%; }
+  .grid-4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:1rem; width:100%; }
+  .full-width { width:100%; }
+  .mt-1{margin-top:.5rem} .mt-2{margin-top:1rem} .mt-3{margin-top:1.5rem}
+  .mb-1{margin-bottom:.5rem} .mb-2{margin-bottom:1rem}
+  .text-center{text-align:center}
+
+  /* ——— TYPOGRAPHY ——— */
+  .slide-tag { font-size:.72rem; letter-spacing:.15em; text-transform:uppercase; font-weight:600; color:var(--c1); margin-bottom:.65rem; }
+  .slide-tag.blue   { color:var(--c2); }
+  .slide-tag.purple { color:#9D97FF; }
+  .slide-tag.pink   { color:var(--c4); }
+  .slide-tag.gold   { color:var(--c5); }
+
+  h1.hero { font-family:'Space Grotesk',sans-serif; font-size:clamp(2.4rem,5vw,4rem); font-weight:800; line-height:1.05; text-align:center; letter-spacing:-.02em; }
+  h2.section-title { font-family:'Space Grotesk',sans-serif; font-size:clamp(1.6rem,3vw,2.4rem); font-weight:700; margin-bottom:1.2rem; line-height:1.15; }
+  h3.card-title { font-size:1rem; font-weight:700; margin-bottom:.35rem; }
+  p.lead { font-size:1.05rem; line-height:1.7; color:var(--text2); max-width:780px; text-align:center; }
+  p.body { font-size:.88rem; line-height:1.65; color:var(--text2); }
+
+  .grad-green  { background:linear-gradient(135deg,var(--c1),var(--c2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .grad-purple { background:linear-gradient(135deg,#9D97FF,var(--c2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .grad-pink   { background:linear-gradient(135deg,var(--c4),var(--c5)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .grad-gold   { background:linear-gradient(135deg,var(--c5),var(--c4)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+
+  /* ——— CARDS ——— */
+  .card { background:var(--glass); border:1px solid var(--border); border-radius:14px; padding:1.2rem 1.4rem; backdrop-filter:blur(12px); transition:transform .25s,border-color .25s; }
+  .card:hover { transform:translateY(-3px); border-color:rgba(0,245,160,.4); }
+  .ac-g  { border-color:rgba(0,245,160,.4); }
+  .ac-b  { border-color:rgba(67,203,255,.4); }
+  .ac-p  { border-color:rgba(108,99,255,.4); }
+  .ac-pk { border-color:rgba(255,101,132,.4); }
+  .ac-gd { border-color:rgba(255,179,71,.4); }
+
+  /* ——— BADGE ——— */
+  .badge { display:inline-block; font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:.28rem .65rem; border-radius:99px; }
+  .bg-b { background:rgba(0,245,160,.2);   color:#5CFFD1; border:1px solid rgba(0,245,160,.4); }
+  .bc   { background:rgba(67,203,255,.2);  color:#7DD8FF; border:1px solid rgba(67,203,255,.4); }
+  .bp   { background:rgba(108,99,255,.2);  color:#9D97FF; border:1px solid rgba(108,99,255,.4); }
+  .bpk  { background:rgba(255,101,132,.2); color:#FF9DB0; border:1px solid rgba(255,101,132,.4); }
+  .bgd  { background:rgba(255,179,71,.18); color:#FFD08A; border:1px solid rgba(255,179,71,.4); }
+
+  /* ——— FEATURE ROW ——— */
+  .feature-row { display:flex; align-items:flex-start; gap:.9rem; padding:.85rem 1.1rem; background:var(--glass); border:1px solid var(--border); border-radius:12px; margin-bottom:.55rem; backdrop-filter:blur(8px); }
+  .feat-icon { font-size:1.4rem; flex-shrink:0; margin-top:.1rem; }
+
+  /* ——— AGENDA ——— */
+  .agenda-item { display:flex; align-items:center; gap:1rem; padding:.75rem 1.2rem; background:var(--glass); border:1px solid var(--border); border-radius:12px; margin-bottom:.5rem; backdrop-filter:blur(8px); transition:border-color .2s; }
+  .agenda-item:hover { border-color:rgba(0,245,160,.5); }
+  .agenda-num  { font-family:'Space Grotesk',sans-serif; font-size:1.4rem; font-weight:800; color:rgba(0,245,160,.3); min-width:2rem; text-align:center; }
+  .agenda-time { font-size:.7rem; font-weight:700; color:var(--c1); text-transform:uppercase; letter-spacing:.08em; min-width:3.5rem; }
+  .agenda-label{ font-weight:600; font-size:.9rem; }
+  .agenda-sub  { font-size:.76rem; color:var(--text2); }
+
+  /* ——— STEP FLOW ——— */
+  .step-flow { display:flex; flex-direction:column; gap:.5rem; width:100%; }
+  .step { display:flex; align-items:flex-start; gap:1rem; padding:.8rem 1.1rem; background:var(--glass); border:1px solid var(--border); border-radius:12px; backdrop-filter:blur(8px); }
+  .step-num   { font-family:'Space Grotesk',sans-serif; font-size:1.3rem; font-weight:800; color:var(--c1); min-width:1.8rem; flex-shrink:0; line-height:1; }
+  .step-title { font-weight:700; font-size:.9rem; margin-bottom:.15rem; }
+  .step-desc  { font-size:.78rem; color:var(--text2); line-height:1.45; }
+
+  /* ——— STAT BOX ——— */
+  .stat-mini { text-align:center; padding:1rem; background:var(--glass); border:1px solid var(--border); border-radius:14px; backdrop-filter:blur(12px); }
+  .stat-mini .num { font-family:'Space Grotesk',sans-serif; font-size:2rem; font-weight:800; line-height:1; margin-bottom:.2rem; }
+  .stat-mini .lbl { font-size:.72rem; color:var(--text2); text-transform:uppercase; letter-spacing:.07em; }
+
+  /* ——— PROMPT BOX ——— */
+  .prompt-box { background:#0d0d1a; border:1px solid rgba(0,245,160,.3); border-radius:12px; padding:1.1rem 1.4rem; font-family:'Courier New',monospace; font-size:.82rem; line-height:1.65; color:#c8c8e8; width:100%; position:relative; }
+  .prompt-box::before { content:'⌨ Prompt'; position:absolute; top:-.55rem; left:1rem; font-size:.62rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; background:var(--dark); padding:0 .5rem; color:var(--c1); font-family:'Inter',sans-serif; }
+  .ph { color:#5CFFD1; font-weight:600; }
+  .pv { color:#7DD8FF; }
+  .po { color:#FFD08A; }
+  .pp { color:#FF9DB0; }
+
+  /* ——— CLASS BANNER ——— */
+  .class-banner { display:flex; align-items:center; gap:1.3rem; margin-bottom:1.8rem; width:100%; }
+  .banner-num   { font-family:'Space Grotesk',sans-serif; font-size:4.5rem; font-weight:900; line-height:1; opacity:.13; flex-shrink:0; }
+
+  /* ——— TOOL CARD ——— */
+  .tool-card { border-radius:16px; padding:1.4rem; background:var(--glass); border:1px solid var(--border); backdrop-filter:blur(12px); display:flex; flex-direction:column; gap:.5rem; transition:transform .25s; }
+  .tool-card:hover { transform:translateY(-4px); }
+  .tool-logo { font-size:2.6rem; margin-bottom:.2rem; }
+  .tool-name { font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.05rem; }
+  .tool-org  { font-size:.72rem; color:var(--text2); margin-bottom:.3rem; }
+  .tool-item { display:flex; align-items:flex-start; gap:.4rem; font-size:.78rem; color:var(--text2); line-height:1.4; margin-bottom:.2rem; }
+  .bullet    { width:5px; height:5px; border-radius:50%; flex-shrink:0; margin-top:.45rem; }
+
+  /* ——— DELIVERABLE ——— */
+  .deliverable { display:flex; align-items:center; gap:.7rem; padding:.6rem .9rem; background:rgba(255,255,255,.05); border-radius:10px; margin-bottom:.45rem; font-size:.82rem; font-weight:500; }
+  .del-icon { font-size:1.1rem; flex-shrink:0; }
+  .del-time { font-size:.68rem; font-weight:700; margin-left:auto; white-space:nowrap; }
+
+  /* ——— APP PREVIEW ——— */
+  .app-preview { border-radius:14px; padding:1rem 1.2rem; background:rgba(0,0,0,.4); border:1px solid rgba(0,245,160,.25); font-family:'Courier New',monospace; font-size:.78rem; line-height:1.6; color:#9898B8; position:relative; }
+  .app-preview::before { content:'💻 Resultado'; position:absolute; top:-.55rem; left:1rem; font-size:.62rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; background:var(--dark); padding:0 .5rem; color:var(--c1); font-family:'Inter',sans-serif; }
+  .app-line-g { color:#5CFFD1; }
+  .app-line-b { color:#7DD8FF; }
+  .app-line-y { color:#FFD08A; }
+
+  /* ——— TIMELINE FUTURO ——— */
+  .future-card { border-radius:14px; padding:1.2rem 1.3rem; background:var(--glass); border:1px solid var(--border); backdrop-filter:blur(12px); transition:transform .25s; }
+  .future-card:hover { transform:translateY(-4px); }
+  .future-year  { font-family:'Space Grotesk',sans-serif; font-size:1.5rem; font-weight:800; margin-bottom:.4rem; }
+  .future-title { font-weight:700; font-size:.95rem; margin-bottom:.5rem; }
+  .future-item  { display:flex; gap:.5rem; font-size:.76rem; color:var(--text2); margin-bottom:.3rem; line-height:1.4; }
+
+  /* ——— PROJECT CARD ——— */
+  .project-option { border-radius:14px; padding:1.1rem 1.3rem; background:var(--glass); border:1px solid var(--border); backdrop-filter:blur(12px); transition:transform .25s,border-color .25s; cursor:pointer; }
+  .project-option:hover { transform:translateY(-3px); }
+  .proj-icon  { font-size:2rem; margin-bottom:.5rem; }
+  .proj-title { font-weight:700; font-size:.92rem; margin-bottom:.3rem; }
+  .proj-desc  { font-size:.76rem; color:var(--text2); line-height:1.5; margin-bottom:.5rem; }
+  .proj-tools { display:flex; flex-wrap:wrap; gap:.3rem; }
+
+  /* ——— RUBRICA ——— */
+  .rubric-row { display:grid; grid-template-columns:2fr 1fr 1fr 1fr 0.7fr; gap:.5rem; padding:.6rem .8rem; border-radius:10px; align-items:center; font-size:.78rem; margin-bottom:.3rem; }
+  .rubric-header { background:rgba(0,245,160,.1); border:1px solid rgba(0,245,160,.25); font-weight:700; font-size:.72rem; text-transform:uppercase; letter-spacing:.07em; color:var(--c1); }
+  .rubric-row:not(.rubric-header) { background:var(--glass); border:1px solid var(--border); }
+  .rubric-row:not(.rubric-header):hover { border-color:rgba(0,245,160,.3); }
+  .rubric-level { text-align:center; padding:.2rem .4rem; border-radius:6px; font-size:.7rem; font-weight:600; }
+  .rl-e { background:rgba(0,245,160,.15); color:#5CFFD1; }
+  .rl-b { background:rgba(67,203,255,.15); color:#7DD8FF; }
+  .rl-s { background:rgba(255,179,71,.15); color:#FFD08A; }
+  .rl-pts{ font-weight:800; font-size:.85rem; color:var(--c1); text-align:center; }
+
+  /* ——— ETHICS ITEM ——— */
+  .ethics-item { display:flex; gap:1rem; padding:.95rem 1.1rem; border-radius:12px; border-left:3px solid; background:var(--glass); backdrop-filter:blur(8px); margin-bottom:.55rem; }
+
+  /* ——— CLOSING ——— */
+  .closing-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; width:100%; }
+  .cl-card { border-radius:14px; padding:1.1rem; text-align:center; background:var(--glass); border:1px solid var(--border); backdrop-filter:blur(12px); transition:transform .25s; }
+  .cl-card:hover { transform:translateY(-3px); }
+  .cl-icon  { font-size:2rem; margin-bottom:.5rem; }
+  .cl-label { font-weight:700; font-size:.85rem; margin-bottom:.2rem; }
+  .cl-sub   { font-size:.72rem; color:var(--text2); line-height:1.45; }
+
+  /* ——— GLOW RING ——— */
+  .glow-ring { width:180px; height:180px; border-radius:50%; border:1.5px solid rgba(0,245,160,.45); box-shadow:0 0 50px rgba(0,245,160,.25),inset 0 0 40px rgba(0,245,160,.12); display:flex; align-items:center; justify-content:center; font-size:3.5rem; margin-bottom:1.8rem; animation:pulse-ring 3s ease-in-out infinite; }
+  @keyframes pulse-ring { 0%,100%{box-shadow:0 0 50px rgba(0,245,160,.25),inset 0 0 40px rgba(0,245,160,.12)} 50%{box-shadow:0 0 80px rgba(0,245,160,.45),inset 0 0 60px rgba(0,245,160,.22)} }
+
+  /* ——— NAV ——— */
+  #nav { position:fixed; bottom:1.8rem; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:.9rem; background:rgba(10,10,20,.88); border:1px solid var(--border); border-radius:99px; padding:.55rem 1.1rem; backdrop-filter:blur(20px); z-index:100; }
+  .nav-btn { background:var(--glass); border:1px solid var(--border); border-radius:50%; width:34px; height:34px; color:var(--text); font-size:.9rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .2s,border-color .2s; }
+  .nav-btn:hover { background:rgba(0,245,160,.2); border-color:var(--c1); }
+  .nav-btn.home-btn { border-radius:8px; width:auto; padding:0 .8rem; font-size:.72rem; font-weight:600; }
+  #slide-counter { font-size:.78rem; font-weight:600; color:var(--text2); min-width:58px; text-align:center; }
+
+  /* ——— DOTS ——— */
+  #dots { position:fixed; right:1.3rem; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:.45rem; z-index:100; }
+  .dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.18); cursor:pointer; transition:background .3s,transform .3s; }
+  .dot.on { background:var(--c1); transform:scale(1.5); }
+
+  /* ——— PROGRESS ——— */
+  #progress-bar { position:fixed; top:0; left:0; height:3px; z-index:200; background:linear-gradient(90deg,var(--c1),var(--c2)); transition:width .4s ease; }
+
+  /* ——— COPYRIGHT & KB ——— */
+  #copyright { position:fixed; bottom:1.5rem; left:1.5rem; display:flex; align-items:center; gap:.5rem; font-size:.7rem; color:var(--text2); background:var(--glass); border:1px solid var(--border); border-radius:8px; padding:.38rem .8rem; backdrop-filter:blur(12px); z-index:100; }
+  #copyright span.name { font-weight:700; background:linear-gradient(135deg,var(--c1),var(--c2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  #kb-hint { position:fixed; top:1.3rem; right:1.3rem; font-size:.68rem; color:var(--text2); background:var(--glass); border:1px solid var(--border); border-radius:8px; padding:.38rem .75rem; backdrop-filter:blur(8px); z-index:100; }
+  kbd { display:inline-block; background:rgba(255,255,255,.1); border-radius:4px; padding:0 .32rem; font-family:inherit; font-size:.68rem; }
+
+  /* ——— PARTICLES ——— */
+  #particles { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+  .particle { position:absolute; border-radius:50%; opacity:.12; animation:float linear infinite; }
+  @keyframes float { 0%{transform:translateY(100vh) rotate(0deg);opacity:0} 10%{opacity:.12} 90%{opacity:.12} 100%{transform:translateY(-10vh) rotate(720deg);opacity:0} }
+
+  /* ——— BROWSER MOCKUP ——— */
+  .browser-mock { border-radius:12px; overflow:hidden; border:1px solid rgba(0,245,160,.3); background:#0d0d1a; }
+  .browser-bar  { background:#1a1a2e; padding:.5rem .9rem; display:flex; align-items:center; gap:.5rem; border-bottom:1px solid rgba(255,255,255,.07); }
+  .b-dot { width:10px; height:10px; border-radius:50%; }
+  .browser-url  { flex:1; background:rgba(255,255,255,.07); border-radius:6px; padding:.2rem .7rem; font-size:.68rem; color:var(--text2); margin:0 .5rem; font-family:'Courier New',monospace; }
+  .browser-body { padding:1rem; font-size:.76rem; line-height:1.6; }
+
+  /* ——— INTEGRATED FLOW ——— */
+  .flow-box { border-radius:14px; padding:1rem 1.2rem; background:var(--glass); border:1px solid var(--border); backdrop-filter:blur(10px); text-align:center; transition:transform .2s; }
+  .flow-box:hover { transform:translateY(-3px); }
+  .flow-emoji { font-size:2rem; margin-bottom:.4rem; }
+  .flow-label { font-size:.8rem; font-weight:700; margin-bottom:.15rem; }
+  .flow-tool  { font-size:.68rem; color:var(--text2); }
+  .flow-arrow { font-size:1.4rem; color:var(--c1); opacity:.5; display:flex; align-items:center; flex-shrink:0; }
+</style>
+</head>
+<body>
+
+<div id="particles"></div>
+<div id="progress-bar"></div>
+<div id="kb-hint"><kbd>←</kbd><kbd>→</kbd> navegar · <kbd>F</kbd> fullscreen</div>
+<div id="dots"></div>
+<div id="copyright">© 2026 &nbsp;<span class="name">Ing. Robert Farfan</span>&nbsp;· Docente</div>
+
+<div id="nav">
+  <button class="nav-btn home-btn" onclick="window.location.href='index.html'">🏠 Inicio</button>
+  <button class="nav-btn" id="prev">&#8592;</button>
+  <span id="slide-counter">1 / 16</span>
+  <button class="nav-btn" id="next">&#8594;</button>
+</div>
+
+<div id="deck">
+
+  <!-- ══════════════════════════════
+       SLIDE 1 — PORTADA CLASE 3
+  ══════════════════════════════ -->
+  <div class="slide bg-c3 active">
+    <div class="glow-ring">💡</div>
+    <div class="slide-tag">IA Generativa Aplicada · Clase 3 de 3</div>
+    <h1 class="hero">
+      Presentaciones, <span class="grad-green">Apps</span><br>
+      <span style="color:var(--text2);font-size:.75em">y Proyecto Final Integrador</span>
+    </h1>
+    <p class="lead" style="margin:1.2rem 0 2rem">
+      En la clase final crearás presentaciones interactivas con IA, explorarás el desarrollo
+      de apps sin código y presentarás tu proyecto integrador ante el grupo.
+    </p>
+    <div class="grid-4" style="max-width:580px;gap:.8rem">
+      <div class="stat-mini">
+        <div class="num grad-green">3</div>
+        <div class="lbl">Módulos</div>
+      </div>
+      <div class="stat-mini">
+        <div class="num" style="background:linear-gradient(135deg,var(--c2),#9D97FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent">5+</div>
+        <div class="lbl">Herramientas</div>
+      </div>
+      <div class="stat-mini">
+        <div class="num grad-pink">1</div>
+        <div class="lbl">Proyecto Final</div>
+      </div>
+      <div class="stat-mini">
+        <div class="num grad-gold">2h</div>
+        <div class="lbl">Intensivas</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:.7rem;flex-wrap:wrap;justify-content:center;margin-top:1.5rem">
+      <span class="badge bg-b">Claude</span>
+      <span class="badge bc">Qwen</span>
+      <span class="badge bp">Lovable</span>
+      <span class="badge bg-b">Google AI Studio</span>
+      <span class="badge bgd">Manus AI</span>
+      <span class="badge bpk">Proyecto Final</span>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SLIDE 2 — AGENDA
+  ══════════════════════════════ -->
+  <div class="slide bg-dark">
+    <div class="slide-tag">Hoja de Ruta</div>
+    <h2 class="section-title text-center">Agenda de la <span class="grad-green">Clase 3</span> — la gran final</h2>
+
+    <div class="full-width" style="max-width:860px">
+      <div class="agenda-item" style="border-color:rgba(0,245,160,.5)">
+        <div class="agenda-num">1</div>
+        <div class="agenda-time">0:00–0:25</div>
+        <div>
+          <div class="agenda-label">🌐 Presentaciones HTML interactivas con IA</div>
+          <div class="agenda-sub">Claude, Qwen y Manus AI — de un prompt a una presentación profesional</div>
+        </div>
+      </div>
+      <div class="agenda-item" style="border-color:rgba(67,203,255,.45)">
+        <div class="agenda-num">2</div>
+        <div class="agenda-time">0:25–0:50</div>
+        <div>
+          <div class="agenda-label">📱 Apps sin código con Lovable y AI Studio</div>
+          <div class="agenda-sub">Generar aplicaciones web funcionales desde una descripción en lenguaje natural</div>
+        </div>
+      </div>
+      <div class="agenda-item" style="border-color:rgba(108,99,255,.4)">
+        <div class="agenda-num">3</div>
+        <div class="agenda-time">0:50–1:10</div>
+        <div>
+          <div class="agenda-label">🔗 Flujo de trabajo integrado con múltiples IAs</div>
+          <div class="agenda-sub">Cómo combinar las herramientas de las 3 clases en un solo proyecto profesional</div>
+        </div>
+      </div>
+      <div class="agenda-item" style="border-color:rgba(255,101,132,.4)">
+        <div class="agenda-num">4</div>
+        <div class="agenda-time">1:10–1:30</div>
+        <div>
+          <div class="agenda-label">⚖️ Ética, riesgos y tendencias futuras de la IA</div>
+          <div class="agenda-sub">Deepfakes, propiedad intelectual, IA en 2027–2028 y reflexión colectiva</div>
+        </div>
+      </div>
+      <div class="agenda-item" style="border-color:rgba(255,179,71,.45)">
+        <div class="agenda-num">5</div>
+        <div class="agenda-time">1:30–2:00</div>
+        <div>
+          <div class="agenda-label">🏆 Presentación del Proyecto Final Integrador</div>
+          <div class="agenda-sub">Cada participante presenta su proyecto · Evaluación · Cierre del curso</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-2 full-width" style="max-width:860px;text-align:center;border-color:rgba(255,179,71,.35);padding:.8rem">
+      <span style="color:var(--c5);font-size:.82rem;font-weight:600">🎓 Al cerrar esta clase tendrás un portafolio de proyectos con IA que podrás mostrar en tu vida profesional.</span>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SLIDE 3 — PRESENTACIONES CON IA
+  ══════════════════════════════ -->
+  <div class="slide bg-green">
+    <div class="class-banner">
+      <div class="banner-num" style="color:var(--c1)">01</div>
+      <div>
+        <div class="slide-tag">Módulo 1 · Presentaciones</div>
+        <h2 class="section-title" style="margin-bottom:.2rem">Presentaciones <span class="grad-green">HTML interactivas</span> con IA</h2>
+        <p class="body">De un simple prompt a una presentación profesional animada como ésta</p>
+      </div>
+    </div>
+
+    <div class="grid-2 full-width">
+      <div style="display:flex;flex-direction:column;gap:.65rem">
+        <div class="feature-row" style="border-color:rgba(0,245,160,.5)">
+          <div class="feat-icon">🌐</div>
+          <div>
+            <h3 class="card-title" style="color:#5CFFD1">¿Por qué HTML y no PowerPoint?</h3>
+            <p class="body">Las presentaciones HTML son interactivas, funcionan en cualquier dispositivo sin instalar nada, pueden incluir animaciones, videos y datos en vivo, y se comparten con un simple enlace.</p>
+          </div>
+        </div>
+        <div class="feature-row" style="border-color:rgba(67,203,255,.4)">
+          <div class="feat-icon">⚡</div>
+          <div>
+            <h3 class="card-title" style="color:#7DD8FF">Claude — el mejor generador de HTML</h3>
+            <p class="body">Claude puede generar presentaciones completas con diseño moderno, animaciones CSS, navegación por teclado y múltiples diapositivas desde un único prompt bien construido.</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon">🌊</div>
+          <div>
+            <h3 class="card-title">Qwen y Manus AI — alternativas</h3>
+            <p class="body">Qwen (Alibaba) también genera presentaciones HTML de calidad. Manus AI puede crear presentaciones con estructura automática, pensado para uso empresarial y educativo.</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--c1);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem">⚡ Comparativa de herramientas</div>
+        <div class="tool-card" style="border-color:rgba(0,245,160,.45);margin-bottom:.7rem">
+          <div style="display:flex;align-items:center;gap:.8rem;margin-bottom:.4rem">
+            <span style="font-size:1.8rem">⚡</span>
+            <div>
+              <div class="tool-name" style="font-size:.95rem">Claude (Anthropic)</div>
+              <div class="tool-org">claude.ai · Acceso gratuito</div>
+            </div>
+          </div>
+          <div class="tool-item"><div class="bullet" style="background:var(--c1)"></div>HTML + CSS + JS en una sola respuesta</div>
+          <div class="tool-item"><div class="bullet" style="background:var(--c1)"></div>Diseños modernos con animaciones fluidas</div>
+          <div class="tool-item"><div class="bullet" style="background:var(--c1)"></div>Permite iterar y personalizar fácilmente</div>
+        </div>
+        <div class="grid-2" style="gap:.6rem">
+          <div class="tool-card" style="border-color:rgba(67,203,255,.4);padding:1rem">
+            <div style="font-size:1.5rem;margin-bottom:.3rem">🌊</div>
+            <div class="tool-name" style="font-size:.85rem">Qwen</div>
+            <div class="tool-org">qwen.ai · Gratuito</div>
+            <div class="tool-item" style="margin-top:.3rem"><div class="bullet" style="background:var(--c2)"></div>Alta capacidad multimodal</div>
+          </div>
+          <div class="tool-card" style="border-color:rgba(255,179,71,.4);padding:1rem">
+            <div style="font-size:1.5rem;margin-bottom:.3rem">🤖</div>
+            <div class="tool-name" style="font-size:.85rem">Manus AI</div>
+            <div class="tool-org">manus.im · Agente IA</div>
+            <div class="tool-item" style="margin-top:.3rem"><div class="bullet" style="background:var(--c5)"></div>Crea, sube y comparte online</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SLIDE 4 — DEMO: PROMPT PARA PRESENTACIÓN
+  ══════════════════════════════ -->
+  <div class="slide bg-dark">
+    <div class="slide-tag">Demo en Vivo · Presentaciones</div>
+    <h2 class="section-title text-center">Creamos <span class="grad-green">esta presentación</span> con un prompt</h2>
+    <p class="lead" style="font-size:.9rem;margin-bottom:1.3rem">Así se vería el prompt que le diste a Claude para generar una presentación como ésta</p>
+
+    <div class="grid-2 full-width">
+      <div>
+        <div class="prompt-box" style="margin-bottom:.8rem">
+<span class="ph">Crea una presentación HTML completa</span> para el<br>
+curso "<span class="pv">IA Generativa Aplicada</span>".<br><br>
+<span class="ph">Requisitos técnicos:</span><br>
+· <span class="po">Fondo oscuro</span> con partículas animadas<br>
+· Navegación con <span class="pv">flechas del teclado</span><br>
+· <span class="po">Gradientes modernos</span> en cian y verde<br>
+· Tipografía: <span class="pv">Space Grotesk + Inter</span><br>
+· Cards con <span class="po">efecto glassmorphism</span><br><br>
+<span class="ph">Contenido — 3 secciones:</span><br>
+1. Portada con <span class="pv">título y estadísticas</span><br>
+2. Temario de las <span class="po">3 clases</span> del curso<br>
+3. <span class="pv">Cierre</span> con herramientas y contacto<br><br>
+<span class="ph">Formato:</span> <span class="pv">un único archivo .html</span> autocontenido
+        </div>
+
+        <div class="card ac-g" style="padding:.9rem">
+          <div style="font-size:.72rem;font-weight:700;color:var(--c1);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">💡 Claves del prompt</div>
+          <div class="tool-item"><div class="bullet" style="background:var(--c1)"></div>Especificar estilo visual deseado</div>
+          <div class="tool-item"><div class="bullet" style="background:var(--c1)"></div>Listar funcionalidades de navegación</div>
+          <div class="tool-item"><div class="bullet" style="background:var(--c1)"></div>Detallar el contenido por secciones</div>
+          <div class="tool-item"><div class="bullet" style="background:var(--c1)"></div>Pedir archivo único autocontenido</div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--c1);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem">📋 Paso a paso — 15 minutos</div>
+        <div class="step-flow">
+          <div class="step" style="border-color:rgba(0,245,160,.5)">
+            <div class="step-num">1</div>
+            <div>
+              <div class="step-title">Abrir claude.ai o qwen.ai</div>
+              <div class="step-desc">Iniciar sesión con cuenta gratuita → nuevo chat</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(0,245,160,.4)">
+            <div class="step-num">2</div>
+            <div>
+              <div class="step-title">Escribir el prompt completo</div>
+              <div class="step-desc">Tema de tu clase o área profesional + estilo visual + secciones requeridas</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(67,203,255,.4)">
+            <div class="step-num" style="color:var(--c2)">3</div>
+            <div>
+              <div class="step-title">Copiar el HTML generado</div>
+              <div class="step-desc">Seleccionar todo el código → copiar al portapapeles</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(108,99,255,.4)">
+            <div class="step-num" style="color:#9D97FF">4</div>
+            <div>
+              <div class="step-title">Guardar como archivo .html</div>
+              <div class="step-desc">Notepad / VS Code → pegar → guardar como "presentacion_mi_tema.html"</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(255,179,71,.4)">
+            <div class="step-num" style="color:var(--c5)">5</div>
+            <div>
+              <div class="step-title">Abrir en navegador e iterar</div>
+              <div class="step-desc">Doble clic → ver resultado → volver a Claude con correcciones específicas</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SLIDE 5 — LOVABLE: APPS SIN CÓDIGO
+  ══════════════════════════════ -->
+  <div class="slide bg-blue">
+    <div class="class-banner">
+      <div class="banner-num" style="color:var(--c2)">02</div>
+      <div>
+        <div class="slide-tag blue">Módulo 2 · Apps sin código</div>
+        <h2 class="section-title" style="margin-bottom:.2rem"><span class="grad-purple">Lovable</span>: de la idea a la app en minutos</h2>
+        <p class="body">Describe tu aplicación en español y Lovable la construye con código real, base de datos y diseño profesional</p>
+      </div>
+    </div>
+
+    <div class="grid-2 full-width">
+      <div style="display:flex;flex-direction:column;gap:.65rem">
+        <div class="feature-row" style="border-color:rgba(67,203,255,.5)">
+          <div class="feat-icon">💙</div>
+          <div>
+            <h3 class="card-title" style="color:#7DD8FF">¿Qué es Lovable?</h3>
+            <p class="body">Una plataforma que usa IA (Claude) internamente para generar aplicaciones web React completas desde una descripción en lenguaje natural. Sin escribir código.</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon">⚙️</div>
+          <div>
+            <h3 class="card-title">Qué puede generar</h3>
+            <p class="body">Dashboards, formularios, gestores de tareas, calculadoras, quizzes, landing pages, portfolios, sistemas de votación y cualquier app web simple.</p>
+          </div>
+        </div>
+        <div class="feature-row" style="border-color:rgba(0,245,160,.4)">
+          <div class="feat-icon">🚀</div>
+          <div>
+            <h3 class="card-title" style="color:#5CFFD1">Publicación automática</h3>
+            <p class="body">Lovable despliega la aplicación online automáticamente con una URL pública. Puedes compartir el enlace al instante, sin configurar servidores.</p>
+          </div>
+        </div>
+        <div class="feature-row" style="border-color:rgba(255,179,71,.4)">
+          <div class="feat-icon">🔗</div>
+          <div>
+            <h3 class="card-title" style="color:var(--c5)">Integración con Supabase</h3>
+            <p class="body">Conecta automáticamente una base de datos real. Las apps pueden guardar, leer y actualizar datos persistentes sin configuración manual.</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--c2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem">📱 Apps educativas que puedes generar hoy</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.65rem">
+          <div class="card ac-b" style="padding:1rem;text-align:center">
+            <div style="font-size:1.8rem;margin-bottom:.35rem">📝</div>
+            <div style="font-weight:700;font-size:.85rem">Gestor de tareas</div>
+            <div style="font-size:.72rem;color:var(--text2)">Lista de actividades con fechas y prioridades</div>
+          </div>
+          <div class="card" style="padding:1rem;text-align:center;border-color:rgba(0,245,160,.4)">
+            <div style="font-size:1.8rem;margin-bottom:.35rem">❓</div>
+            <div style="font-weight:700;font-size:.85rem">Quiz interactivo</div>
+            <div style="font-size:.72rem;color:var(--text2)">Cuestionario con puntaje y retroalimentación</div>
+          </div>
+          <div class="card" style="padding:1rem;text-align:center;border-color:rgba(108,99,255,.4)">
+            <div style="font-size:1.8rem;margin-bottom:.35rem">📊</div>
+            <div style="font-weight:700;font-size:.85rem">Dashboard de notas</div>
+            <div style="font-size:.72rem;color:var(--text2)">Panel de control de calificaciones</div>
+          </div>
+          <div class="card" style="padding:1rem;text-align:center;border-color:rgba(255,179,71,.4)">
+            <div style="font-size:1.8rem;margin-bottom:.35rem">🗳️</div>
+            <div style="font-weight:700;font-size:.85rem">Votación en vivo</div>
+            <div style="font-size:.72rem;color:var(--text2)">Sistema de votos para dinámicas de clase</div>
+          </div>
+        </div>
+
+        <div class="card mt-2" style="border-color:rgba(255,193,7,.35);padding:.85rem;text-align:center">
+          <div style="font-size:.78rem;color:#FFD54F;font-weight:600">🌐 lovable.dev · Plan gratuito: 5 proyectos activos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SLIDE 6 — DEMO LOVABLE
+  ══════════════════════════════ -->
+  <div class="slide bg-dark">
+    <div class="slide-tag blue">Demo en Vivo · Lovable</div>
+    <h2 class="section-title text-center">Construimos una <span class="grad-purple">app real</span> desde un prompt</h2>
+
+    <div class="grid-2 full-width">
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:#9D97FF;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem">📋 Paso a paso — 15 minutos</div>
+        <div class="step-flow">
+          <div class="step" style="border-color:rgba(108,99,255,.5)">
+            <div class="step-num" style="color:#9D97FF">1</div>
+            <div>
+              <div class="step-title">Ir a lovable.dev</div>
+              <div class="step-desc">Crear cuenta gratuita con Google → "New Project"</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(108,99,255,.4)">
+            <div class="step-num" style="color:#9D97FF">2</div>
+            <div>
+              <div class="step-title">Escribir el prompt en el chat</div>
+              <div class="step-desc">Describir la app en detalle — qué hace, qué datos maneja, cómo se ve</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(67,203,255,.4)">
+            <div class="step-num" style="color:var(--c2)">3</div>
+            <div>
+              <div class="step-title">Observar la generación en tiempo real</div>
+              <div class="step-desc">Lovable muestra el código generándose y el preview de la app simultáneamente</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(0,245,160,.4)">
+            <div class="step-num">4</div>
+            <div>
+              <div class="step-title">Iterar con instrucciones en chat</div>
+              <div class="step-desc">"Agrega un botón de exportar" · "Cambia el color a verde" → se actualiza al instante</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(255,179,71,.4)">
+            <div class="step-num" style="color:var(--c5)">5</div>
+            <div>
+              <div class="step-title">Publicar y compartir el enlace</div>
+              <div class="step-desc">"Publish" → obtener URL pública → la app está online en segundos</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:.8rem">
+        <div class="prompt-box" style="border-color:rgba(108,99,255,.35)">
+<span class="ph">Crea una app web</span> de Quiz interactivo<br>
+para una clase universitaria.<br><br>
+<span class="ph">Funcionalidades:</span><br>
+· <span class="pv">5 preguntas de opción múltiple</span> sobre IA<br>
+· Mostrar si la respuesta es <span class="po">correcta o incorrecta</span><br>
+· <span class="pv">Puntaje final</span> al terminar con porcentaje<br>
+· Botón de <span class="po">"Intentar de nuevo"</span><br>
+· Diseño moderno con <span class="pv">colores oscuros</span><br><br>
+<span class="ph">Tecnología:</span> <span class="pv">React</span> con diseño <span class="po">responsive</span>
+        </div>
+
+        <div class="browser-mock">
+          <div class="browser-bar">
+            <div class="b-dot" style="background:#FF5F57"></div>
+            <div class="b-dot" style="background:#FFBD2E"></div>
+            <div class="b-dot" style="background:#28C941"></div>
+            <div class="browser-url">app.lovable.dev/quiz-ia-universitario</div>
+          </div>
+          <div class="browser-body">
+            <div style="color:var(--c1);font-weight:700;margin-bottom:.4rem">🎓 Quiz: IA Generativa</div>
+            <div style="color:var(--text2);font-size:.72rem;margin-bottom:.5rem">Pregunta 3 de 5</div>
+            <div style="background:rgba(0,245,160,.08);border:1px solid rgba(0,245,160,.3);border-radius:8px;padding:.5rem .7rem;font-size:.75rem;margin-bottom:.4rem">¿Qué significa LLM en el contexto de la IA?</div>
+            <div style="display:flex;flex-direction:column;gap:.25rem">
+              <div style="background:rgba(255,255,255,.05);border-radius:6px;padding:.35rem .6rem;font-size:.72rem">◯ Large Language Model</div>
+              <div style="background:rgba(0,245,160,.15);border:1px solid rgba(0,245,160,.4);border-radius:6px;padding:.35rem .6rem;font-size:.72rem;color:#5CFFD1">◉ Large Language Model ✓</div>
+              <div style="background:rgba(255,255,255,.05);border-radius:6px;padding:.35rem .6rem;font-size:.72rem">◯ Linear Learning Machine</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SLIDE 7 — GOOGLE AI STUDIO
+  ══════════════════════════════ -->
+  <div class="slide bg-green">
+    <div class="slide-tag">Herramienta Avanzada</div>
+    <h2 class="section-title text-center"><span class="grad-green">Google AI Studio</span>: el laboratorio de Gemini</h2>
+    <p class="lead" style="font-size:.9rem;margin-bottom:1.3rem">La plataforma de Google para experimentar con los modelos Gemini más avanzados, incluyendo capacidades que ninguna otra herramienta tiene</p>
+
+    <div class="grid-3 full-width">
+      <div class="card ac-g">
+        <div style="font-size:2rem;margin-bottom:.6rem">🎥</div>
+        <h3 class="card-title grad-green">Video en vivo</h3>
+        <p class="body" style="font-size:.8rem">Comparte tu pantalla o cámara con Gemini y recibe análisis, respuestas y asistencia en tiempo real mientras trabajas.</p>
+        <div style="margin-top:.6rem;font-size:.72rem;color:var(--c1);font-weight:600">→ Ideal para: tutorías, revisión de trabajos en vivo</div>
+      </div>
+
+      <div class="card ac-b">
+        <div style="font-size:2rem;margin-bottom:.6rem">📄</div>
+        <h3 class="card-title" style="color:#7DD8FF">Análisis de documentos masivos</h3>
+        <p class="body" style="font-size:.8rem">Sube PDFs de cientos de páginas, videos de horas de duración o bases de código completas. Gemini 2.5 Pro tiene contexto de 1M+ tokens.</p>
+        <div style="margin-top:.6rem;font-size:.72rem;color:var(--c2);font-weight:600">→ Ideal para: investigación académica profunda</div>
+      </div>
+
+      <div class="card" style="border-color:rgba(108,99,255,.4)">
+        <div style="font-size:2rem;margin-bottom:.6rem">💻</div>
+        <h3 class="card-title" style="color:#9D97FF">Generación de código avanzada</h3>
+        <p class="body" style="font-size:.8rem">Genera, depura y ejecuta código Python, JavaScript y más directamente en el navegador. Ideal para crear scripts y automatizaciones.</p>
+        <div style="margin-top:.6rem;font-size:.72rem;color:#9D97FF;font-weight:600">→ Ideal para: prototipos rápidos y automatización</div>
+      </div>
+
+      <div class="card" style="border-color:rgba(255,179,71,.4)">
+        <div style="font-size:2rem;margin-bottom:.6rem">🎨</div>
+        <h3 class="card-title" style="color:var(--c5)">Generación multimodal</h3>
+        <p class="body" style="font-size:.8rem">Imagen + texto + audio en una sola conversación. Gemini puede ver imágenes que le muestras y generar respuestas que mezclan todos los formatos.</p>
+        <div style="margin-top:.6rem;font-size:.72rem;color:var(--c5);font-weight:600">→ Ideal para: contenido educativo enriquecido</div>
+      </div>
+
+      <div class="card" style="border-color:rgba(255,101,132,.4)">
+        <div style="font-size:2rem;margin-bottom:.6rem">🔧</div>
+        <h3 class="card-title" style="color:#FF9DB0">API gratuita para desarrolladores</h3>
+        <p class="body" style="font-size:.8rem">Obtén una clave API gratuita para integrar Gemini en tus propias aplicaciones y proyectos sin costo inicial.</p>
+        <div style="margin-top:.6rem;font-size:.72rem;color:var(--c4);font-weight:600">→ Ideal para: crear tus propias herramientas IA</div>
+      </div>
+
+      <div class="card ac-g" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:.6rem">
+        <div style="font-size:2.5rem">🌐</div>
+        <div style="font-weight:700;font-size:.95rem">aistudio.google.com</div>
+        <div style="font-size:.75rem;color:var(--text2);line-height:1.5">Acceso gratuito con cuenta Google.<br>Sin tarjeta de crédito requerida.</div>
+        <span class="badge bg-b">Gratis</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SLIDE 8 — FLUJO INTEGRADO
+  ══════════════════════════════ -->
+  <div class="slide bg-purple">
+    <div class="class-banner">
+      <div class="banner-num" style="color:var(--c3)">03</div>
+      <div>
+        <div class="slide-tag purple">Módulo 3 · Integración</div>
+        <h2 class="section-title" style="margin-bottom:.2rem">Flujo de trabajo <span class="grad-purple">integrado con múltiples IAs</span></h2>
+        <p class="body">Cómo combinar todas las herramientas de las 3 clases en un proyecto coherente y profesional</p>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:.5rem;width:100%;margin-bottom:1.5rem;overflow-x:auto">
+      <div class="flow-box" style="border-color:rgba(0,245,160,.4)">
+        <div class="flow-emoji">📄</div>
+        <div class="flow-label">Investigación</div>
+        <div class="flow-tool">NotebookLM</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="border-color:rgba(108,99,255,.4)">
+        <div class="flow-emoji">✍️</div>
+        <div class="flow-label">Redacción</div>
+        <div class="flow-tool">Claude / ChatGPT</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="border-color:rgba(67,203,255,.4)">
+        <div class="flow-emoji">🖼️</div>
+        <div class="flow-label">Imágenes</div>
+        <div class="flow-tool">DALL·E / Nano Banana</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="border-color:rgba(255,101,132,.4)">
+        <div class="flow-emoji">🎤</div>
+        <div class="flow-label">Narración</div>
+        <div class="flow-tool">ElevenLabs</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="border-color:rgba(0,245,160,.4)">
+        <div class="flow-emoji">🎵</div>
+        <div class="flow-label">Música</div>
+        <div class="flow-tool">Suno AI</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="border-color:rgba(255,179,71,.4)">
+        <div class="flow-emoji">🎬</div>
+        <div class="flow-label">Video</div>
+        <div class="flow-tool">Veo 3 / Kling</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="border-color:rgba(108,99,255,.4)">
+        <div class="flow-emoji">🌐</div>
+        <div class="flow-label">Presentación</div>
+        <div class="flow-tool">Claude HTML</div>
+      </div>
+    </div>
+
+    <div class="grid-3 full-width">
+      <div class="card ac-g" style="padding:1rem">
+        <div style="font-size:.72rem;font-weight:700;color:var(--c1);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">🎓 Proyecto educativo completo</div>
+        <div class="tool-item"><div class="bullet" style="background:var(--c1)"></div>NotebookLM → analiza bibliografía del tema</div>
+        <div class="tool-item"><div class="bullet" style="background:var(--c1)"></div>Claude → redacta el contenido de la clase</div>
+        <div class="tool-item"><div class="bullet" style="background:var(--c1)"></div>DALL·E → imágenes ilustrativas del tema</div>
+        <div class="tool-item"><div class="bullet" style="background:var(--c1)"></div>ElevenLabs → narración para video-clase</div>
+        <div class="tool-item"><div class="bullet" style="background:var(--c1)"></div>Claude HTML → presentación final</div>
+      </div>
+      <div class="card ac-p" style="padding:1rem">
+        <div style="font-size:.72rem;font-weight:700;color:#9D97FF;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">📱 App + contenido de marketing</div>
+        <div class="tool-item"><div class="bullet" style="background:#9D97FF"></div>ChatGPT → estrategia de contenido</div>
+        <div class="tool-item"><div class="bullet" style="background:#9D97FF"></div>DALL·E → imágenes para redes sociales</div>
+        <div class="tool-item"><div class="bullet" style="background:#9D97FF"></div>Suno + ElevenLabs → jingle de marca</div>
+        <div class="tool-item"><div class="bullet" style="background:#9D97FF"></div>CapCut → reels automatizados</div>
+        <div class="tool-item"><div class="bullet" style="background:#9D97FF"></div>Lovable → landing page de campaña</div>
+      </div>
+      <div class="card ac-gd" style="padding:1rem">
+        <div style="font-size:.72rem;font-weight:700;color:var(--c5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">🔬 Investigación y publicación</div>
+        <div class="tool-item"><div class="bullet" style="background:var(--c5)"></div>NotebookLM → síntesis de 20 artículos</div>
+        <div class="tool-item"><div class="bullet" style="background:var(--c5)"></div>Gemini AI Studio → análisis de datos</div>
+        <div class="tool-item"><div class="bullet" style="background:var(--c5)"></div>Claude → redacción del paper</div>
+        <div class="tool-item"><div class="bullet" style="background:var(--c5)"></div>DALL·E → infografías del estudio</div>
+        <div class="tool-item"><div class="bullet" style="background:var(--c5)"></div>Claude HTML → presentación de resultados</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SLIDE 9 — ÉTICA Y RIESGOS PROFUNDOS
+  ══════════════════════════════ -->
+  <div class="slide bg-pink">
+    <div class="slide-tag pink">Reflexión Crítica</div>
+    <h2 class="section-title text-center">⚖️ Ética, riesgos y <span class="grad-pink">responsabilidad</span> con la IA</h2>
+
+    <div class="grid-2 full-width">
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--c4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem">🔴 Riesgos reales que debemos conocer</div>
+        <div class="ethics-item" style="border-color:var(--c4);margin-bottom:.55rem">
+          <div style="font-size:1.4rem;flex-shrink:0">🎭</div>
+          <div>
+            <h3 class="card-title" style="font-size:.9rem;color:#FF9DB0">Deepfakes y manipulación visual</h3>
+            <p class="body" style="font-size:.78rem">Videos falsos de políticos, docentes o figuras públicas ya circulan masivamente. La detección es cada vez más difícil para el ojo humano sin herramientas especializadas.</p>
+          </div>
+        </div>
+        <div class="ethics-item" style="border-color:var(--c5);margin-bottom:.55rem">
+          <div style="font-size:1.4rem;flex-shrink:0">📰</div>
+          <div>
+            <h3 class="card-title" style="font-size:.9rem;color:#FFD08A">Desinformación a escala industrial</h3>
+            <p class="body" style="font-size:.78rem">La IA puede producir miles de artículos falsos, comentarios y publicaciones en segundos. Las "granjas de contenido" IA representan un riesgo para la democracia informativa.</p>
+          </div>
+        </div>
+        <div class="ethics-item" style="border-color:#9D97FF">
+          <div style="font-size:1.4rem;flex-shrink:0">©️</div>
+          <div>
+            <h3 class="card-title" style="font-size:.9rem;color:#9D97FF">Propiedad intelectual en disputa</h3>
+            <p class="body" style="font-size:.78rem">Los modelos se entrenaron con obras protegidas. Hay demandas activas de artistas, escritores y músicos contra OpenAI, Stability AI y otros. El marco legal aún no existe.</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--c1);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem">🟢 Marco para el uso responsable</div>
+        <div class="ethics-item" style="border-color:var(--c1);margin-bottom:.55rem">
+          <div style="font-size:1.4rem;flex-shrink:0">🔍</div>
+          <div>
+            <h3 class="card-title" style="font-size:.9rem;color:#5CFFD1">Verificación siempre</h3>
+            <p class="body" style="font-size:.78rem">Ningún output de IA debe publicarse sin verificación humana. Buscar las fuentes originales, contrastar datos, cuestionar afirmaciones. La IA es asistente, no árbitro de verdad.</p>
+          </div>
+        </div>
+        <div class="ethics-item" style="border-color:var(--c2);margin-bottom:.55rem">
+          <div style="font-size:1.4rem;flex-shrink:0">🏷️</div>
+          <div>
+            <h3 class="card-title" style="font-size:.9rem;color:#7DD8FF">Transparencia y etiquetado</h3>
+            <p class="body" style="font-size:.78rem">Declarar siempre el uso de IA en creaciones académicas, periodísticas y comerciales. El ocultamiento genera desconfianza y puede tener consecuencias legales.</p>
+          </div>
+        </div>
+        <div class="ethics-item" style="border-color:var(--c5)">
+          <div style="font-size:1.4rem;flex-shrink:0">🎓</div>
+          <div>
+            <h3 class="card-title" style="font-size:.9rem;color:#FFD08A">Educación en alfabetización IA</h3>
+            <p class="body" style="font-size:.78rem">La respuesta al mal uso de la IA no es prohibirla sino educar sobre ella. Enseñar a detectar contenido falso, entender sesgos algorítmicos y usar IA con criterio.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SLIDE 10 — TENDENCIAS FUTURAS
+  ══════════════════════════════ -->
+  <div class="slide bg-multi">
+    <div class="slide-tag">Horizonte 2026–2028</div>
+    <h2 class="section-title text-center">El <span class="grad-green">futuro</span> que ya está construyéndose</h2>
+
+    <div class="grid-3 full-width">
+      <div class="future-card" style="border-color:rgba(0,245,160,.4)">
+        <div class="future-year grad-green">2026</div>
+        <div class="future-title">Agentes IA autónomos</div>
+        <div class="future-item"><div class="bullet" style="background:var(--c1);margin-top:.4rem"></div>Agentes que completan proyectos enteros sin supervisión constante</div>
+        <div class="future-item"><div class="bullet" style="background:var(--c1);margin-top:.4rem"></div>Computadoras operadas por IA (Computer Use)</div>
+        <div class="future-item"><div class="bullet" style="background:var(--c1);margin-top:.4rem"></div>Flujos de trabajo 100% automatizados para tareas repetitivas</div>
+        <div class="future-item"><div class="bullet" style="background:var(--c1);margin-top:.4rem"></div>IA con memoria persistente entre conversaciones</div>
+      </div>
+
+      <div class="future-card" style="border-color:rgba(67,203,255,.4)">
+        <div class="future-year" style="background:linear-gradient(135deg,var(--c2),#9D97FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent">2027</div>
+        <div class="future-title">Multimodalidad total</div>
+        <div class="future-item"><div class="bullet" style="background:var(--c2);margin-top:.4rem"></div>Video generativo de 10+ minutos con coherencia narrativa</div>
+        <div class="future-item"><div class="bullet" style="background:var(--c2);margin-top:.4rem"></div>Avatares digitales indistinguibles de personas reales</div>
+        <div class="future-item"><div class="bullet" style="background:var(--c2);margin-top:.4rem"></div>Modelos que aprenden en tiempo real de nuevas informaciones</div>
+        <div class="future-item"><div class="bullet" style="background:var(--c2);margin-top:.4rem"></div>IA personalizada por usuario con contexto propio</div>
+      </div>
+
+      <div class="future-card" style="border-color:rgba(108,99,255,.4)">
+        <div class="future-year grad-purple">2028</div>
+        <div class="future-title">IA ubicua y especializada</div>
+        <div class="future-item"><div class="bullet" style="background:#9D97FF;margin-top:.4rem"></div>Tutores IA personalizados para cada estudiante</div>
+        <div class="future-item"><div class="bullet" style="background:#9D97FF;margin-top:.4rem"></div>Asistentes de IA integrados en todos los dispositivos</div>
+        <div class="future-item"><div class="bullet" style="background:#9D97FF;margin-top:.4rem"></div>Modelos de IA especializados por disciplina académica</div>
+        <div class="future-item"><div class="bullet" style="background:#9D97FF;margin-top:.4rem"></div>Interfaces cerebrales + IA (investigación temprana)</div>
+      </div>
+    </div>
+
+    <div class="card mt-3 full-width" style="border-color:rgba(255,193,7,.4);padding:1rem;text-align:center">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;margin-bottom:.3rem">
+        "El mayor riesgo no es que la IA sea demasiado inteligente,<br>sino que las personas la usen sin suficiente pensamiento crítico."
+      </div>
+      <div style="font-size:.78rem;color:var(--text2)">— Reflexión colectiva del curso</div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SLIDE 11 — PROYECTO FINAL: OPCIONES
+  ══════════════════════════════ -->
+  <div class="slide bg-dark">
+    <div class="slide-tag gold">Proyecto Final Integrador</div>
+    <h2 class="section-title text-center">🏆 Elige y construye tu <span class="grad-gold">proyecto final</span></h2>
+    <p class="lead" style="font-size:.9rem;margin-bottom:1.3rem">Cada participante elige una opción y la desarrolla usando al menos 3 herramientas de IA del curso</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;width:100%">
+      <div class="project-option" style="border-color:rgba(0,245,160,.45)">
+        <div class="proj-icon">📚</div>
+        <div class="proj-title grad-green">Recurso educativo completo</div>
+        <div class="proj-desc">Diseña una clase o unidad didáctica sobre un tema de tu área. Incluye presentación, materiales, cuestionario y narración en audio.</div>
+        <div class="proj-tools">
+          <span class="badge bg-b">NotebookLM</span>
+          <span class="badge bc">Claude</span>
+          <span class="badge bc">ElevenLabs</span>
+        </div>
+      </div>
+
+      <div class="project-option" style="border-color:rgba(67,203,255,.45)">
+        <div class="proj-icon">📱</div>
+        <div class="proj-title" style="background:linear-gradient(135deg,var(--c2),#9D97FF);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Campaña de marketing digital</div>
+        <div class="proj-desc">Crea una campaña completa: imagen de marca, texto publicitario, jingle, reel para redes y landing page de producto o servicio.</div>
+        <div class="proj-tools">
+          <span class="badge bc">DALL·E</span>
+          <span class="badge bg-b">Suno</span>
+          <span class="badge bpk">CapCut</span>
+          <span class="badge bp">Lovable</span>
+        </div>
+      </div>
+
+      <div class="project-option" style="border-color:rgba(108,99,255,.45)">
+        <div class="proj-icon">🌐</div>
+        <div class="proj-title grad-purple">Presentación interactiva HTML</div>
+        <div class="proj-desc">Crea una presentación profesional en HTML sobre un tema de tu elección. Con animaciones, navegación y diseño moderno generado por IA.</div>
+        <div class="proj-tools">
+          <span class="badge bp">Claude</span>
+          <span class="badge bc">Qwen</span>
+          <span class="badge bg-b">NotebookLM</span>
+        </div>
+      </div>
+
+      <div class="project-option" style="border-color:rgba(255,101,132,.45)">
+        <div class="proj-icon">🎬</div>
+        <div class="proj-title grad-pink">Reel para redes sociales</div>
+        <div class="proj-desc">Produce un reel de 30–60 segundos sobre tu área profesional. Con imágenes, narración, música y subtítulos generados 100% con IA.</div>
+        <div class="proj-tools">
+          <span class="badge bpk">DALL·E</span>
+          <span class="badge bc">ElevenLabs</span>
+          <span class="badge bg-b">Suno</span>
+          <span class="badge bp">CapCut</span>
+        </div>
+      </div>
+
+      <div class="project-option" style="border-color:rgba(255,179,71,.45)">
+        <div class="proj-icon">💻</div>
+        <div class="proj-title grad-gold">App generada con prompts</div>
+        <div class="proj-desc">Crea una aplicación web funcional desde cero usando Lovable. Puede ser un quiz, un gestor de tareas, un formulario inteligente o cualquier herramienta educativa.</div>
+        <div class="proj-tools">
+          <span class="badge bgd">Lovable</span>
+          <span class="badge bc">Google AI Studio</span>
+          <span class="badge bp">Claude</span>
+        </div>
+      </div>
+
+      <div class="project-option" style="border-color:rgba(0,245,160,.35);background:linear-gradient(135deg,rgba(0,245,160,.06),rgba(67,203,255,.04))">
+        <div class="proj-icon">✨</div>
+        <div class="proj-title" style="color:var(--text)">Proyecto libre</div>
+        <div class="proj-desc">¿Tienes una idea propia? Propón tu proyecto al docente. Debe usar al menos 3 herramientas de IA del curso y demostrar un resultado concreto.</div>
+        <div class="proj-tools">
+          <span class="badge bg-b">Mínimo 3 herramientas</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SLIDE 12 — RÚBRICA DE EVALUACIÓN
+  ══════════════════════════════ -->
+  <div class="slide bg-green">
+    <div class="slide-tag">Evaluación</div>
+    <h2 class="section-title text-center">Rúbrica del <span class="grad-green">Proyecto Final</span></h2>
+    <p class="lead" style="font-size:.9rem;margin-bottom:1.2rem">Así se evaluará tu proyecto integrador — conoce los criterios antes de empezar</p>
+
+    <div class="full-width" style="max-width:880px">
+      <div class="rubric-row rubric-header">
+        <div>Criterio</div>
+        <div style="text-align:center">Excelente</div>
+        <div style="text-align:center">Bueno</div>
+        <div style="text-align:center">En desarrollo</div>
+        <div style="text-align:center">Pts</div>
+      </div>
+      <div class="rubric-row">
+        <div><strong style="font-size:.8rem">Uso de herramientas IA</strong><div style="font-size:.7rem;color:var(--text2)">Mínimo 3 herramientas integradas</div></div>
+        <div><span class="rubric-level rl-e">3+ herramientas integradas con fluidez</span></div>
+        <div><span class="rubric-level rl-b">2–3 herramientas con alguna integración</span></div>
+        <div><span class="rubric-level rl-s">Solo 1 herramienta o uso básico</span></div>
+        <div class="rl-pts">25</div>
+      </div>
+      <div class="rubric-row">
+        <div><strong style="font-size:.8rem">Calidad del resultado</strong><div style="font-size:.7rem;color:var(--text2)">Nivel de acabado profesional</div></div>
+        <div><span class="rubric-level rl-e">Resultado pulido, coherente y publicable</span></div>
+        <div><span class="rubric-level rl-b">Resultado correcto con detalles por mejorar</span></div>
+        <div><span class="rubric-level rl-s">Resultado incompleto o sin coherencia</span></div>
+        <div class="rl-pts">25</div>
+      </div>
+      <div class="rubric-row">
+        <div><strong style="font-size:.8rem">Prompting efectivo</strong><div style="font-size:.7rem;color:var(--text2)">Calidad de las instrucciones usadas</div></div>
+        <div><span class="rubric-level rl-e">Prompts elaborados con técnicas avanzadas</span></div>
+        <div><span class="rubric-level rl-b">Prompts claros con estructura básica</span></div>
+        <div><span class="rubric-level rl-s">Prompts genéricos sin iteración</span></div>
+        <div class="rl-pts">20</div>
+      </div>
+      <div class="rubric-row">
+        <div><strong style="font-size:.8rem">Presentación oral</strong><div style="font-size:.7rem;color:var(--text2)">Exposición al grupo (3–5 minutos)</div></div>
+        <div><span class="rubric-level rl-e">Clara, motivadora, domina el proceso</span></div>
+        <div><span class="rubric-level rl-b">Comprensible con alguna inseguridad</span></div>
+        <div><span class="rubric-level rl-s">Confusa o incompleta en la exposición</span></div>
+        <div class="rl-pts">20</div>
+      </div>
+      <div class="rubric-row">
+        <div><strong style="font-size:.8rem">Reflexión ética</strong><div style="font-size:.7rem;color:var(--text2)">Consideración de uso responsable</div></div>
+        <div><span class="rubric-level rl-e">Identifica riesgos y declara uso de IA</span></div>
+        <div><span class="rubric-level rl-b">Menciona el uso de IA en el proyecto</span></div>
+        <div><span class="rubric-level rl-s">No considera aspectos éticos</span></div>
+        <div class="rl-pts">10</div>
+      </div>
+    </div>
+
+    <div class="card mt-2 full-width" style="max-width:880px;border-color:rgba(255,193,7,.4);padding:.9rem;text-align:center">
+      <span style="color:#FFD54F;font-size:.82rem;font-weight:600">⭐ Puntaje total: 100 puntos · Lo más importante es demostrar que aprendiste a usar la IA como herramienta real en tu campo.</span>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SLIDE 13 — GUÍA DEL PROYECTO
+  ══════════════════════════════ -->
+  <div class="slide bg-dark">
+    <div class="slide-tag gold">Guía de Trabajo</div>
+    <h2 class="section-title text-center">Cómo ejecutar tu <span class="grad-gold">proyecto en 30 minutos</span></h2>
+
+    <div class="grid-2 full-width">
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--c5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem">⏱ Plan de trabajo — 30 minutos</div>
+        <div class="step-flow">
+          <div class="step" style="border-color:rgba(255,179,71,.5)">
+            <div class="step-num" style="color:var(--c5)">1</div>
+            <div>
+              <div class="step-title">Elegir el tipo de proyecto (2 min)</div>
+              <div class="step-desc">Decidir cuál de las 5 opciones se alinea mejor con tu área y objetivos</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(255,179,71,.4)">
+            <div class="step-num" style="color:var(--c5)">2</div>
+            <div>
+              <div class="step-title">Definir el tema y la audiencia (3 min)</div>
+              <div class="step-desc">¿Sobre qué? ¿Para quién? ¿Qué resultado concreto quieres obtener?</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(0,245,160,.4)">
+            <div class="step-num">3</div>
+            <div>
+              <div class="step-title">Seleccionar las herramientas (2 min)</div>
+              <div class="step-desc">Mínimo 3 herramientas · Abrir las pestañas necesarias antes de empezar</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(67,203,255,.4)">
+            <div class="step-num" style="color:var(--c2)">4</div>
+            <div>
+              <div class="step-title">Diseñar los prompts principales (5 min)</div>
+              <div class="step-desc">Escribir borradores de prompts antes de ejecutar. Usar las técnicas aprendidas.</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(108,99,255,.4)">
+            <div class="step-num" style="color:#9D97FF">5</div>
+            <div>
+              <div class="step-title">Ejecutar, iterar y producir (15 min)</div>
+              <div class="step-desc">Generar → revisar → ajustar → mejorar. La iteración es parte del proceso.</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(255,101,132,.4)">
+            <div class="step-num" style="color:var(--c4)">6</div>
+            <div>
+              <div class="step-title">Preparar la presentación oral (3 min)</div>
+              <div class="step-desc">Qué hiciste · Qué herramientas usaste · Qué aprendiste · Resultado final</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:.8rem">
+        <div class="card ac-gd" style="padding:1.1rem">
+          <div style="font-size:.72rem;font-weight:700;color:var(--c5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem">📋 Check-list antes de presentar</div>
+          <div class="deliverable" style="background:rgba(0,245,160,.08)"><div class="del-icon">✅</div>El resultado final está terminado o avanzado</div>
+          <div class="deliverable" style="background:rgba(0,245,160,.08)"><div class="del-icon">✅</div>Usé al menos 3 herramientas de IA</div>
+          <div class="deliverable" style="background:rgba(0,245,160,.08)"><div class="del-icon">✅</div>Puedo mostrar el proceso (prompts usados)</div>
+          <div class="deliverable" style="background:rgba(0,245,160,.08)"><div class="del-icon">✅</div>Mencionaré el uso de IA explícitamente</div>
+          <div class="deliverable" style="background:rgba(0,245,160,.08)"><div class="del-icon">✅</div>Preparé qué decir en 3–5 minutos</div>
+        </div>
+
+        <div class="card ac-g" style="padding:1.1rem">
+          <div style="font-size:.72rem;font-weight:700;color:var(--c1);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">💡 Consejo del docente</div>
+          <p class="body" style="font-size:.82rem">No busques la perfección — busca demostrar el <strong style="color:var(--text)">proceso de trabajo con IA</strong>. Un resultado imperfecto con buen proceso es mejor que uno perfecto sin entender cómo se hizo.</p>
+        </div>
+
+        <div class="card" style="border-color:rgba(255,101,132,.35);padding:.9rem;text-align:center">
+          <div style="font-size:1.3rem;margin-bottom:.3rem">🎤</div>
+          <div style="font-weight:700;font-size:.88rem;margin-bottom:.2rem">Presentación: 3 a 5 minutos</div>
+          <div style="font-size:.76rem;color:var(--text2)">Mostrar el resultado · explicar el proceso · reflexión personal</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SLIDE 14 — SHOWCASE / EXPOSICIÓN
+  ══════════════════════════════ -->
+  <div class="slide bg-multi">
+    <div class="slide-tag">Exposición Final</div>
+    <h2 class="section-title text-center">🎤 Showcase: <span class="grad-green">presentamos nuestros proyectos</span></h2>
+    <p class="lead" style="font-size:.92rem;margin-bottom:1.5rem">Cada participante tiene 3–5 minutos para mostrar su trabajo al grupo. Aprenderemos tanto de los logros como de los desafíos.</p>
+
+    <div class="grid-3 full-width mb-2">
+      <div class="card ac-g" style="text-align:center;padding:1.3rem">
+        <div style="font-size:2.5rem;margin-bottom:.6rem">🎯</div>
+        <h3 class="card-title grad-green">Mostrar el resultado</h3>
+        <p class="body" style="font-size:.8rem">Presenta el producto final: la presentación, el reel, la app o el material educativo. Que el grupo pueda verlo y experimentarlo.</p>
+      </div>
+      <div class="card ac-b" style="text-align:center;padding:1.3rem">
+        <div style="font-size:2.5rem;margin-bottom:.6rem">🔍</div>
+        <h3 class="card-title" style="color:#7DD8FF">Explicar el proceso</h3>
+        <p class="body" style="font-size:.8rem">Comparte qué herramientas usaste, cómo construiste los prompts y qué iteraciones hiciste. El proceso es tan valioso como el resultado.</p>
+      </div>
+      <div class="card ac-p" style="text-align:center;padding:1.3rem">
+        <div style="font-size:2.5rem;margin-bottom:.6rem">💡</div>
+        <h3 class="card-title" style="color:#9D97FF">Reflexión personal</h3>
+        <p class="body" style="font-size:.8rem">¿Qué fue lo más sorprendente? ¿Qué fue difícil? ¿Cómo vas a aplicar esto en tu trabajo o estudio desde mañana?</p>
+      </div>
+    </div>
+
+    <div class="card full-width" style="border-color:rgba(255,193,7,.4);padding:1.2rem">
+      <div style="display:flex;align-items:center;gap:1.5rem">
+        <div style="font-size:3rem">🏆</div>
+        <div style="flex:1">
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1rem;margin-bottom:.5rem;color:#FFD54F">Criterios de reconocimiento del grupo</div>
+          <div style="display:flex;gap:.7rem;flex-wrap:wrap">
+            <span class="badge bg-b">Más creativo</span>
+            <span class="badge bc">Más completo</span>
+            <span class="badge bp">Mejor aplicación educativa</span>
+            <span class="badge bgd">Mejor prompting</span>
+            <span class="badge bpk">Más sorprendente</span>
+          </div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:2rem;font-weight:800;color:#FFD54F">5'</div>
+          <div style="font-size:.72rem;color:var(--text2)">por participante</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SLIDE 15 — REFLEXIÓN COLECTIVA
+  ══════════════════════════════ -->
+  <div class="slide bg-purple">
+    <div class="slide-tag purple">Reflexión Final del Curso</div>
+    <h2 class="section-title text-center">Del miedo a la <span class="grad-purple">maestría</span>: lo que aprendiste</h2>
+
+    <div class="grid-2 full-width">
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:#9D97FF;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem">🧠 Preguntas para reflexionar (en grupo)</div>
+        <div class="feature-row" style="border-color:rgba(108,99,255,.5);padding:.85rem 1rem">
+          <div style="font-size:1.3rem;flex-shrink:0">1️⃣</div>
+          <p class="body" style="font-size:.85rem">¿Qué herramienta de las 3 clases tiene mayor potencial de impacto en tu área profesional o educativa? ¿Por qué?</p>
+        </div>
+        <div class="feature-row" style="border-color:rgba(108,99,255,.45);padding:.85rem 1rem">
+          <div style="font-size:1.3rem;flex-shrink:0">2️⃣</div>
+          <p class="body" style="font-size:.85rem">¿Cómo ha cambiado tu percepción de la IA después del curso? ¿Qué pensabas antes y qué piensas ahora?</p>
+        </div>
+        <div class="feature-row" style="border-color:rgba(67,203,255,.4);padding:.85rem 1rem">
+          <div style="font-size:1.3rem;flex-shrink:0">3️⃣</div>
+          <p class="body" style="font-size:.85rem">¿Cuál es la primera tarea concreta de tu trabajo o estudio en la que vas a usar IA esta misma semana?</p>
+        </div>
+        <div class="feature-row" style="border-color:rgba(0,245,160,.4);padding:.85rem 1rem">
+          <div style="font-size:1.3rem;flex-shrink:0">4️⃣</div>
+          <p class="body" style="font-size:.85rem">¿Qué responsabilidad ética crees que tienes como docente, creador o profesional al usar IA Generativa?</p>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:.8rem">
+        <div style="font-size:.72rem;font-weight:700;color:var(--c1);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.3rem">📈 Tu evolución en estas 3 clases</div>
+
+        <div class="card ac-g" style="padding:1rem">
+          <div style="font-size:.72rem;font-weight:700;color:var(--c1);margin-bottom:.6rem">ANTES del curso pensabas...</div>
+          <div class="tool-item" style="margin-bottom:.3rem"><div class="bullet" style="background:var(--c4)"></div>"La IA es solo un chatbot que contesta preguntas"</div>
+          <div class="tool-item" style="margin-bottom:.3rem"><div class="bullet" style="background:var(--c4)"></div>"Para usar IA necesito saber programar"</div>
+          <div class="tool-item"><div class="bullet" style="background:var(--c4)"></div>"Generar imágenes profesionales requiere diseñadores"</div>
+        </div>
+
+        <div class="card" style="border-color:rgba(0,245,160,.4);padding:1rem">
+          <div style="font-size:.72rem;font-weight:700;color:var(--c1);margin-bottom:.6rem">DESPUÉS del curso sabes que...</div>
+          <div class="tool-item" style="margin-bottom:.3rem"><div class="bullet" style="background:var(--c1)"></div>La IA es un ecosistema de +700 herramientas especializadas</div>
+          <div class="tool-item" style="margin-bottom:.3rem"><div class="bullet" style="background:var(--c1)"></div>El prompting efectivo es la nueva habilidad digital esencial</div>
+          <div class="tool-item"><div class="bullet" style="background:var(--c1)"></div>Puedes crear multimedia, apps y presentaciones en horas</div>
+        </div>
+
+        <div class="card" style="border-color:rgba(255,193,7,.4);padding:.9rem;text-align:center;background:linear-gradient(135deg,rgba(255,179,71,.08),rgba(0,245,160,.06))">
+          <div style="font-size:1.5rem;margin-bottom:.3rem">🚀</div>
+          <div style="font-weight:700;font-size:.9rem;margin-bottom:.2rem;color:#FFD54F">El aprendizaje no termina aquí</div>
+          <div style="font-size:.76rem;color:var(--text2);line-height:1.5">La IA evoluciona cada semana. Sigue explorando, experimentando y compartiendo lo que descubres.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       SLIDE 16 — CIERRE DEL CURSO
+  ══════════════════════════════ -->
+  <div class="slide bg-c3">
+    <div class="slide-tag">Cierre del Curso · Clase 3 de 3</div>
+    <h2 class="section-title text-center" style="margin-bottom:1rem">
+      ¡Felicitaciones, <span class="grad-green">lo lograste</span>! 🎉
+    </h2>
+    <p class="lead" style="font-size:.95rem;margin-bottom:1.5rem">Completaste el curso de IA Generativa Aplicada. Ya tienes las herramientas, los conocimientos y la práctica para transformar tu manera de trabajar y crear.</p>
+
+    <div class="closing-grid">
+      <div class="cl-card" style="border-color:rgba(108,99,255,.5)">
+        <div class="cl-icon">🔬</div>
+        <div class="cl-label" style="color:#9D97FF">Clase 1</div>
+        <div class="cl-sub">IA para investigar, organizar y crear conocimiento con ChatGPT, Gemini, Claude y NotebookLM</div>
+      </div>
+      <div class="cl-card" style="border-color:rgba(67,203,255,.5)">
+        <div class="cl-icon">🎨</div>
+        <div class="cl-label" style="color:#7DD8FF">Clase 2</div>
+        <div class="cl-sub">Creación multimedia: imagen, voz, música y video generativos con herramientas de última generación</div>
+      </div>
+      <div class="cl-card" style="border-color:rgba(0,245,160,.5)">
+        <div class="cl-icon">💡</div>
+        <div class="cl-label grad-green">Clase 3</div>
+        <div class="cl-sub">Presentaciones HTML, apps sin código, integración de herramientas y proyecto final integrador</div>
+      </div>
+      <div class="cl-card" style="border-color:rgba(255,179,71,.5);background:linear-gradient(135deg,rgba(255,179,71,.08),rgba(0,245,160,.05))">
+        <div class="cl-icon">🏆</div>
+        <div class="cl-label grad-gold">Tú</div>
+        <div class="cl-sub">Dominas el prompting, creas contenido profesional y usas la IA como herramienta de trabajo real</div>
+      </div>
+    </div>
+
+    <div class="card mt-3 full-width" style="border-color:rgba(0,245,160,.5);padding:1.3rem">
+      <div style="display:flex;align-items:center;gap:1.5rem">
+        <div style="font-size:3rem">🎓</div>
+        <div style="flex:1">
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:.3rem">
+            <span class="grad-green">IA Generativa Aplicada</span> · Completado
+          </div>
+          <div style="font-size:.82rem;color:var(--text2)">Docente: <strong style="color:var(--text)">Ing. Robert Farfan</strong> · Modalidad virtual sincrónica · 3 clases · 6 horas</div>
+          <div style="display:flex;gap:.5rem;margin-top:.6rem;flex-wrap:wrap">
+            <span class="badge bg-b">Investigación IA</span>
+            <span class="badge bc">Multimedia IA</span>
+            <span class="badge bp">Apps sin código</span>
+            <span class="badge bgd">Prompting avanzado</span>
+            <span class="badge bpk">Uso ético</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button onclick="window.location.href='index.html'" style="margin-top:1.2rem;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:.6rem 1.4rem;color:var(--text);font-size:.82rem;font-weight:600;cursor:pointer;backdrop-filter:blur(10px);transition:border-color .2s" onmouseover="this.style.borderColor='rgba(0,245,160,.6)'" onmouseout="this.style.borderColor='var(--border)'">
+      ← Volver al curso principal
+    </button>
+  </div>
+
+</div><!-- end deck -->
+
+<script>
+  // Particles
+  (function() {
+    const el = document.getElementById('particles');
+    const cols = ['#00F5A0','#43CBFF','#6C63FF','#FF6584','#FFB347'];
+    for (let i = 0; i < 20; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = 3 + Math.random() * 7;
+      p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;background:${cols[Math.floor(Math.random()*cols.length)]};animation-duration:${14+Math.random()*18}s;animation-delay:${-Math.random()*20}s;`;
+      el.appendChild(p);
+    }
+  })();
+
+  // Slide engine
+  const slides  = Array.from(document.querySelectorAll('.slide'));
+  const total   = slides.length;
+  let   current = 0;
+
+  const counter = document.getElementById('slide-counter');
+  const dotsEl  = document.getElementById('dots');
+  const progBar = document.getElementById('progress-bar');
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' on' : '');
+    d.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(d);
+  });
+
+  function updateUI() {
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('on', i === current));
+    counter.textContent = `${current + 1} / ${total}`;
+    progBar.style.width = `${((current + 1) / total) * 100}%`;
+  }
+
+  function goTo(idx) {
+    if (idx < 0 || idx >= total || idx === current) return;
+    slides[current].classList.remove('active');
+    slides[current].classList.add('exit');
+    const prev = current;
+    current = idx;
+    setTimeout(() => slides[prev].classList.remove('exit'), 450);
+    slides[current].classList.add('active');
+    updateUI();
+  }
+
+  document.getElementById('next').addEventListener('click', () => goTo(current + 1));
+  document.getElementById('prev').addEventListener('click', () => goTo(current - 1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); goTo(current + 1); }
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                    { e.preventDefault(); goTo(current - 1); }
+    if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  });
+
+  let touchX = 0;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; });
+  document.addEventListener('touchend',   e => {
+    const dx = touchX - e.changedTouches[0].clientX;
+    if (Math.abs(dx) > 50) goTo(current + (dx > 0 ? 1 : -1));
+  });
+
+  updateUI();
+</script>
+</body>
+</html>

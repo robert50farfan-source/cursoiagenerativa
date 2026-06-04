@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase 2 — Creación Multimedia con IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --c1: #43CBFF;   /* cyan — color dominante Clase 2 */
+    --c2: #FF6584;
+    --c3: #6C63FF;
+    --c4: #00F5A0;
+    --c5: #FFB347;
+    --dark: #0A0A14;
+    --glass: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.10);
+    --text: #E8E8F0;
+    --text2: #9898B8;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Inter',sans-serif; background:var(--dark); color:var(--text); overflow:hidden; height:100vh; width:100vw; }
+
+  /* ——— SLIDE ENGINE ——— */
+  #deck { width:100%; height:100%; position:relative; }
+  .slide {
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    justify-content:center; align-items:center;
+    padding:3.5rem 5.5rem;
+    opacity:0; pointer-events:none;
+    transform:translateX(60px);
+    transition:opacity .45s ease, transform .45s ease;
+  }
+  .slide.active { opacity:1; pointer-events:all; transform:translateX(0); }
+  .slide.exit   { opacity:0; transform:translateX(-60px); }
+
+  /* ——— BACKGROUNDS ——— */
+  .bg-c2    { background: radial-gradient(ellipse 80% 60% at 60% 0%, rgba(67,203,255,.38) 0%, var(--dark) 65%); }
+  .bg-dark  { background: var(--dark); }
+  .bg-cyan  { background: radial-gradient(ellipse 70% 55% at 15% 50%, rgba(67,203,255,.28) 0%, var(--dark) 65%); }
+  .bg-pink  { background: radial-gradient(ellipse 70% 55% at 85% 40%, rgba(255,101,132,.28) 0%, var(--dark) 65%); }
+  .bg-green { background: radial-gradient(ellipse 70% 55% at 50% 80%, rgba(0,245,160,.22) 0%, var(--dark) 65%); }
+  .bg-gold  { background: radial-gradient(ellipse 70% 55% at 20% 30%, rgba(255,179,71,.22) 0%, var(--dark) 65%); }
+  .bg-purple{ background: radial-gradient(ellipse 70% 55% at 80% 60%, rgba(108,99,255,.25) 0%, var(--dark) 65%); }
+  .bg-multi {
+    background:
+      radial-gradient(ellipse 50% 50% at 0% 0%,   rgba(67,203,255,.18) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 50% at 100% 100%,rgba(255,101,132,.15) 0%, transparent 55%),
+      var(--dark);
+  }
+
+  /* ——— LAYOUT ——— */
+  .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1.6rem; width:100%; }
+  .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.3rem; width:100%; }
+  .grid-4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:1rem; width:100%; }
+  .full-width { width:100%; }
+  .mt-1{margin-top:.5rem} .mt-2{margin-top:1rem} .mt-3{margin-top:1.5rem}
+  .mb-1{margin-bottom:.5rem} .mb-2{margin-bottom:1rem}
+  .text-center{text-align:center}
+
+  /* ——— TYPOGRAPHY ——— */
+  .slide-tag { font-size:.72rem; letter-spacing:.15em; text-transform:uppercase; font-weight:600; color:var(--c1); margin-bottom:.65rem; }
+  .slide-tag.pink   { color:var(--c2); }
+  .slide-tag.green  { color:var(--c4); }
+  .slide-tag.gold   { color:var(--c5); }
+  .slide-tag.purple { color:#9D97FF; }
+
+  h1.hero { font-family:'Space Grotesk',sans-serif; font-size:clamp(2.4rem,5vw,4rem); font-weight:800; line-height:1.05; text-align:center; letter-spacing:-.02em; }
+  h2.section-title { font-family:'Space Grotesk',sans-serif; font-size:clamp(1.6rem,3vw,2.4rem); font-weight:700; margin-bottom:1.2rem; line-height:1.15; }
+  h3.card-title { font-size:1rem; font-weight:700; margin-bottom:.35rem; }
+
+  p.lead { font-size:1.05rem; line-height:1.7; color:var(--text2); max-width:780px; text-align:center; }
+  p.body { font-size:.88rem; line-height:1.65; color:var(--text2); }
+
+  .grad-cyan  { background:linear-gradient(135deg,var(--c1),#9D97FF); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .grad-pink  { background:linear-gradient(135deg,var(--c2),var(--c5)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .grad-green { background:linear-gradient(135deg,var(--c4),var(--c1)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .grad-gold  { background:linear-gradient(135deg,var(--c5),var(--c2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+
+  /* ——— CARDS ——— */
+  .card { background:var(--glass); border:1px solid var(--border); border-radius:14px; padding:1.2rem 1.4rem; backdrop-filter:blur(12px); transition:transform .25s, border-color .25s; }
+  .card:hover { transform:translateY(-3px); border-color:rgba(67,203,255,.4); }
+  .ac { border-color:rgba(67,203,255,.4); }
+  .ac-pink   { border-color:rgba(255,101,132,.4); }
+  .ac-green  { border-color:rgba(0,245,160,.4); }
+  .ac-gold   { border-color:rgba(255,179,71,.4); }
+  .ac-purple { border-color:rgba(108,99,255,.4); }
+
+  /* ——— BADGE ——— */
+  .badge { display:inline-block; font-size:.68rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:.28rem .65rem; border-radius:99px; }
+  .bc  { background:rgba(67,203,255,.2);  color:#7DD8FF; border:1px solid rgba(67,203,255,.4); }
+  .bpk { background:rgba(255,101,132,.2); color:#FF9DB0; border:1px solid rgba(255,101,132,.4); }
+  .bg-b{ background:rgba(0,245,160,.2);   color:#5CFFD1; border:1px solid rgba(0,245,160,.4); }
+  .bgd { background:rgba(255,179,71,.18); color:#FFD08A; border:1px solid rgba(255,179,71,.4); }
+  .bp  { background:rgba(108,99,255,.2);  color:#9D97FF; border:1px solid rgba(108,99,255,.4); }
+
+  /* ——— FEATURE ROW ——— */
+  .feature-row { display:flex; align-items:flex-start; gap:.9rem; padding:.85rem 1.1rem; background:var(--glass); border:1px solid var(--border); border-radius:12px; margin-bottom:.55rem; backdrop-filter:blur(8px); }
+  .feat-icon { font-size:1.4rem; flex-shrink:0; margin-top:.1rem; }
+
+  /* ——— AGENDA ——— */
+  .agenda-item { display:flex; align-items:center; gap:1rem; padding:.75rem 1.2rem; background:var(--glass); border:1px solid var(--border); border-radius:12px; margin-bottom:.5rem; backdrop-filter:blur(8px); transition:border-color .2s; }
+  .agenda-item:hover { border-color:rgba(67,203,255,.5); }
+  .agenda-num  { font-family:'Space Grotesk',sans-serif; font-size:1.4rem; font-weight:800; color:rgba(67,203,255,.3); min-width:2rem; text-align:center; }
+  .agenda-time { font-size:.7rem; font-weight:700; color:var(--c1); text-transform:uppercase; letter-spacing:.08em; min-width:3.5rem; }
+  .agenda-label{ font-weight:600; font-size:.9rem; }
+  .agenda-sub  { font-size:.76rem; color:var(--text2); }
+
+  /* ——— TOOL CARD ——— */
+  .tool-card { border-radius:16px; padding:1.4rem; background:var(--glass); border:1px solid var(--border); backdrop-filter:blur(12px); display:flex; flex-direction:column; gap:.5rem; transition:transform .25s; }
+  .tool-card:hover { transform:translateY(-4px); }
+  .tool-logo { font-size:2.6rem; margin-bottom:.2rem; }
+  .tool-name { font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.05rem; }
+  .tool-org  { font-size:.72rem; color:var(--text2); margin-bottom:.3rem; }
+  .tool-item { display:flex; align-items:flex-start; gap:.4rem; font-size:.78rem; color:var(--text2); line-height:1.4; margin-bottom:.2rem; }
+  .bullet { width:5px; height:5px; border-radius:50%; flex-shrink:0; margin-top:.45rem; }
+
+  /* ——— PROMPT BOX ——— */
+  .prompt-box { background:#0d0d1a; border:1px solid rgba(67,203,255,.3); border-radius:12px; padding:1.1rem 1.4rem; font-family:'Courier New',monospace; font-size:.82rem; line-height:1.65; color:#c8c8e8; width:100%; position:relative; }
+  .prompt-box::before { content:'⌨ Prompt'; position:absolute; top:-.55rem; left:1rem; font-size:.62rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; background:var(--dark); padding:0 .5rem; color:var(--c1); font-family:'Inter',sans-serif; }
+  .ph { color:#7DD8FF; font-weight:600; }
+  .pv { color:#5CFFD1; }
+  .po { color:#FFD08A; }
+  .pp { color:#FF9DB0; }
+
+  /* ——— STEP FLOW ——— */
+  .step-flow { display:flex; flex-direction:column; gap:.5rem; width:100%; }
+  .step { display:flex; align-items:flex-start; gap:1rem; padding:.8rem 1.1rem; background:var(--glass); border:1px solid var(--border); border-radius:12px; backdrop-filter:blur(8px); }
+  .step-num   { font-family:'Space Grotesk',sans-serif; font-size:1.3rem; font-weight:800; color:var(--c1); min-width:1.8rem; flex-shrink:0; line-height:1; }
+  .step-title { font-weight:700; font-size:.9rem; margin-bottom:.15rem; }
+  .step-desc  { font-size:.78rem; color:var(--text2); line-height:1.45; }
+
+  /* ——— STAT BOX ——— */
+  .stat-mini { text-align:center; padding:1rem; background:var(--glass); border:1px solid var(--border); border-radius:14px; backdrop-filter:blur(12px); }
+  .stat-mini .num { font-family:'Space Grotesk',sans-serif; font-size:2rem; font-weight:800; line-height:1; margin-bottom:.2rem; }
+  .stat-mini .lbl { font-size:.72rem; color:var(--text2); text-transform:uppercase; letter-spacing:.07em; }
+
+  /* ——— CLASS BANNER ——— */
+  .class-banner { display:flex; align-items:center; gap:1.3rem; margin-bottom:1.8rem; width:100%; }
+  .banner-num { font-family:'Space Grotesk',sans-serif; font-size:4.5rem; font-weight:900; line-height:1; opacity:.13; flex-shrink:0; }
+
+  /* ——— ACTIVITY BOX ——— */
+  .activity-box { border-radius:16px; padding:1.4rem 1.6rem; border:1px solid; width:100%; }
+  .activity-header { display:flex; align-items:center; gap:.8rem; margin-bottom:1rem; }
+  .activity-icon { font-size:2rem; }
+  .activity-title { font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.05rem; }
+  .activity-sub   { font-size:.78rem; color:var(--text2); }
+
+  .deliverable { display:flex; align-items:center; gap:.7rem; padding:.6rem .9rem; background:rgba(255,255,255,.05); border-radius:10px; margin-bottom:.45rem; font-size:.82rem; font-weight:500; }
+  .del-icon { font-size:1.1rem; flex-shrink:0; }
+  .del-time { font-size:.68rem; font-weight:700; margin-left:auto; white-space:nowrap; }
+
+  /* ——— IMAGE GRID DEMO ——— */
+  .img-demo { border-radius:14px; padding:1rem; background:var(--glass); border:1px solid var(--border); text-align:center; backdrop-filter:blur(10px); }
+  .img-placeholder { width:100%; height:90px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:2rem; margin-bottom:.5rem; }
+  .img-prompt { font-size:.68rem; font-family:'Courier New',monospace; color:var(--text2); line-height:1.4; }
+
+  /* ——— AUDIO WAVEFORM VISUAL ——— */
+  .waveform { display:flex; align-items:center; gap:3px; height:40px; justify-content:center; margin:1rem 0; }
+  .wave-bar { width:4px; border-radius:99px; background:linear-gradient(180deg, var(--c1), rgba(67,203,255,.3)); animation: wave-anim 1.2s ease-in-out infinite; }
+  @keyframes wave-anim {
+    0%,100% { transform:scaleY(.3); }
+    50%      { transform:scaleY(1); }
+  }
+
+  /* ——— VIDEO CARD ——— */
+  .video-card { border-radius:16px; padding:1.3rem; background:var(--glass); border:1px solid var(--border); backdrop-filter:blur(12px); transition:transform .25s; }
+  .video-card:hover { transform:translateY(-3px); }
+  .video-icon  { font-size:2.4rem; margin-bottom:.4rem; }
+  .video-name  { font-weight:700; font-size:.95rem; margin-bottom:.2rem; }
+  .video-org   { font-size:.72rem; color:var(--text2); margin-bottom:.5rem; }
+  .video-tag   { font-size:.68rem; padding:.2rem .55rem; border-radius:6px; display:inline-block; margin:.15rem .15rem 0 0; font-weight:600; }
+
+  /* ——— CAPCUT STEPS ——— */
+  .capcut-step { display:flex; gap:.8rem; align-items:flex-start; padding:.75rem 1rem; background:var(--glass); border:1px solid var(--border); border-radius:12px; margin-bottom:.5rem; }
+  .capcut-num  { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.75rem; font-weight:800; flex-shrink:0; }
+
+  /* ——— CLOSING GRID ——— */
+  .closing-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; width:100%; }
+  .cl-card { border-radius:14px; padding:1.1rem; text-align:center; background:var(--glass); border:1px solid var(--border); backdrop-filter:blur(12px); transition:transform .25s; }
+  .cl-card:hover { transform:translateY(-3px); }
+  .cl-icon  { font-size:2rem; margin-bottom:.5rem; }
+  .cl-label { font-weight:700; font-size:.85rem; margin-bottom:.2rem; }
+  .cl-sub   { font-size:.72rem; color:var(--text2); line-height:1.45; }
+
+  /* ——— GLOW RING ——— */
+  .glow-ring { width:180px; height:180px; border-radius:50%; border:1.5px solid rgba(67,203,255,.45); box-shadow:0 0 50px rgba(67,203,255,.25), inset 0 0 40px rgba(67,203,255,.12); display:flex; align-items:center; justify-content:center; font-size:3.5rem; margin-bottom:1.8rem; animation:pulse-ring 3s ease-in-out infinite; }
+  @keyframes pulse-ring {
+    0%,100% { box-shadow:0 0 50px rgba(67,203,255,.25), inset 0 0 40px rgba(67,203,255,.12); }
+    50%      { box-shadow:0 0 80px rgba(67,203,255,.45), inset 0 0 60px rgba(67,203,255,.22); }
+  }
+
+  /* ——— NAV ——— */
+  #nav { position:fixed; bottom:1.8rem; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:.9rem; background:rgba(10,10,20,.88); border:1px solid var(--border); border-radius:99px; padding:.55rem 1.1rem; backdrop-filter:blur(20px); z-index:100; }
+  .nav-btn { background:var(--glass); border:1px solid var(--border); border-radius:50%; width:34px; height:34px; color:var(--text); font-size:.9rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .2s, border-color .2s; }
+  .nav-btn:hover { background:rgba(67,203,255,.25); border-color:var(--c1); }
+  .nav-btn.home-btn { border-radius:8px; width:auto; padding:0 .8rem; font-size:.72rem; font-weight:600; }
+  #slide-counter { font-size:.78rem; font-weight:600; color:var(--text2); min-width:58px; text-align:center; }
+
+  /* ——— DOTS ——— */
+  #dots { position:fixed; right:1.3rem; top:50%; transform:translateY(-50%); display:flex; flex-direction:column; gap:.45rem; z-index:100; }
+  .dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.18); cursor:pointer; transition:background .3s, transform .3s; }
+  .dot.on { background:var(--c1); transform:scale(1.5); }
+
+  /* ——— PROGRESS BAR ——— */
+  #progress-bar { position:fixed; top:0; left:0; height:3px; z-index:200; background:linear-gradient(90deg,var(--c1),var(--c2)); transition:width .4s ease; }
+
+  /* ——— COPYRIGHT & KB ——— */
+  #copyright { position:fixed; bottom:1.5rem; left:1.5rem; display:flex; align-items:center; gap:.5rem; font-size:.7rem; color:var(--text2); background:var(--glass); border:1px solid var(--border); border-radius:8px; padding:.38rem .8rem; backdrop-filter:blur(12px); z-index:100; }
+  #copyright span.name { font-weight:700; background:linear-gradient(135deg,var(--c1),var(--c2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  #kb-hint { position:fixed; top:1.3rem; right:1.3rem; font-size:.68rem; color:var(--text2); background:var(--glass); border:1px solid var(--border); border-radius:8px; padding:.38rem .75rem; backdrop-filter:blur(8px); z-index:100; }
+  kbd { display:inline-block; background:rgba(255,255,255,.1); border-radius:4px; padding:0 .32rem; font-family:inherit; font-size:.68rem; }
+
+  /* ——— PARTICLES ——— */
+  #particles { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+  .particle { position:absolute; border-radius:50%; opacity:.12; animation:float linear infinite; }
+  @keyframes float { 0%{transform:translateY(100vh) rotate(0deg);opacity:0} 10%{opacity:.12} 90%{opacity:.12} 100%{transform:translateY(-10vh) rotate(720deg);opacity:0} }
+
+  /* ——— MINI TIMELINE ——— */
+  .mini-tl { display:flex; align-items:center; gap:.3rem; width:100%; margin-bottom:1rem; }
+  .mtl-item { flex:1; display:flex; flex-direction:column; align-items:center; position:relative; }
+  .mtl-item::after { content:''; position:absolute; top:7px; left:50%; width:100%; height:2px; background:rgba(67,203,255,.2); z-index:0; }
+  .mtl-item:last-child::after { display:none; }
+  .mtl-dot { width:14px; height:14px; border-radius:50%; border:2px solid rgba(67,203,255,.5); background:var(--dark); z-index:1; margin-bottom:.4rem; flex-shrink:0; }
+  .mtl-dot.active { background:var(--c1); border-color:var(--c1); box-shadow:0 0 10px var(--c1); }
+  .mtl-label { font-size:.65rem; color:var(--text2); text-align:center; font-weight:600; }
+
+  /* ——— COMPARISON TABLE ——— */
+  .comp-table { width:100%; border-collapse:collapse; }
+  .comp-table th { font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--text2); padding:.5rem .8rem; border-bottom:1px solid var(--border); text-align:left; }
+  .comp-table td { font-size:.8rem; padding:.55rem .8rem; border-bottom:1px solid rgba(255,255,255,.05); vertical-align:top; line-height:1.4; }
+  .comp-table tr:hover td { background:rgba(255,255,255,.03); }
+  .comp-tool { font-weight:700; color:var(--text); }
+
+</style>
+</head>
+<body>
+
+<div id="particles"></div>
+<div id="progress-bar"></div>
+<div id="kb-hint"><kbd>←</kbd><kbd>→</kbd> navegar · <kbd>F</kbd> fullscreen</div>
+<div id="dots"></div>
+<div id="copyright">© 2026 &nbsp;<span class="name">Ing. Robert Farfan</span>&nbsp;· Docente</div>
+
+<div id="nav">
+  <button class="nav-btn home-btn" onclick="window.location.href='index.html'">🏠 Inicio</button>
+  <button class="nav-btn" id="prev">&#8592;</button>
+  <span id="slide-counter">1 / 16</span>
+  <button class="nav-btn" id="next">&#8594;</button>
+</div>
+
+<div id="deck">
+
+  <!-- ════════════════════════════════
+       SLIDE 1 — PORTADA CLASE 2
+  ════════════════════════════════ -->
+  <div class="slide bg-c2 active">
+    <div class="glow-ring">🎨</div>
+    <div class="slide-tag">IA Generativa Aplicada · Clase 2 de 3</div>
+    <h1 class="hero">
+      Creación <span class="grad-cyan">Multimedia</span><br>
+      <span style="color:var(--text2);font-size:.75em">con Inteligencia Artificial</span>
+    </h1>
+    <p class="lead" style="margin:1.2rem 0 2rem">
+      Genera imágenes, voces, música y video profesional usando únicamente
+      instrucciones escritas. Sin cámara, sin estudio, sin conocimientos técnicos previos.
+    </p>
+    <div class="grid-4" style="max-width:580px;gap:.8rem">
+      <div class="stat-mini">
+        <div class="num grad-cyan">4</div>
+        <div class="lbl">Módulos</div>
+      </div>
+      <div class="stat-mini">
+        <div class="num grad-pink">8+</div>
+        <div class="lbl">Herramientas</div>
+      </div>
+      <div class="stat-mini">
+        <div class="num grad-green">1</div>
+        <div class="lbl">Proyecto</div>
+      </div>
+      <div class="stat-mini">
+        <div class="num grad-gold">2h</div>
+        <div class="lbl">Intensivas</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:.7rem;flex-wrap:wrap;justify-content:center;margin-top:1.5rem">
+      <span class="badge bc">DALL·E</span>
+      <span class="badge bc">Nano Banana</span>
+      <span class="badge bpk">ElevenLabs</span>
+      <span class="badge bg-b">Suno AI</span>
+      <span class="badge bgd">Veo 3</span>
+      <span class="badge bp">CapCut AI</span>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════
+       SLIDE 2 — AGENDA
+  ════════════════════════════════ -->
+  <div class="slide bg-dark">
+    <div class="slide-tag">Hoja de Ruta</div>
+    <h2 class="section-title text-center">Agenda de la <span class="grad-cyan">Clase 2</span></h2>
+
+    <!-- mini timeline -->
+    <div class="mini-tl" style="max-width:860px;margin-bottom:1.5rem">
+      <div class="mtl-item"><div class="mtl-dot active"></div><div class="mtl-label">Imágenes<br>IA</div></div>
+      <div class="mtl-item"><div class="mtl-dot active"></div><div class="mtl-label">Prompt<br>Visual</div></div>
+      <div class="mtl-item"><div class="mtl-dot active"></div><div class="mtl-label">Voz &<br>Narración</div></div>
+      <div class="mtl-item"><div class="mtl-dot active"></div><div class="mtl-label">Música<br>con IA</div></div>
+      <div class="mtl-item"><div class="mtl-dot active"></div><div class="mtl-label">Video<br>Generativo</div></div>
+      <div class="mtl-item"><div class="mtl-dot active"></div><div class="mtl-label">Proyecto<br>Final</div></div>
+    </div>
+
+    <div class="full-width" style="max-width:860px">
+      <div class="agenda-item" style="border-color:rgba(67,203,255,.45)">
+        <div class="agenda-num">1</div>
+        <div class="agenda-time">0:00–0:25</div>
+        <div>
+          <div class="agenda-label">🖼️ Generación de imágenes con IA</div>
+          <div class="agenda-sub">DALL·E 3, Nano Banana, Arena AI — Prompt visual avanzado</div>
+        </div>
+      </div>
+      <div class="agenda-item" style="border-color:rgba(108,99,255,.4)">
+        <div class="agenda-num">2</div>
+        <div class="agenda-time">0:25–0:50</div>
+        <div>
+          <div class="agenda-label">🎤 Voz y narración con ElevenLabs</div>
+          <div class="agenda-sub">Text-to-Speech · Clonación de voz · Voces multilingüe</div>
+        </div>
+      </div>
+      <div class="agenda-item" style="border-color:rgba(0,245,160,.4)">
+        <div class="agenda-num">3</div>
+        <div class="agenda-time">0:50–1:10</div>
+        <div>
+          <div class="agenda-label">🎵 Música original con Suno AI</div>
+          <div class="agenda-sub">Composición desde texto · Géneros · Letras automáticas</div>
+        </div>
+      </div>
+      <div class="agenda-item" style="border-color:rgba(255,179,71,.4)">
+        <div class="agenda-num">4</div>
+        <div class="agenda-time">1:10–1:35</div>
+        <div>
+          <div class="agenda-label">🎬 Video generativo: Veo 3, Flow, Sora</div>
+          <div class="agenda-sub">Text-to-video · Image-to-video · Reels y animaciones</div>
+        </div>
+      </div>
+      <div class="agenda-item" style="border-color:rgba(255,101,132,.45)">
+        <div class="agenda-num">5</div>
+        <div class="agenda-time">1:35–2:00</div>
+        <div>
+          <div class="agenda-label">🎯 Proyecto integrador: Mini producción multimedia</div>
+          <div class="agenda-sub">Imagen + Voz + Música + Video ensamblados con CapCut AI</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-2 full-width" style="max-width:860px;text-align:center;border-color:rgba(255,179,71,.3);padding:.8rem">
+      <span style="color:var(--c5);font-size:.82rem;font-weight:600">🚀 Al finalizar esta clase habrás producido un mini-reel multimedia 100% generado con IA.</span>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════
+       SLIDE 3 — INTRO IMÁGENES IA
+  ════════════════════════════════ -->
+  <div class="slide bg-cyan">
+    <div class="class-banner">
+      <div class="banner-num" style="color:var(--c1)">01</div>
+      <div>
+        <div class="slide-tag">Módulo 1 · Imágenes</div>
+        <h2 class="section-title" style="margin-bottom:.2rem">Generación de <span class="grad-cyan">imágenes con IA</span></h2>
+        <p class="body">Del texto a la imagen profesional en segundos</p>
+      </div>
+    </div>
+
+    <div class="grid-2 full-width">
+      <div style="display:flex;flex-direction:column;gap:.65rem">
+        <div class="feature-row" style="border-color:rgba(67,203,255,.45)">
+          <div class="feat-icon">🧠</div>
+          <div>
+            <h3 class="card-title" style="color:#7DD8FF">¿Cómo funciona?</h3>
+            <p class="body">Los modelos de difusión (Diffusion Models) aprenden la relación entre texto e imagen. A partir de ruido aleatorio, generan la imagen que mejor coincide con tu descripción.</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon">⚡</div>
+          <div>
+            <h3 class="card-title">Generación en segundos</h3>
+            <p class="body">Lo que antes requería un fotógrafo, diseñador y horas de edición, ahora se obtiene en 5–20 segundos escribiendo una descripción.</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon">🎭</div>
+          <div>
+            <h3 class="card-title">Estilos ilimitados</h3>
+            <p class="body">Fotorrealismo, acuarela, óleo, anime, pixel art, ilustración editorial, 3D render, minimalismo — cualquier estilo artístico desde una instrucción.</p>
+          </div>
+        </div>
+        <div class="feature-row" style="border-color:rgba(255,101,132,.35)">
+          <div class="feat-icon">⚠️</div>
+          <div>
+            <h3 class="card-title" style="color:#FF9DB0">Consideración ética</h3>
+            <p class="body">Evita generar imágenes de personas reales sin consentimiento, contenido engañoso o materiales que violen derechos de autor.</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--c1);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.8rem">🛠 Herramientas principales 2026</div>
+        <div class="grid-2" style="gap:.7rem">
+          <div class="card ac" style="padding:1rem;text-align:center">
+            <div style="font-size:1.8rem;margin-bottom:.3rem">🤖</div>
+            <div style="font-weight:700;font-size:.88rem">DALL·E 3</div>
+            <div style="font-size:.72rem;color:var(--text2)">OpenAI · Integrado en ChatGPT</div>
+            <div style="font-size:.7rem;margin-top:.4rem;color:var(--c1)">★ Seguimiento de prompt</div>
+          </div>
+          <div class="card" style="padding:1rem;text-align:center;border-color:rgba(255,101,132,.4)">
+            <div style="font-size:1.8rem;margin-bottom:.3rem">🍌</div>
+            <div style="font-weight:700;font-size:.88rem">Nano Banana</div>
+            <div style="font-size:.72rem;color:var(--text2)">Acceso gratuito · Rápido</div>
+            <div style="font-size:.7rem;margin-top:.4rem;color:var(--c2)">★ Ideal para práctica</div>
+          </div>
+          <div class="card" style="padding:1rem;text-align:center;border-color:rgba(108,99,255,.4)">
+            <div style="font-size:1.8rem;margin-bottom:.3rem">🌈</div>
+            <div style="font-weight:700;font-size:.88rem">Flux / Stable Diffusion</div>
+            <div style="font-size:.72rem;color:var(--text2)">Open Source · Personalizable</div>
+            <div style="font-size:.7rem;margin-top:.4rem;color:#9D97FF">★ Máximo control</div>
+          </div>
+          <div class="card" style="padding:1rem;text-align:center;border-color:rgba(0,245,160,.4)">
+            <div style="font-size:1.8rem;margin-bottom:.3rem">🏟️</div>
+            <div style="font-weight:700;font-size:.88rem">Arena AI</div>
+            <div style="font-size:.72rem;color:var(--text2)">Compara modelos en paralelo</div>
+            <div style="font-size:.7rem;margin-top:.4rem;color:#5CFFD1">★ Ver diferencias</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════
+       SLIDE 4 — ARTE DEL PROMPT VISUAL
+  ════════════════════════════════ -->
+  <div class="slide bg-dark">
+    <div class="slide-tag">Skill clave</div>
+    <h2 class="section-title text-center">El arte del <span class="grad-cyan">Prompt Visual</span></h2>
+    <p class="lead" style="font-size:.93rem;margin-bottom:1.4rem">Describir imágenes es una habilidad. Un buen prompt visual puede ser la diferencia entre algo genérico y algo asombroso.</p>
+
+    <div class="grid-2 full-width">
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--c1);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem">🏗 Anatomía del prompt visual</div>
+        <div class="step-flow">
+          <div class="step" style="border-color:rgba(67,203,255,.5);padding:.7rem 1rem">
+            <div style="font-size:1.1rem">📸</div>
+            <div>
+              <div class="step-title" style="font-size:.85rem;color:#7DD8FF">SUJETO — ¿Qué imagen?</div>
+              <div class="step-desc">"Un docente universitario explicando IA a sus estudiantes"</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(108,99,255,.45);padding:.7rem 1rem">
+            <div style="font-size:1.1rem">🎨</div>
+            <div>
+              <div class="step-title" style="font-size:.85rem;color:#9D97FF">ESTILO — ¿Cómo se ve?</div>
+              <div class="step-desc">"Ilustración digital moderna · Estilo infográfico · Colores vibrantes"</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(255,179,71,.4);padding:.7rem 1rem">
+            <div style="font-size:1.1rem">💡</div>
+            <div>
+              <div class="step-title" style="font-size:.85rem;color:var(--c5)">ILUMINACIÓN — Ambiente</div>
+              <div class="step-desc">"Luz de estudio suave · Golden hour · Neón futurista · Cinematográfico"</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(0,245,160,.4);padding:.7rem 1rem">
+            <div style="font-size:1.1rem">📐</div>
+            <div>
+              <div class="step-title" style="font-size:.85rem;color:var(--c4)">COMPOSICIÓN — Encuadre</div>
+              <div class="step-desc">"Plano cenital · Primer plano · Plano panorámico · 16:9 · Cuadrado"</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(255,101,132,.4);padding:.7rem 1rem">
+            <div style="font-size:1.1rem">⚙️</div>
+            <div>
+              <div class="step-title" style="font-size:.85rem;color:var(--c2)">CALIDAD — Detalles técnicos</div>
+              <div class="step-desc">"4K ultra realistic · Highly detailed · Award winning photography"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:.8rem">
+        <div class="card ac-pink" style="padding:1rem">
+          <div style="font-size:.7rem;font-weight:700;color:var(--c2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">❌ Prompt débil</div>
+          <div style="font-family:'Courier New',monospace;font-size:.82rem;color:var(--text2)">"una clase de universidad"</div>
+          <div style="font-size:.7rem;color:var(--c2);margin-top:.35rem">Resultado: imagen genérica, sin personalidad</div>
+        </div>
+
+        <div class="prompt-box">
+          <span class="ph">Un salón universitario moderno</span>, vista frontal,
+          con <span class="pv">hologramas de IA</span> flotando en el aire.<br>
+          <span class="ph">Estilo:</span> <span class="pv">ilustración digital futurista</span>,
+          colores cian y morado.<br>
+          <span class="ph">Iluminación:</span> <span class="po">luz azul neón</span>,
+          ambiente tecnológico.<br>
+          <span class="ph">Formato:</span> <span class="pv">horizontal 16:9</span>,
+          <span class="po">ultra detailed, 4K</span>
+        </div>
+
+        <div class="card ac-green" style="padding:.9rem;text-align:center">
+          <div style="font-size:.72rem;font-weight:700;color:var(--c4);text-transform:uppercase;margin-bottom:.35rem">Modificadores mágicos</div>
+          <div style="display:flex;flex-wrap:wrap;gap:.3rem;justify-content:center">
+            <span class="badge bc">photorealistic</span><span class="badge bp">cinematic</span>
+            <span class="badge bg-b">vibrant colors</span><span class="badge bpk">dramatic lighting</span>
+            <span class="badge bgd">8K resolution</span><span class="badge bc">bokeh background</span>
+            <span class="badge bp">trending on ArtStation</span><span class="badge bpk">sharp focus</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════
+       SLIDE 5 — DEMO IMÁGENES EN VIVO
+  ════════════════════════════════ -->
+  <div class="slide bg-dark">
+    <div class="slide-tag">Actividad Guiada · Imágenes</div>
+    <h2 class="section-title text-center">Demo: <span class="grad-cyan">generamos imágenes</span> ahora mismo</h2>
+
+    <div class="grid-2 full-width">
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--c1);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem">🎯 Ejercicios progresivos (15 min)</div>
+        <div class="step-flow">
+          <div class="step" style="border-color:rgba(67,203,255,.5)">
+            <div class="step-num">1</div>
+            <div>
+              <div class="step-title">Prompt básico — solo sujeto</div>
+              <div class="step-desc">"Docente enseñando IA" → observar resultado genérico</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(67,203,255,.4)">
+            <div class="step-num">2</div>
+            <div>
+              <div class="step-title">Agregar estilo e iluminación</div>
+              <div class="step-desc">Sumar estilo artístico + tipo de luz → ver mejora inmediata</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(0,245,160,.4)">
+            <div class="step-num">3</div>
+            <div>
+              <div class="step-title">Prompt completo con modificadores</div>
+              <div class="step-desc">Composición + calidad + detalles técnicos → resultado profesional</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(255,179,71,.35)">
+            <div class="step-num">4</div>
+            <div>
+              <div class="step-title">Iterar y refinar</div>
+              <div class="step-desc">Comparar en Arena AI. Cambiar 1 variable. Guardar la mejor versión.</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(255,101,132,.4)">
+            <div class="step-num">5</div>
+            <div>
+              <div class="step-title">Crear imagen para tu proyecto</div>
+              <div class="step-desc">Genera la imagen que usarás en tu mini-reel final. Descarga en alta resolución.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:.8rem">
+        <div style="font-size:.72rem;font-weight:700;color:var(--c1);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.3rem">🖼 Ideas de imágenes para el proyecto</div>
+        <div class="grid-2" style="gap:.7rem">
+          <div class="img-demo" style="border-color:rgba(67,203,255,.35)">
+            <div class="img-placeholder" style="background:linear-gradient(135deg,rgba(67,203,255,.15),rgba(108,99,255,.15))">🏫</div>
+            <div class="img-prompt">"Aula universitaria futurista con IA, estilo tecnológico, luz azul"</div>
+          </div>
+          <div class="img-demo" style="border-color:rgba(255,101,132,.35)">
+            <div class="img-placeholder" style="background:linear-gradient(135deg,rgba(255,101,132,.15),rgba(255,179,71,.15))">🎓</div>
+            <div class="img-prompt">"Graduado con cerebro digital, ilustración vectorial, colores vivos"</div>
+          </div>
+          <div class="img-demo" style="border-color:rgba(0,245,160,.35)">
+            <div class="img-placeholder" style="background:linear-gradient(135deg,rgba(0,245,160,.15),rgba(67,203,255,.15))">🌐</div>
+            <div class="img-prompt">"Red neuronal conectando personas, 3D render, fondo oscuro, neón"</div>
+          </div>
+          <div class="img-demo" style="border-color:rgba(255,179,71,.35)">
+            <div class="img-placeholder" style="background:linear-gradient(135deg,rgba(255,179,71,.15),rgba(255,101,132,.15))">🤖</div>
+            <div class="img-prompt">"Robot amigable enseñando, estilo cartoon moderno, paleta pasteles"</div>
+          </div>
+        </div>
+        <div class="card ac" style="text-align:center;padding:.8rem">
+          <span style="font-size:.78rem;color:#7DD8FF;font-weight:600">💾 Guarda tu imagen favorita — la usarás en el proyecto final de esta clase</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════
+       SLIDE 6 — ELEVENLABS: VOZ CON IA
+  ════════════════════════════════ -->
+  <div class="slide bg-purple">
+    <div class="class-banner">
+      <div class="banner-num" style="color:var(--c3)">02</div>
+      <div>
+        <div class="slide-tag purple">Módulo 2 · Voz & Narración</div>
+        <h2 class="section-title" style="margin-bottom:.2rem"><span style="background:linear-gradient(135deg,#9D97FF,var(--c1));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">ElevenLabs</span>: voz hiperrealista con IA</h2>
+        <p class="body">Transforma cualquier texto en narración de calidad profesional en segundos</p>
+      </div>
+    </div>
+
+    <div class="grid-2 full-width">
+      <div style="display:flex;flex-direction:column;gap:.65rem">
+        <div class="feature-row" style="border-color:rgba(108,99,255,.5)">
+          <div class="feat-icon">🎤</div>
+          <div>
+            <h3 class="card-title" style="color:#9D97FF">Text-to-Speech avanzado</h3>
+            <p class="body">Más de 3.000 voces en 32 idiomas. Controla velocidad, tono, emoción y énfasis con precisión quirúrgica.</p>
+          </div>
+        </div>
+        <div class="feature-row" style="border-color:rgba(67,203,255,.4)">
+          <div class="feat-icon">🧬</div>
+          <div>
+            <h3 class="card-title" style="color:#7DD8FF">Clonación de voz</h3>
+            <p class="body">Con apenas 30 segundos de audio, ElevenLabs puede clonar tu propia voz y usarla para narrar cualquier texto en cualquier idioma.</p>
+          </div>
+        </div>
+        <div class="feature-row" style="border-color:rgba(0,245,160,.4)">
+          <div class="feat-icon">🌍</div>
+          <div>
+            <h3 class="card-title" style="color:#5CFFD1">Multilingüe nativo</h3>
+            <p class="body">Español, inglés, portugués, francés, alemán... La voz suena como un hablante nativo en cada idioma, no como una traducción robotizada.</p>
+          </div>
+        </div>
+        <div class="feature-row" style="border-color:rgba(255,179,71,.4)">
+          <div class="feat-icon">🎙️</div>
+          <div>
+            <h3 class="card-title" style="color:var(--c5)">Casos de uso educativos</h3>
+            <p class="body">Narraciones de presentaciones · Podcasts educativos · Audiolibros · Contenido accesible · Guías de estudio en audio.</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <!-- Waveform visual -->
+        <div class="card ac-purple" style="text-align:center;padding:1.3rem;margin-bottom:.8rem">
+          <div style="font-size:1.2rem;font-weight:700;margin-bottom:.5rem">🎵 Visualización de audio</div>
+          <div class="waveform">
+            <div class="wave-bar" style="height:15px;animation-delay:0s"></div>
+            <div class="wave-bar" style="height:25px;animation-delay:.1s"></div>
+            <div class="wave-bar" style="height:35px;animation-delay:.2s"></div>
+            <div class="wave-bar" style="height:20px;animation-delay:.3s"></div>
+            <div class="wave-bar" style="height:38px;animation-delay:.4s"></div>
+            <div class="wave-bar" style="height:30px;animation-delay:.5s"></div>
+            <div class="wave-bar" style="height:18px;animation-delay:.6s"></div>
+            <div class="wave-bar" style="height:40px;animation-delay:.7s"></div>
+            <div class="wave-bar" style="height:28px;animation-delay:.8s"></div>
+            <div class="wave-bar" style="height:15px;animation-delay:.9s"></div>
+            <div class="wave-bar" style="height:32px;animation-delay:1s"></div>
+            <div class="wave-bar" style="height:22px;animation-delay:1.1s"></div>
+            <div class="wave-bar" style="height:38px;animation-delay:1.2s"></div>
+            <div class="wave-bar" style="height:16px;animation-delay:1.3s"></div>
+            <div class="wave-bar" style="height:25px;animation-delay:1.4s"></div>
+          </div>
+          <div style="font-size:.78rem;color:var(--text2)">ElevenLabs genera audio con entonación natural y pausas humanas</div>
+        </div>
+
+        <div class="card ac" style="padding:1.1rem;margin-bottom:.7rem">
+          <div style="font-size:.72rem;font-weight:700;color:var(--c1);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">⚙ Parámetros de control</div>
+          <div class="tool-item"><div class="bullet" style="background:var(--c1)"></div><strong style="color:var(--text)">Stability:</strong> estabilidad de la voz (0-1)</div>
+          <div class="tool-item"><div class="bullet" style="background:var(--c1)"></div><strong style="color:var(--text)">Clarity:</strong> claridad vs. similitud con la voz original</div>
+          <div class="tool-item"><div class="bullet" style="background:var(--c1)"></div><strong style="color:var(--text)">Style Exaggeration:</strong> intensidad expresiva</div>
+          <div class="tool-item"><div class="bullet" style="background:var(--c1)"></div><strong style="color:var(--text)">Speaker Boost:</strong> potencia la voz del hablante</div>
+        </div>
+
+        <div class="card" style="border-color:rgba(255,193,7,.35);padding:.85rem;text-align:center">
+          <div style="font-size:.78rem;color:#FFD54F;font-weight:600">🌐 elevenlabs.io · Plan gratuito: 10.000 caracteres/mes</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════
+       SLIDE 7 — DEMO ELEVENLABS
+  ════════════════════════════════ -->
+  <div class="slide bg-dark">
+    <div class="slide-tag purple">Actividad Guiada · Voz</div>
+    <h2 class="section-title text-center">Creamos nuestra <span style="background:linear-gradient(135deg,#9D97FF,var(--c1));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">primera narración</span></h2>
+
+    <div class="grid-2 full-width">
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:#9D97FF;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem">📋 Paso a paso — 12 minutos</div>
+        <div class="step-flow">
+          <div class="step" style="border-color:rgba(108,99,255,.5)">
+            <div class="step-num" style="color:#9D97FF">1</div>
+            <div>
+              <div class="step-title">Ir a elevenlabs.io</div>
+              <div class="step-desc">Crear cuenta gratuita con email → ingresar al editor de voz</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(67,203,255,.4)">
+            <div class="step-num">2</div>
+            <div>
+              <div class="step-title">Elegir una voz en español</div>
+              <div class="step-desc">Explorar la biblioteca → filtrar por idioma "Spanish" → probar 3 voces</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(0,245,160,.4)">
+            <div class="step-num" style="color:var(--c4)">3</div>
+            <div>
+              <div class="step-title">Escribir el texto a narrar</div>
+              <div class="step-desc">Usar el texto generado con ChatGPT/Claude en Clase 1, o el texto del proyecto</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(255,179,71,.4)">
+            <div class="step-num" style="color:var(--c5)">4</div>
+            <div>
+              <div class="step-title">Ajustar parámetros y generar</div>
+              <div class="step-desc">Stability: 0.5 · Similarity: 0.75 → clic en "Generate" → escuchar resultado</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(255,101,132,.4)">
+            <div class="step-num" style="color:var(--c2)">5</div>
+            <div>
+              <div class="step-title">Descargar en MP3</div>
+              <div class="step-desc">Botón Download → guardar como "narracion_proyecto.mp3" para el reel final</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:.8rem">
+        <div class="card ac-purple" style="padding:1.1rem">
+          <div style="font-size:.72rem;font-weight:700;color:#9D97FF;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem">📝 Texto modelo para la narración</div>
+          <div style="background:#0d0d1a;border-radius:10px;padding:1rem;font-size:.82rem;line-height:1.6;color:#c8c8e8;border:1px solid rgba(108,99,255,.25)">
+            "La inteligencia artificial generativa está transformando la educación de una manera que nunca antes imaginamos. Hoy, cualquier docente puede crear contenido multimedia profesional, materiales didácticos innovadores y experiencias de aprendizaje memorables, usando solo su creatividad y la IA como herramienta."
+          </div>
+          <div style="font-size:.7rem;color:var(--text2);margin-top:.5rem">~25 segundos de narración · Perfecto para un reel educativo</div>
+        </div>
+
+        <div class="card" style="border-color:rgba(67,203,255,.4);padding:1rem">
+          <div style="font-size:.72rem;font-weight:700;color:var(--c1);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">💡 Consejos pro</div>
+          <div class="tool-item" style="margin-bottom:.3rem"><div class="bullet" style="background:var(--c1)"></div>Usa signos de puntuación para controlar el ritmo</div>
+          <div class="tool-item" style="margin-bottom:.3rem"><div class="bullet" style="background:var(--c1)"></div>Puntos suspensivos (...) = pausa dramática</div>
+          <div class="tool-item" style="margin-bottom:.3rem"><div class="bullet" style="background:var(--c1)"></div>Mayúsculas = énfasis en la palabra</div>
+          <div class="tool-item"><div class="bullet" style="background:var(--c1)"></div>Genera varias versiones y quédate con la mejor</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════
+       SLIDE 8 — MÚSICA CON SUNO AI
+  ════════════════════════════════ -->
+  <div class="slide bg-green">
+    <div class="class-banner">
+      <div class="banner-num" style="color:var(--c4)">03</div>
+      <div>
+        <div class="slide-tag green">Módulo 3 · Música</div>
+        <h2 class="section-title" style="margin-bottom:.2rem"><span class="grad-green">Suno AI</span>: composición musical desde texto</h2>
+        <p class="body">De la idea a la canción completa en menos de un minuto</p>
+      </div>
+    </div>
+
+    <div class="grid-2 full-width">
+      <div style="display:flex;flex-direction:column;gap:.65rem">
+        <div class="feature-row" style="border-color:rgba(0,245,160,.5)">
+          <div class="feat-icon">🎶</div>
+          <div>
+            <h3 class="card-title" style="color:#5CFFD1">Música completa desde prompts</h3>
+            <p class="body">Suno genera canciones de 2 a 4 minutos con instrumentos, voces, letra y arreglos completos desde una descripción en texto.</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon">🎸</div>
+          <div>
+            <h3 class="card-title">Cualquier género musical</h3>
+            <p class="body">Pop, rock, jazz, clásica, electrónica, reggaetón, cumbia, salsa, música épica de cine, lofi... el prompt define el género y el estado de ánimo.</p>
+          </div>
+        </div>
+        <div class="feature-row" style="border-color:rgba(67,203,255,.4)">
+          <div class="feat-icon">📝</div>
+          <div>
+            <h3 class="card-title" style="color:#7DD8FF">Letras automáticas o personalizadas</h3>
+            <p class="body">Puedes escribir la letra tú mismo o dejar que Suno la genere. También acepta un tema para que construya toda la historia de la canción.</p>
+          </div>
+        </div>
+        <div class="feature-row" style="border-color:rgba(255,179,71,.4)">
+          <div class="feat-icon">🎯</div>
+          <div>
+            <h3 class="card-title" style="color:var(--c5)">Uso en educación</h3>
+            <p class="body">Música de fondo para videos · Jingles educativos · Canciones mnemotécnicas · Ambientación para presentaciones · Fondos musicales para podcasts.</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--c4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.8rem">🎵 Tipos de prompt en Suno</div>
+
+        <div class="card ac-green" style="padding:1rem;margin-bottom:.7rem">
+          <div style="font-size:.7rem;font-weight:700;color:var(--c4);margin-bottom:.4rem">MODO SIMPLE — Descripción libre</div>
+          <div style="font-family:'Courier New',monospace;font-size:.8rem;color:#c8c8e8;line-height:1.5">"Música instrumental motivadora para una presentación de tecnología educativa, estilo electrónico moderno, energía alta, sin letra"</div>
+        </div>
+
+        <div class="card" style="border-color:rgba(0,245,160,.4);padding:1rem;margin-bottom:.7rem">
+          <div style="font-size:.7rem;font-weight:700;color:var(--c4);margin-bottom:.4rem">MODO CUSTOM — Con letra y estilo</div>
+          <div style="font-family:'Courier New',monospace;font-size:.78rem;color:#c8c8e8;line-height:1.5">
+            [Style: upbeat pop, electronic]<br>
+            [Verse 1]<br>
+            Con la IA en mis manos puedo crear...<br>
+            [Chorus]<br>
+            El futuro llegó, es tiempo de aprender...
+          </div>
+        </div>
+
+        <div class="grid-2" style="gap:.6rem">
+          <div class="card" style="padding:.8rem;text-align:center;border-color:rgba(255,193,7,.35)">
+            <div style="font-size:1.5rem;margin-bottom:.3rem">🆓</div>
+            <div style="font-weight:700;font-size:.82rem">suno.com</div>
+            <div style="font-size:.7rem;color:var(--text2)">Plan gratuito: 50 canciones/día</div>
+          </div>
+          <div class="card" style="padding:.8rem;text-align:center;border-color:rgba(67,203,255,.35)">
+            <div style="font-size:1.5rem;margin-bottom:.3rem">🎵</div>
+            <div style="font-weight:700;font-size:.82rem">Udio</div>
+            <div style="font-size:.7rem;color:var(--text2)">Alternativa · Alta calidad musical</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════
+       SLIDE 9 — DEMO SUNO
+  ════════════════════════════════ -->
+  <div class="slide bg-dark">
+    <div class="slide-tag green">Actividad Guiada · Música</div>
+    <h2 class="section-title text-center">Componemos <span class="grad-green">nuestra primera canción</span> con IA</h2>
+
+    <div class="grid-2 full-width">
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--c4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem">📋 Paso a paso — 10 minutos</div>
+        <div class="step-flow">
+          <div class="step" style="border-color:rgba(0,245,160,.5)">
+            <div class="step-num" style="color:var(--c4)">1</div>
+            <div>
+              <div class="step-title">Abrir suno.com</div>
+              <div class="step-desc">Crear cuenta gratuita → acceder al compositor</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(0,245,160,.4)">
+            <div class="step-num" style="color:var(--c4)">2</div>
+            <div>
+              <div class="step-title">Crear con modo simple</div>
+              <div class="step-desc">Escribir: "música de fondo instrumental para presentación educativa sobre IA, estilo moderno y motivador, sin letra, 90 segundos"</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(67,203,255,.4)">
+            <div class="step-num">3</div>
+            <div>
+              <div class="step-title">Escuchar y comparar variaciones</div>
+              <div class="step-desc">Suno genera 2 versiones por prompt. Escuchar ambas y elegir la mejor.</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(255,179,71,.4)">
+            <div class="step-num" style="color:var(--c5)">4</div>
+            <div>
+              <div class="step-title">Modo custom (opcional avanzado)</div>
+              <div class="step-desc">Activar "Custom Mode" → escribir tu propia letra sobre IA educativa</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(255,101,132,.4)">
+            <div class="step-num" style="color:var(--c2)">5</div>
+            <div>
+              <div class="step-title">Descargar en MP3 o MP4</div>
+              <div class="step-desc">Guardar como "musica_proyecto.mp3" para usarla de fondo en el reel final</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:.8rem">
+        <div style="font-size:.72rem;font-weight:700;color:var(--c4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.3rem">🎯 Prompts para diferentes usos educativos</div>
+
+        <div class="card ac-green" style="padding:.9rem">
+          <div style="font-size:.7rem;font-weight:700;color:var(--c4);margin-bottom:.4rem">📽 Para videos de presentación</div>
+          <div style="font-family:'Courier New',monospace;font-size:.76rem;color:var(--text2);line-height:1.5">"Música orquestal inspiradora de fondo, estilo corporativo educativo, que crezca gradualmente en intensidad, sin letra, sonido profesional"</div>
+        </div>
+
+        <div class="card" style="border-color:rgba(108,99,255,.4);padding:.9rem">
+          <div style="font-size:.7rem;font-weight:700;color:#9D97FF;margin-bottom:.4rem">☕ Para podcasts o estudio</div>
+          <div style="font-family:'Courier New',monospace;font-size:.76rem;color:var(--text2);line-height:1.5">"Beats lofi relajantes, música para estudiar, ambiente tranquilo y concentrado, piano suave con batería lo-fi, 120 BPM"</div>
+        </div>
+
+        <div class="card ac-pink" style="padding:.9rem">
+          <div style="font-size:.7rem;font-weight:700;color:#FF9DB0;margin-bottom:.4rem">🎬 Para reels o contenido viral</div>
+          <div style="font-family:'Courier New',monospace;font-size:.76rem;color:var(--text2);line-height:1.5">"Pop electrónico energético y animado, tempo rápido, música impactante para reel de redes sociales, beats potentes, sin letra"</div>
+        </div>
+
+        <div class="card ac-gold" style="text-align:center;padding:.8rem">
+          <span style="font-size:.78rem;color:var(--c5);font-weight:600">🎵 Tendrás imagen + voz + música. Solo falta el video →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════
+       SLIDE 10 — VIDEO GENERATIVO
+  ════════════════════════════════ -->
+  <div class="slide bg-gold">
+    <div class="class-banner">
+      <div class="banner-num" style="color:var(--c5)">04</div>
+      <div>
+        <div class="slide-tag gold">Módulo 4 · Video</div>
+        <h2 class="section-title" style="margin-bottom:.2rem">Video <span class="grad-gold">generativo</span>: texto a video con IA</h2>
+        <p class="body">La frontera más nueva y emocionante de la IA Generativa en 2026</p>
+      </div>
+    </div>
+
+    <div class="grid-2 full-width">
+      <div style="display:flex;flex-direction:column;gap:.65rem">
+        <div class="feature-row" style="border-color:rgba(255,179,71,.5)">
+          <div class="feat-icon">🎬</div>
+          <div>
+            <h3 class="card-title" style="color:var(--c5)">Text-to-Video</h3>
+            <p class="body">Describes una escena en texto y la IA genera el video. Veo 3 de Google puede producir clips con audio sincronizado y física realista.</p>
+          </div>
+        </div>
+        <div class="feature-row" style="border-color:rgba(67,203,255,.4)">
+          <div class="feat-icon">🖼️➡🎬</div>
+          <div>
+            <h3 class="card-title" style="color:#7DD8FF">Image-to-Video</h3>
+            <p class="body">Tomas una imagen estática y la animas. Tu imagen generada con DALL·E puede cobrar vida con movimiento, viento, agua o efectos cinematográficos.</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon">🎭</div>
+          <div>
+            <h3 class="card-title">Personajes y presentadores IA</h3>
+            <p class="body">Plataformas como HeyGen y Synthesia permiten crear avatares que presentan tus contenidos sin necesidad de grabarte a ti mismo.</p>
+          </div>
+        </div>
+        <div class="feature-row" style="border-color:rgba(255,101,132,.35)">
+          <div class="feat-icon">⚠️</div>
+          <div>
+            <h3 class="card-title" style="color:#FF9DB0">Estado actual (2026)</h3>
+            <p class="body">Los videos de IA duran 5–30 segundos. Las manos y los textos aún son puntos débiles. Perfectos para fragmentos de reels, no para producciones largas.</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--c5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.8rem">🎬 Herramientas de video IA 2026</div>
+
+        <div class="video-card" style="border-color:rgba(255,179,71,.5);margin-bottom:.7rem">
+          <div class="video-icon">🌊</div>
+          <div class="video-name">Veo 3 · Google DeepMind</div>
+          <div class="video-org">La herramienta más avanzada del mercado · Genera video con audio</div>
+          <div>
+            <span class="video-tag" style="background:rgba(255,179,71,.2);color:#FFD08A">Text-to-video</span>
+            <span class="video-tag" style="background:rgba(255,179,71,.2);color:#FFD08A">Audio nativo</span>
+            <span class="video-tag" style="background:rgba(255,179,71,.2);color:#FFD08A">Física realista</span>
+          </div>
+        </div>
+
+        <div class="grid-2" style="gap:.6rem">
+          <div class="video-card" style="border-color:rgba(67,203,255,.4)">
+            <div style="font-size:1.8rem">🎭</div>
+            <div class="video-name" style="font-size:.88rem">Sora · OpenAI</div>
+            <div class="video-org">Clips creativos hasta 60s</div>
+            <div><span class="video-tag" style="background:rgba(67,203,255,.15);color:#7DD8FF">Text-to-video</span></div>
+          </div>
+          <div class="video-card" style="border-color:rgba(0,245,160,.4)">
+            <div style="font-size:1.8rem">⚡</div>
+            <div class="video-name" style="font-size:.88rem">Flow · Google</div>
+            <div class="video-org">Integrado con Veo 3</div>
+            <div><span class="video-tag" style="background:rgba(0,245,160,.15);color:#5CFFD1">Animación</span></div>
+          </div>
+          <div class="video-card" style="border-color:rgba(255,101,132,.4)">
+            <div style="font-size:1.8rem">🤖</div>
+            <div class="video-name" style="font-size:.88rem">HeyGen</div>
+            <div class="video-org">Avatares IA presentadores</div>
+            <div><span class="video-tag" style="background:rgba(255,101,132,.15);color:#FF9DB0">Avatar</span></div>
+          </div>
+          <div class="video-card" style="border-color:rgba(108,99,255,.4)">
+            <div style="font-size:1.8rem">🌊</div>
+            <div class="video-name" style="font-size:.88rem">Kling AI</div>
+            <div class="video-org">Img-to-video · Alternativa</div>
+            <div><span class="video-tag" style="background:rgba(108,99,255,.15);color:#9D97FF">Img→Video</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════
+       SLIDE 11 — PROMPTS PARA VIDEO
+  ════════════════════════════════ -->
+  <div class="slide bg-dark">
+    <div class="slide-tag gold">Prompting para Video</div>
+    <h2 class="section-title text-center">Cómo escribir <span class="grad-gold">prompts para video</span> efectivos</h2>
+
+    <div class="grid-2 full-width">
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--c5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem">🎬 Estructura del prompt de video</div>
+        <div class="step-flow">
+          <div class="step" style="border-color:rgba(255,179,71,.5);padding:.75rem 1rem">
+            <div style="font-size:1.1rem">🎭</div>
+            <div>
+              <div class="step-title" style="font-size:.85rem;color:var(--c5)">ESCENA — Qué sucede</div>
+              <div class="step-desc">"Un científico en un laboratorio futurista mirando a cámara con curiosidad"</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(255,179,71,.4);padding:.75rem 1rem">
+            <div style="font-size:1.1rem">🎥</div>
+            <div>
+              <div class="step-title" style="font-size:.85rem;color:var(--c5)">MOVIMIENTO — Tipo de plano</div>
+              <div class="step-desc">"Zoom lento · Pan horizontal · Tracking shot · Cámara estática · Dolly out"</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(255,179,71,.35);padding:.75rem 1rem">
+            <div style="font-size:1.1rem">💡</div>
+            <div>
+              <div class="step-title" style="font-size:.85rem;color:var(--c5)">ESTÉTICA — Estilo visual</div>
+              <div class="step-desc">"Cinematográfico · Documental · Animación 3D · Stop motion · Cine neón"</div>
+            </div>
+          </div>
+          <div class="step" style="border-color:rgba(67,203,255,.4);padding:.75rem 1rem">
+            <div style="font-size:1.1rem">🌐</div>
+            <div>
+              <div class="step-title" style="font-size:.85rem;color:var(--c1)">DETALLES TÉCNICOS</div>
+              <div class="step-desc">"4K · 24fps · Bokeh depth of field · Golden hour lighting · Epic scale"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:.7rem">
+        <div class="prompt-box" style="border-color:rgba(255,179,71,.4)">
+          <span class="prompt-box" style="border:none;padding:0;background:transparent;font-family:inherit;font-size:inherit">
+          <span class="ph">Una docente universitaria</span> explica conceptos de IA<br>
+          en un <span class="pv">aula ultramoderna con hologramas flotantes</span>.<br><br>
+          <span class="ph">Movimiento:</span> <span class="po">dolly lento hacia adelante</span>,<br>
+          la cámara se acerca gradualmente al rostro.<br><br>
+          <span class="ph">Estilo:</span> <span class="pv">cinematográfico, colores cálidos</span>,<br>
+          ambiente de <span class="po">inspiración y esperanza</span>.<br><br>
+          <span class="ph">Técnico:</span> <span class="pv">4K, 24fps, profundidad de campo</span>,<br>
+          <span class="po">golden hour, realistic lighting</span>, 8 segundos.
+          </span>
+        </div>
+
+        <div class="card ac-gold" style="padding:1rem">
+          <div style="font-size:.72rem;font-weight:700;color:var(--c5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">⚡ Alternativa práctica: Image-to-Video</div>
+          <p class="body" style="font-size:.8rem">Si el acceso a Veo 3 es limitado, usa la <strong style="color:var(--text)">imagen generada en el Módulo 1</strong> y anímala con Kling AI o el generador de video de Qwen. Describe solo el movimiento que quieres agregar.</p>
+        </div>
+
+        <div class="card" style="border-color:rgba(255,101,132,.4);padding:.9rem">
+          <div style="font-size:.72rem;font-weight:700;color:var(--c2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">📍 Acceso a las herramientas</div>
+          <div class="tool-item"><div class="bullet" style="background:var(--c2)"></div>flow.google.com (Veo 3 + Flow)</div>
+          <div class="tool-item"><div class="bullet" style="background:var(--c2)"></div>sora.com (OpenAI · con suscripción)</div>
+          <div class="tool-item"><div class="bullet" style="background:var(--c2)"></div>klingai.com (gratuito con límites)</div>
+          <div class="tool-item"><div class="bullet" style="background:var(--c2)"></div>heygen.com (avatar + presentador)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════
+       SLIDE 12 — CAPCUT AI: ENSAMBLAJE
+  ════════════════════════════════ -->
+  <div class="slide bg-pink">
+    <div class="slide-tag pink">Producción Final</div>
+    <h2 class="section-title text-center"><span class="grad-pink">CapCut AI</span>: donde todo se une</h2>
+    <p class="lead" style="font-size:.93rem;margin-bottom:1.4rem">La herramienta que permite ensamblar imagen + voz + música + video en un reel profesional sin experiencia en edición</p>
+
+    <div class="grid-2 full-width">
+      <div style="display:flex;flex-direction:column;gap:.6rem">
+        <div class="feature-row" style="border-color:rgba(255,101,132,.5)">
+          <div class="feat-icon">✂️</div>
+          <div>
+            <h3 class="card-title" style="color:#FF9DB0">Editor de video inteligente</h3>
+            <p class="body">CapCut AI detecta automáticamente los mejores momentos, sincroniza audio con video y aplica efectos según el ritmo de la música.</p>
+          </div>
+        </div>
+        <div class="feature-row">
+          <div class="feat-icon">📝</div>
+          <div>
+            <h3 class="card-title">Subtítulos automáticos</h3>
+            <p class="body">Transcribe la narración y genera subtítulos animados automáticamente. Soporta español e inglés con alta precisión.</p>
+          </div>
+        </div>
+        <div class="feature-row" style="border-color:rgba(0,245,160,.4)">
+          <div class="feat-icon">🎨</div>
+          <div>
+            <h3 class="card-title" style="color:#5CFFD1">Templates y efectos IA</h3>
+            <p class="body">Miles de plantillas para reels de Instagram, TikTok, YouTube Shorts. La IA elige los efectos que mejor combinan con tu contenido.</p>
+          </div>
+        </div>
+        <div class="feature-row" style="border-color:rgba(255,179,71,.4)">
+          <div class="feat-icon">📱</div>
+          <div>
+            <h3 class="card-title" style="color:var(--c5)">Web + App móvil gratuito</h3>
+            <p class="body">capcut.com disponible en navegador. También app móvil para iOS/Android. Plan gratuito más que suficiente para el proyecto.</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--c2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem">🔧 Flujo de ensamblaje del reel</div>
+        <div class="step-flow">
+          <div class="capcut-step" style="border-color:rgba(255,101,132,.45)">
+            <div class="capcut-num" style="background:rgba(255,101,132,.25);color:#FF9DB0">1</div>
+            <div><div class="step-title" style="font-size:.85rem">Subir el video generado por IA</div><div class="step-desc">Importar tu clip de Veo 3 / Kling / imagen animada</div></div>
+          </div>
+          <div class="capcut-step" style="border-color:rgba(108,99,255,.4)">
+            <div class="capcut-num" style="background:rgba(108,99,255,.2);color:#9D97FF">2</div>
+            <div><div class="step-title" style="font-size:.85rem">Agregar la narración de ElevenLabs</div><div class="step-desc">Importar el MP3 de la voz generada → ajustar sincronía</div></div>
+          </div>
+          <div class="capcut-step" style="border-color:rgba(0,245,160,.4)">
+            <div class="capcut-num" style="background:rgba(0,245,160,.15);color:#5CFFD1">3</div>
+            <div><div class="step-title" style="font-size:.85rem">Agregar música de fondo (Suno)</div><div class="step-desc">Importar el MP3 → bajar el volumen al 20–30% → equilibrar con la voz</div></div>
+          </div>
+          <div class="capcut-step" style="border-color:rgba(255,179,71,.4)">
+            <div class="capcut-num" style="background:rgba(255,179,71,.15);color:#FFD08A">4</div>
+            <div><div class="step-title" style="font-size:.85rem">Activar subtítulos automáticos</div><div class="step-desc">Auto Captions → elegir estilo animado → verificar texto</div></div>
+          </div>
+          <div class="capcut-step" style="border-color:rgba(67,203,255,.4)">
+            <div class="capcut-num" style="background:rgba(67,203,255,.15);color:#7DD8FF">5</div>
+            <div><div class="step-title" style="font-size:.85rem">Exportar en alta calidad</div><div class="step-desc">1080p → MP4 → Guardar → listo para compartir en cualquier red</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════
+       SLIDE 13 — PROYECTO INTEGRADOR
+  ════════════════════════════════ -->
+  <div class="slide bg-multi">
+    <div class="slide-tag pink">Proyecto Integrador · 25 minutos</div>
+    <h2 class="section-title text-center">🎯 Mini producción <span class="grad-cyan">multimedia completa</span></h2>
+    <p class="lead" style="font-size:.92rem;margin-bottom:1.4rem">Cada participante produce su propio reel multimedia usando las 4 herramientas de la clase</p>
+
+    <div class="grid-2 full-width">
+      <div>
+        <div style="font-size:.72rem;font-weight:700;color:var(--c1);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem">📦 Las 4 piezas del proyecto</div>
+
+        <div class="deliverable" style="background:rgba(67,203,255,.1);border:1px solid rgba(67,203,255,.35);border-radius:12px;margin-bottom:.5rem;padding:.9rem 1rem">
+          <div class="del-icon" style="font-size:1.5rem">🖼️</div>
+          <div>
+            <div style="font-weight:700;font-size:.88rem;color:#7DD8FF">Imagen generada con DALL·E / Nano Banana</div>
+            <div style="font-size:.74rem;color:var(--text2)">La portada visual de tu reel · Formato 16:9 o 9:16</div>
+          </div>
+          <div class="del-time" style="color:#7DD8FF">✓ Hecho</div>
+        </div>
+
+        <div class="deliverable" style="background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.35);border-radius:12px;margin-bottom:.5rem;padding:.9rem 1rem">
+          <div class="del-icon" style="font-size:1.5rem">🎤</div>
+          <div>
+            <div style="font-weight:700;font-size:.88rem;color:#9D97FF">Narración con ElevenLabs</div>
+            <div style="font-size:.74rem;color:var(--text2)">20–40 segundos · Voz elegida · En español</div>
+          </div>
+          <div class="del-time" style="color:#9D97FF">✓ Hecho</div>
+        </div>
+
+        <div class="deliverable" style="background:rgba(0,245,160,.08);border:1px solid rgba(0,245,160,.35);border-radius:12px;margin-bottom:.5rem;padding:.9rem 1rem">
+          <div class="del-icon" style="font-size:1.5rem">🎵</div>
+          <div>
+            <div style="font-weight:700;font-size:.88rem;color:#5CFFD1">Música de fondo con Suno AI</div>
+            <div style="font-size:.74rem;color:var(--text2)">Instrumental · Coincide con el mood del contenido</div>
+          </div>
+          <div class="del-time" style="color:#5CFFD1">✓ Hecho</div>
+        </div>
+
+        <div class="deliverable" style="background:rgba(255,179,71,.08);border:1px solid rgba(255,179,71,.35);border-radius:12px;margin-bottom:.5rem;padding:.9rem 1rem">
+          <div class="del-icon" style="font-size:1.5rem">🎬</div>
+          <div>
+            <div style="font-weight:700;font-size:.88rem;color:#FFD08A">Video / animación generada con IA</div>
+            <div style="font-size:.74rem;color:var(--text2)">5–15 segundos · Veo 3, Kling o imagen animada</div>
+          </div>
+          <div class="del-time" style="color:#FFD08A">Ahora →</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:.8rem">
+        <div class="activity-box" style="background:linear-gradient(135deg,rgba(67,203,255,.1),rgba(255,101,132,.07));border-color:rgba(67,203,255,.45)">
+          <div class="activity-header">
+            <div class="activity-icon">🎬</div>
+            <div>
+              <div class="activity-title" style="color:var(--c1)">Temáticas sugeridas</div>
+              <div class="activity-sub">Elige una o propón la tuya</div>
+            </div>
+          </div>
+          <div class="deliverable" style="background:rgba(67,203,255,.1)"><div class="del-icon">📚</div>La IA como herramienta educativa</div>
+          <div class="deliverable" style="background:rgba(255,101,132,.08)"><div class="del-icon">🚀</div>El futuro de la tecnología en 2026</div>
+          <div class="deliverable" style="background:rgba(0,245,160,.08)"><div class="del-icon">🌍</div>Beneficios de la IA en mi campo profesional</div>
+          <div class="deliverable" style="background:rgba(255,179,71,.08)"><div class="del-icon">💡</div>Innovación educativa con IA Generativa</div>
+        </div>
+
+        <div class="card" style="border-color:rgba(255,193,7,.35);padding:.9rem;text-align:center">
+          <div style="font-weight:700;font-size:.88rem;color:#FFD54F;margin-bottom:.3rem">🏆 Resultado esperado</div>
+          <div style="font-size:.78rem;color:var(--text2);line-height:1.5">Un reel de 20–45 segundos con imagen, narración, música y video, 100% generado con IA, listo para compartir en redes sociales o presentaciones.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════
+       SLIDE 14 — COMPARATIVA DE HERRAMIENTAS
+  ════════════════════════════════ -->
+  <div class="slide bg-dark">
+    <div class="slide-tag">Referencia Rápida</div>
+    <h2 class="section-title text-center">Guía de referencia: <span class="grad-cyan">cuándo usar cada herramienta</span></h2>
+
+    <div class="full-width" style="overflow-x:auto">
+      <table class="comp-table" style="max-width:880px;margin:0 auto">
+        <thead>
+          <tr>
+            <th>Herramienta</th>
+            <th>Tipo</th>
+            <th>Mejor para</th>
+            <th>Limitación</th>
+            <th>Acceso</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="comp-tool">🤖 DALL·E 3</span></td>
+            <td><span class="badge bc" style="font-size:.65rem">Imagen</span></td>
+            <td>Imágenes fotorrealistas con excelente seguimiento del prompt</td>
+            <td>Integrado en ChatGPT Plus</td>
+            <td style="color:#5CFFD1">Freemium</td>
+          </tr>
+          <tr>
+            <td><span class="comp-tool">🍌 Nano Banana</span></td>
+            <td><span class="badge bc" style="font-size:.65rem">Imagen</span></td>
+            <td>Práctica rápida · Sin registro · Generación inmediata</td>
+            <td>Calidad variable</td>
+            <td style="color:#5CFFD1">Gratis</td>
+          </tr>
+          <tr>
+            <td><span class="comp-tool">🏟️ Arena AI</span></td>
+            <td><span class="badge bc" style="font-size:.65rem">Imagen</span></td>
+            <td>Comparar múltiples modelos con el mismo prompt simultáneamente</td>
+            <td>Créditos limitados</td>
+            <td style="color:#5CFFD1">Freemium</td>
+          </tr>
+          <tr>
+            <td><span class="comp-tool">🎤 ElevenLabs</span></td>
+            <td><span class="badge bp" style="font-size:.65rem">Voz</span></td>
+            <td>Narración de máxima calidad · Clonación de voz</td>
+            <td>10.000 char/mes gratis</td>
+            <td style="color:#5CFFD1">Freemium</td>
+          </tr>
+          <tr>
+            <td><span class="comp-tool">🎵 Suno AI</span></td>
+            <td><span class="badge bg-b" style="font-size:.65rem">Música</span></td>
+            <td>Canciones completas con letra · Música de fondo instrumental</td>
+            <td>50 canciones/día gratis</td>
+            <td style="color:#5CFFD1">Freemium</td>
+          </tr>
+          <tr>
+            <td><span class="comp-tool">🌊 Veo 3 / Flow</span></td>
+            <td><span class="badge bgd" style="font-size:.65rem">Video</span></td>
+            <td>Video realista con audio · La mayor calidad disponible en 2026</td>
+            <td>Acceso limitado · Costo</td>
+            <td style="color:#FFD08A">Pago</td>
+          </tr>
+          <tr>
+            <td><span class="comp-tool">🌊 Kling AI</span></td>
+            <td><span class="badge bgd" style="font-size:.65rem">Video</span></td>
+            <td>Image-to-video · Buena calidad · Alternativa accesible</td>
+            <td>5 videos/día gratis</td>
+            <td style="color:#5CFFD1">Freemium</td>
+          </tr>
+          <tr>
+            <td><span class="comp-tool">✂️ CapCut AI</span></td>
+            <td><span class="badge bpk" style="font-size:.65rem">Edición</span></td>
+            <td>Ensamblaje · Subtítulos automáticos · Templates para redes</td>
+            <td>Marca de agua en gratis</td>
+            <td style="color:#5CFFD1">Freemium</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card mt-3 full-width" style="max-width:880px;text-align:center;border-color:rgba(255,193,7,.3);padding:.85rem">
+      <span style="color:#FFD54F;font-size:.82rem;font-weight:600">💡 Todas las herramientas tienen plan gratuito suficiente para aprender y completar el proyecto de la clase.</span>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════
+       SLIDE 15 — ÉTICA EN MULTIMEDIA IA
+  ════════════════════════════════ -->
+  <div class="slide bg-cyan">
+    <div class="slide-tag">Uso Responsable</div>
+    <h2 class="section-title text-center">Ética en la <span class="grad-cyan">creación multimedia con IA</span></h2>
+
+    <div class="grid-2 full-width">
+      <div style="display:flex;flex-direction:column;gap:.65rem">
+        <div style="font-size:.72rem;font-weight:700;color:var(--c2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.2rem">⚠ Riesgos a conocer</div>
+        <div class="feature-row" style="border-color:rgba(255,101,132,.45);padding:.8rem 1rem">
+          <div class="feat-icon" style="font-size:1.2rem">🎭</div>
+          <div>
+            <h3 class="card-title" style="font-size:.88rem;color:#FF9DB0">Deepfakes</h3>
+            <p class="body" style="font-size:.78rem">La IA puede crear imágenes, videos y voces de personas reales de forma falsa. Esto puede usarse para desinformar, difamar o engañar. Detección cada vez más difícil.</p>
+          </div>
+        </div>
+        <div class="feature-row" style="border-color:rgba(255,179,71,.4);padding:.8rem 1rem">
+          <div class="feat-icon" style="font-size:1.2rem">©️</div>
+          <div>
+            <h3 class="card-title" style="font-size:.88rem;color:var(--c5)">Derechos de autor</h3>
+            <p class="body" style="font-size:.78rem">Las imágenes generadas por IA tienen un status legal ambiguo. Verifica los términos de uso de cada herramienta antes de usar el contenido comercialmente.</p>
+          </div>
+        </div>
+        <div class="feature-row" style="border-color:rgba(255,101,132,.35);padding:.8rem 1rem">
+          <div class="feat-icon" style="font-size:1.2rem">🧬</div>
+          <div>
+            <h3 class="card-title" style="font-size:.88rem;color:#FF9DB0">Clonación de voz sin consentimiento</h3>
+            <p class="body" style="font-size:.78rem">Clonar la voz de otra persona sin permiso es ilegal en muchos países. La voz es un dato biométrico protegido.</p>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:.65rem">
+        <div style="font-size:.72rem;font-weight:700;color:var(--c4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.2rem">✅ Buenas prácticas</div>
+        <div class="feature-row" style="border-color:rgba(0,245,160,.45);padding:.8rem 1rem">
+          <div class="feat-icon" style="font-size:1.2rem">🏷️</div>
+          <div>
+            <h3 class="card-title" style="font-size:.88rem;color:#5CFFD1">Etiquetar contenido generado por IA</h3>
+            <p class="body" style="font-size:.78rem">Indica claramente cuando un video, imagen o voz fue creado con IA. Usar hashtags como #AIGenerated o #HechoConIA.</p>
+          </div>
+        </div>
+        <div class="feature-row" style="border-color:rgba(67,203,255,.4);padding:.8rem 1rem">
+          <div class="feat-icon" style="font-size:1.2rem">🎯</div>
+          <div>
+            <h3 class="card-title" style="font-size:.88rem;color:#7DD8FF">Usar solo tu propia imagen/voz</h3>
+            <p class="body" style="font-size:.78rem">Para contenido educativo y profesional, usa tu propia voz para clonar o avatares genéricos. Respeta la identidad y privacidad de terceros.</p>
+          </div>
+        </div>
+        <div class="feature-row" style="border-color:rgba(0,245,160,.35);padding:.8rem 1rem">
+          <div class="feat-icon" style="font-size:1.2rem">💡</div>
+          <div>
+            <h3 class="card-title" style="font-size:.88rem;color:#5CFFD1">Educación sobre detección</h3>
+            <p class="body" style="font-size:.78rem">Enseña a tus estudiantes a identificar contenido falso: inconsistencias en manos, parpadeo anormal, sincronía de labios incorrecta.</p>
+          </div>
+        </div>
+
+        <div class="card ac-gold" style="text-align:center;padding:.85rem">
+          <span style="font-size:.82rem;color:var(--c5);font-weight:600">⚡ El poder de crear implica la responsabilidad de hacerlo con integridad.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════
+       SLIDE 16 — CIERRE CLASE 2
+  ════════════════════════════════ -->
+  <div class="slide bg-c2">
+    <div class="slide-tag">Cierre · Clase 2</div>
+    <h2 class="section-title text-center" style="margin-bottom:1rem">¡Lo que <span class="grad-cyan">produjiste hoy</span>!</h2>
+
+    <div class="closing-grid">
+      <div class="cl-card" style="border-color:rgba(67,203,255,.5)">
+        <div class="cl-icon">🖼️</div>
+        <div class="cl-label grad-cyan">Imagen IA</div>
+        <div class="cl-sub">Arte visual profesional generado con un prompt descriptivo</div>
+      </div>
+      <div class="cl-card" style="border-color:rgba(108,99,255,.5)">
+        <div class="cl-icon">🎤</div>
+        <div class="cl-label" style="color:#9D97FF">Narración</div>
+        <div class="cl-sub">Voz hiperrealista generada por ElevenLabs desde tu texto</div>
+      </div>
+      <div class="cl-card" style="border-color:rgba(0,245,160,.5)">
+        <div class="cl-icon">🎵</div>
+        <div class="cl-label grad-green">Música</div>
+        <div class="cl-sub">Composición original generada por Suno AI según el mood</div>
+      </div>
+      <div class="cl-card" style="border-color:rgba(255,179,71,.5)">
+        <div class="cl-icon">🎬</div>
+        <div class="cl-label grad-gold">Mini Reel</div>
+        <div class="cl-sub">Producción multimedia completa ensamblada con CapCut AI</div>
+      </div>
+    </div>
+
+    <div class="card mt-3 full-width" style="border-color:rgba(255,193,7,.45);padding:1.2rem">
+      <div style="display:flex;align-items:center;gap:1rem">
+        <div style="font-size:2.5rem">🚀</div>
+        <div>
+          <div style="font-weight:700;font-size:1rem;color:#FFD54F;margin-bottom:.3rem">Próxima Clase — Presentaciones, Apps y Proyecto Final</div>
+          <div style="display:flex;gap:.7rem;flex-wrap:wrap">
+            <span class="badge bc">Claude HTML</span>
+            <span class="badge bp">Lovable</span>
+            <span class="badge bg-b">Google AI Studio</span>
+            <span class="badge bgd">Manus AI</span>
+            <span class="badge bpk">Ética & Futuro IA</span>
+          </div>
+          <div style="font-size:.78rem;color:var(--text2);margin-top:.5rem">Trae tu reel terminado y el tema de tu proyecto final integrador.</div>
+        </div>
+      </div>
+    </div>
+
+    <button onclick="window.location.href='index.html'" style="margin-top:1.2rem;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:.6rem 1.4rem;color:var(--text);font-size:.82rem;font-weight:600;cursor:pointer;backdrop-filter:blur(10px);transition:border-color .2s" onmouseover="this.style.borderColor='rgba(67,203,255,.6)'" onmouseout="this.style.borderColor='var(--border)'">
+      ← Volver al curso principal
+    </button>
+  </div>
+
+</div><!-- end deck -->
+
+<script>
+  // Particles
+  (function() {
+    const el = document.getElementById('particles');
+    const cols = ['#43CBFF','#FF6584','#00F5A0','#FFB347','#6C63FF'];
+    for (let i = 0; i < 20; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = 3 + Math.random() * 7;
+      p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;background:${cols[Math.floor(Math.random()*cols.length)]};animation-duration:${14+Math.random()*18}s;animation-delay:${-Math.random()*20}s;`;
+      el.appendChild(p);
+    }
+  })();
+
+  // Slide engine
+  const slides  = Array.from(document.querySelectorAll('.slide'));
+  const total   = slides.length;
+  let   current = 0;
+
+  const counter = document.getElementById('slide-counter');
+  const dotsEl  = document.getElementById('dots');
+  const progBar = document.getElementById('progress-bar');
+
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' on' : '');
+    d.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(d);
+  });
+
+  function updateUI() {
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('on', i === current));
+    counter.textContent = `${current + 1} / ${total}`;
+    progBar.style.width = `${((current + 1) / total) * 100}%`;
+  }
+
+  function goTo(idx) {
+    if (idx < 0 || idx >= total || idx === current) return;
+    slides[current].classList.remove('active');
+    slides[current].classList.add('exit');
+    const prev = current;
+    current = idx;
+    setTimeout(() => slides[prev].classList.remove('exit'), 450);
+    slides[current].classList.add('active');
+    updateUI();
+  }
+
+  document.getElementById('next').addEventListener('click', () => goTo(current + 1));
+  document.getElementById('prev').addEventListener('click', () => goTo(current - 1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); goTo(current + 1); }
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                    { e.preventDefault(); goTo(current - 1); }
+    if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+  });
+
+  let touchX = 0;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; });
+  document.addEventListener('touchend',   e => {
+    const dx = touchX - e.changedTouches[0].clientX;
+    if (Math.abs(dx) > 50) goTo(current + (dx > 0 ? 1 : -1));
+  });
+
+  updateUI();
+</script>
+</body>
+</html>
