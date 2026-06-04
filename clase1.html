@@ -405,6 +405,127 @@
   .cl-label { font-weight:700; font-size:.85rem; margin-bottom:.2rem; }
   .cl-sub   { font-size:.72rem; color:var(--text2); line-height:1.45; }
 
+  /* ═══════════════════════════════════
+     RESPONSIVE — MÓVIL (max 768px)
+  ═══════════════════════════════════ */
+  @media (max-width: 768px) {
+    body { overflow: hidden; }
+
+    .slide {
+      padding: 1.4rem 1rem 6.5rem;
+      overflow-y: auto;
+      overflow-x: hidden;
+      justify-content: flex-start;
+      align-items: stretch;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Grids */
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr !important; gap:.9rem; }
+
+    /* Tipografía */
+    h1.hero          { font-size:1.9rem; }
+    h2.section-title { font-size:1.25rem; margin-bottom:.8rem; }
+    p.lead           { font-size:.9rem; margin-bottom:.9rem; }
+    p.body           { font-size:.82rem; }
+    .slide-tag       { font-size:.63rem; }
+
+    /* Glow ring */
+    .glow-ring { width:120px; height:120px; font-size:2.3rem; margin-bottom:1.2rem; }
+
+    /* Portada: stats 2 columnas */
+    .grid-4[style*="580px"] { grid-template-columns:1fr 1fr !important; }
+    .stat-mini .num { font-size:1.6rem; }
+
+    /* Class banner */
+    .class-banner { flex-direction:column; gap:.4rem; margin-bottom:1.2rem; }
+    .banner-num   { font-size:2.5rem; }
+
+    /* Agenda */
+    .agenda-item  { gap:.6rem; padding:.65rem .9rem; flex-wrap:wrap; }
+    .agenda-num   { font-size:1.1rem; min-width:1.6rem; }
+    .agenda-time  { font-size:.62rem; min-width:auto; }
+    .agenda-label { font-size:.82rem; }
+    .agenda-sub   { font-size:.7rem; }
+
+    /* Tool cards */
+    .tool-card   { padding:1.1rem; }
+    .tool-logo   { font-size:2rem; }
+    .tool-name   { font-size:.95rem; }
+
+    /* Prompt box */
+    .prompt-box  { font-size:.73rem; padding:.9rem 1rem; }
+
+    /* Feature rows */
+    .feature-row { gap:.6rem; padding:.7rem .85rem; }
+    .feat-icon   { font-size:1.2rem; }
+
+    /* Technique cards */
+    .technique   { padding:.9rem 1rem; }
+    .tech-desc   { font-size:.74rem; }
+    .tech-example{ font-size:.7rem; }
+
+    /* Steps */
+    .step        { padding:.7rem .9rem; gap:.7rem; }
+    .step-num    { font-size:1.1rem; min-width:1.5rem; }
+    .step-title  { font-size:.83rem; }
+    .step-desc   { font-size:.74rem; }
+
+    /* NotebookLM flow */
+    .flow-row    { flex-direction:column; gap:.7rem; }
+    .flow-arrow  { transform:rotate(90deg); font-size:1rem; justify-content:center; }
+    .nlm-card    { max-width:100% !important; }
+
+    /* Activity box */
+    .activity-box    { padding:1.1rem; }
+    .activity-title  { font-size:.95rem; }
+    .deliverable     { font-size:.76rem; padding:.5rem .7rem; gap:.5rem; }
+    .del-icon        { font-size:1rem; }
+
+    /* Radar / skills */
+    .skill-row  { gap:.7rem; }
+    .skill-name { min-width:110px; font-size:.73rem; }
+    .skill-pct  { font-size:.7rem; }
+
+    /* Result cards */
+    .result-card    { padding:.9rem 1rem; }
+    .result-icon    { font-size:1.5rem; }
+    .result-name    { font-size:.85rem; }
+    .result-sample  { font-size:.68rem; }
+
+    /* Closing grid → 2 col */
+    .closing-grid { grid-template-columns:1fr 1fr !important; gap:.7rem; }
+    .cl-icon      { font-size:1.6rem; }
+
+    /* Big quote */
+    .big-quote { font-size:.85rem; padding:1rem 1.2rem; }
+
+    /* Nav */
+    #nav           { gap:.5rem; padding:.4rem .9rem; bottom:1rem; }
+    .nav-btn       { width:40px; height:40px; font-size:1rem; }
+    .nav-btn.home-btn { padding:0 .65rem; font-size:.68rem; }
+    #slide-counter { font-size:.7rem; min-width:44px; }
+
+    /* Ocultar en móvil */
+    #dots    { display:none; }
+    #kb-hint { display:none; }
+
+    /* Copyright */
+    #copyright { font-size:.62rem; padding:.3rem .6rem; bottom:4.5rem; }
+
+    /* Cards generales */
+    .card { padding:.95rem 1.1rem; }
+  }
+
+  @media (max-width: 480px) {
+    .slide           { padding:1.1rem .8rem 6.5rem; }
+    h1.hero          { font-size:1.6rem; }
+    h2.section-title { font-size:1.1rem; }
+    .closing-grid    { grid-template-columns:1fr !important; }
+    .glow-ring       { width:100px; height:100px; font-size:2rem; }
+    .prompt-box      { font-size:.68rem; }
+  }
+
 </style>
 </head>
 <body>

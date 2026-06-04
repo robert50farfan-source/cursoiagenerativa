@@ -1010,6 +1010,126 @@
         color: var(--text2);
         line-height: 1.5;
       }
+
+  /* ═══════════════════════════════════
+     RESPONSIVE — MÓVIL (max 768px)
+  ═══════════════════════════════════ */
+  @media (max-width: 768px) {
+
+    body { overflow: hidden; }
+
+    /* Slides: scroll interno, padding móvil */
+    .slide {
+      padding: 1.5rem 1rem 6rem;
+      overflow-y: auto;
+      overflow-x: hidden;
+      justify-content: flex-start;
+      align-items: stretch;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Grids → 1 columna */
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr !important; gap:1rem; }
+
+    /* Tipografía */
+    h1.hero      { font-size: 1.9rem; }
+    h2.section-title { font-size: 1.3rem; margin-bottom:.9rem; }
+    p.lead       { font-size: .92rem; margin-bottom:1rem; }
+    p.body       { font-size: .82rem; }
+
+    /* Glow ring */
+    .glow-ring { width:130px; height:130px; font-size:2.5rem; margin-bottom:1.2rem; }
+
+    /* Hero badges */
+    .hero-badges { gap:.5rem; }
+    .hero-subtitle { font-size:.95rem; }
+
+    /* Stat boxes en portada — 2 columnas */
+    .grid-4[style*="600px"] { grid-template-columns: 1fr 1fr !important; }
+
+    /* Stats */
+    .stat-box { padding:1rem .8rem; }
+    .stat-num  { font-size:1.8rem; }
+
+    /* Course map → columna */
+    .course-map { flex-direction: column; gap:1rem; }
+    .course-class { padding:1.1rem; }
+
+    /* Landscape grid → 2 columnas */
+    .landscape-grid { grid-template-columns: 1fr 1fr !important; gap:.8rem; }
+    .tool-chip { font-size:.72rem; padding:.25rem .5rem; }
+
+    /* Timeline → scroll horizontal */
+    .timeline { overflow-x: auto; padding-bottom:.5rem; }
+    .tl-item  { min-width: 70px; }
+    .tl-text  { font-size:.62rem; }
+    .tl-year  { font-size:.65rem; }
+
+    /* Cards */
+    .card { padding:1rem; }
+
+    /* Class header */
+    .class-header { flex-direction:column; gap:.5rem; }
+    .class-num    { font-size:3rem; opacity:.1; }
+
+    /* Feature row */
+    .feature-row { gap:.7rem; padding:.7rem .9rem; }
+
+    /* Prompt box */
+    .prompt-box { font-size:.74rem; padding:.9rem 1rem; }
+
+    /* Radar / skill */
+    .skill-name { min-width:120px; font-size:.75rem; }
+
+    /* Closing grid → 2 columnas */
+    .closing-grid, .final-grid { grid-template-columns: 1fr 1fr !important; gap:.8rem; }
+    .final-card { padding:1rem; }
+    .final-icon { font-size:1.8rem; }
+    .final-label{ font-size:.85rem; }
+    .final-sub  { font-size:.7rem; }
+
+    /* Course class open-btn siempre visible en móvil */
+    .course-class .open-btn { opacity:1 !important; }
+
+    /* Dots → ocultar */
+    #dots { display: none; }
+
+    /* KB hint → ocultar */
+    #kb-hint { display: none; }
+
+    /* Copyright */
+    #copyright { font-size:.62rem; padding:.3rem .6rem; bottom:4.5rem; }
+
+    /* Nav */
+    #nav { gap:.6rem; padding:.45rem .9rem; bottom:1rem; }
+    .nav-btn { width:38px; height:38px; font-size:1rem; }
+    #slide-counter { font-size:.72rem; min-width:46px; }
+
+    /* Big quote */
+    .big-quote { font-size:.9rem; padding:1.2rem 1.4rem; }
+    .big-quote::before { font-size:4rem; }
+
+    /* Slide tag */
+    .slide-tag { font-size:.65rem; }
+
+    /* Tool pill grid */
+    .full-width[style*="repeat(4"] { grid-template-columns: 1fr 1fr !important; }
+    .tool-pill { font-size:.78rem; padding:.5rem .8rem; }
+    .tool-icon { font-size:1.2rem; }
+
+    /* Stat mini */
+    .stat-mini .num { font-size:1.6rem; }
+  }
+
+  @media (max-width: 480px) {
+    .slide { padding: 1.2rem .85rem 6rem; }
+    h1.hero { font-size: 1.6rem; }
+    h2.section-title { font-size: 1.15rem; }
+    .landscape-grid { grid-template-columns: 1fr !important; }
+    .closing-grid, .final-grid { grid-template-columns: 1fr !important; }
+    .glow-ring { width:110px; height:110px; font-size:2.2rem; }
+  }
+
     </style>
   </head>
   <body>
