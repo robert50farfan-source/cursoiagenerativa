@@ -1,1542 +1,3464 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clase 1 — IA para Investigar, Organizar y Crear Conocimiento</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --c1: #6C63FF;
-    --c2: #FF6584;
-    --c3: #43CBFF;
-    --c4: #9708CC;
-    --c5: #00F5A0;
-    --dark: #0A0A14;
-    --dark2: #12121F;
-    --dark3: #1A1A2E;
-    --glass: rgba(255,255,255,0.06);
-    --border: rgba(255,255,255,0.10);
-    --text: #E8E8F0;
-    --text2: #9898B8;
-    --accent: #6C63FF;
-  }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clase 1 — IA para Investigar, Organizar y Crear Conocimiento</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --c1: #6c63ff;
+        --c2: #ff6584;
+        --c3: #43cbff;
+        --c4: #9708cc;
+        --c5: #00f5a0;
+        --dark: #0a0a14;
+        --dark2: #12121f;
+        --dark3: #1a1a2e;
+        --glass: rgba(255, 255, 255, 0.06);
+        --border: rgba(255, 255, 255, 0.1);
+        --text: #e8e8f0;
+        --text2: #9898b8;
+        --accent: #6c63ff;
+      }
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-  body {
-    font-family:'Inter', sans-serif;
-    background: var(--dark);
-    color: var(--text);
-    overflow: hidden;
-    height: 100vh;
-    width: 100vw;
-  }
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--dark);
+        color: var(--text);
+        overflow: hidden;
+        height: 100vh;
+        width: 100vw;
+      }
 
-  /* ——— SLIDE ENGINE ——— */
-  #deck { width:100%; height:100%; position:relative; }
+      /* ——— SLIDE ENGINE ——— */
+      #deck {
+        width: 100%;
+        height: 100%;
+        position: relative;
+      }
 
-  .slide {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 3.5rem 5.5rem;
-    opacity: 0;
-    pointer-events: none;
-    transform: translateX(60px);
-    transition: opacity .45s ease, transform .45s ease;
-  }
-  .slide.active  { opacity:1; pointer-events:all; transform:translateX(0); }
-  .slide.exit    { opacity:0; transform:translateX(-60px); }
+      .slide {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 3.5rem 5.5rem;
+        opacity: 0;
+        pointer-events: none;
+        transform: translateX(60px);
+        transition:
+          opacity 0.45s ease,
+          transform 0.45s ease;
+      }
+      .slide.active {
+        opacity: 1;
+        pointer-events: all;
+        transform: translateX(0);
+      }
+      .slide.exit {
+        opacity: 0;
+        transform: translateX(-60px);
+      }
 
-  /* ——— BACKGROUNDS ——— */
-  .bg-class1 { background: radial-gradient(ellipse 80% 60% at 30% 0%, rgba(108,99,255,.4) 0%, var(--dark) 65%); }
-  .bg-dark    { background: var(--dark); }
-  .bg-blue    { background: radial-gradient(ellipse 70% 55% at 80% 50%, rgba(67,203,255,.25) 0%, var(--dark) 65%); }
-  .bg-purple  { background: radial-gradient(ellipse 70% 55% at 20% 50%, rgba(151,8,204,.28) 0%, var(--dark) 65%); }
-  .bg-green   { background: radial-gradient(ellipse 70% 55% at 50% 80%, rgba(0,245,160,.2) 0%, var(--dark) 65%); }
-  .bg-pink    { background: radial-gradient(ellipse 70% 55% at 30% 30%, rgba(255,101,132,.22) 0%, var(--dark) 65%); }
-  .bg-multi   {
-    background:
-      radial-gradient(ellipse 55% 55% at 0% 0%, rgba(108,99,255,.2) 0%, transparent 60%),
-      radial-gradient(ellipse 55% 55% at 100% 100%, rgba(0,245,160,.15) 0%, transparent 60%),
-      var(--dark);
-  }
+      /* ——— BACKGROUNDS ——— */
+      .bg-class1 {
+        background: radial-gradient(
+          ellipse 80% 60% at 30% 0%,
+          rgba(108, 99, 255, 0.4) 0%,
+          var(--dark) 65%
+        );
+      }
+      .bg-dark {
+        background: var(--dark);
+      }
+      .bg-blue {
+        background: radial-gradient(
+          ellipse 70% 55% at 80% 50%,
+          rgba(67, 203, 255, 0.25) 0%,
+          var(--dark) 65%
+        );
+      }
+      .bg-purple {
+        background: radial-gradient(
+          ellipse 70% 55% at 20% 50%,
+          rgba(151, 8, 204, 0.28) 0%,
+          var(--dark) 65%
+        );
+      }
+      .bg-green {
+        background: radial-gradient(
+          ellipse 70% 55% at 50% 80%,
+          rgba(0, 245, 160, 0.2) 0%,
+          var(--dark) 65%
+        );
+      }
+      .bg-pink {
+        background: radial-gradient(
+          ellipse 70% 55% at 30% 30%,
+          rgba(255, 101, 132, 0.22) 0%,
+          var(--dark) 65%
+        );
+      }
+      .bg-multi {
+        background:
+          radial-gradient(
+            ellipse 55% 55% at 0% 0%,
+            rgba(108, 99, 255, 0.2) 0%,
+            transparent 60%
+          ),
+          radial-gradient(
+            ellipse 55% 55% at 100% 100%,
+            rgba(0, 245, 160, 0.15) 0%,
+            transparent 60%
+          ),
+          var(--dark);
+      }
 
-  /* ——— LAYOUT ——— */
-  .grid-2  { display:grid; grid-template-columns:1fr 1fr; gap:1.6rem; width:100%; }
-  .grid-3  { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.3rem; width:100%; }
-  .grid-4  { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:1rem; width:100%; }
-  .full-width { width:100%; }
-  .mt-1 { margin-top:.5rem; } .mt-2 { margin-top:1rem; } .mt-3 { margin-top:1.5rem; }
-  .mb-1 { margin-bottom:.5rem; } .mb-2 { margin-bottom:1rem; }
-  .text-center { text-align:center; }
+      /* ——— LAYOUT ——— */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.6rem;
+        width: 100%;
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1.3rem;
+        width: 100%;
+      }
+      .grid-4 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+        gap: 1rem;
+        width: 100%;
+      }
+      .full-width {
+        width: 100%;
+      }
+      .mt-1 {
+        margin-top: 0.5rem;
+      }
+      .mt-2 {
+        margin-top: 1rem;
+      }
+      .mt-3 {
+        margin-top: 1.5rem;
+      }
+      .mb-1 {
+        margin-bottom: 0.5rem;
+      }
+      .mb-2 {
+        margin-bottom: 1rem;
+      }
+      .text-center {
+        text-align: center;
+      }
 
-  /* ——— TYPOGRAPHY ——— */
-  .slide-tag {
-    font-size:.72rem; letter-spacing:.15em; text-transform:uppercase;
-    font-weight:600; color:var(--c1); margin-bottom:.65rem;
-  }
-  .slide-tag.cyan   { color:var(--c3); }
-  .slide-tag.green  { color:var(--c5); }
-  .slide-tag.pink   { color:var(--c2); }
-  .slide-tag.purple { color:#9D97FF; }
+      /* ——— TYPOGRAPHY ——— */
+      .slide-tag {
+        font-size: 0.72rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        font-weight: 600;
+        color: var(--c1);
+        margin-bottom: 0.65rem;
+      }
+      .slide-tag.cyan {
+        color: var(--c3);
+      }
+      .slide-tag.green {
+        color: var(--c5);
+      }
+      .slide-tag.pink {
+        color: var(--c2);
+      }
+      .slide-tag.purple {
+        color: #9d97ff;
+      }
 
-  h1.hero {
-    font-family:'Space Grotesk',sans-serif;
-    font-size:clamp(2.4rem,5vw,4rem);
-    font-weight:800; line-height:1.05;
-    text-align:center; letter-spacing:-.02em;
-  }
-  h2.section-title {
-    font-family:'Space Grotesk',sans-serif;
-    font-size:clamp(1.6rem,3vw,2.4rem);
-    font-weight:700; margin-bottom:1.2rem; line-height:1.15;
-  }
-  h3.card-title { font-size:1rem; font-weight:700; margin-bottom:.35rem; }
+      h1.hero {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(2.4rem, 5vw, 4rem);
+        font-weight: 800;
+        line-height: 1.05;
+        text-align: center;
+        letter-spacing: -0.02em;
+      }
+      h2.section-title {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: clamp(1.6rem, 3vw, 2.4rem);
+        font-weight: 700;
+        margin-bottom: 1.2rem;
+        line-height: 1.15;
+      }
+      h3.card-title {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 0.35rem;
+      }
 
-  p.lead { font-size:1.05rem; line-height:1.7; color:var(--text2); max-width:780px; text-align:center; }
-  p.body { font-size:.88rem; line-height:1.65; color:var(--text2); }
+      p.lead {
+        font-size: 1.05rem;
+        line-height: 1.7;
+        color: var(--text2);
+        max-width: 780px;
+        text-align: center;
+      }
+      p.body {
+        font-size: 0.88rem;
+        line-height: 1.65;
+        color: var(--text2);
+      }
 
-  .grad-text  { background:linear-gradient(135deg,var(--c1),var(--c3)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-  .grad-green { background:linear-gradient(135deg,var(--c5),var(--c3)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-  .grad-pink  { background:linear-gradient(135deg,var(--c2),#FFB347);   -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+      .grad-text {
+        background: linear-gradient(135deg, var(--c1), var(--c3));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .grad-green {
+        background: linear-gradient(135deg, var(--c5), var(--c3));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .grad-pink {
+        background: linear-gradient(135deg, var(--c2), #ffb347);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
 
-  /* ——— CARDS ——— */
-  .card {
-    background:var(--glass); border:1px solid var(--border);
-    border-radius:14px; padding:1.2rem 1.4rem;
-    backdrop-filter:blur(12px);
-    transition:transform .25s, border-color .25s;
-  }
-  .card:hover { transform:translateY(-3px); border-color:rgba(108,99,255,.4); }
-  .card.ac-purple { border-color:rgba(108,99,255,.4); }
-  .card.ac-cyan   { border-color:rgba(67,203,255,.4); }
-  .card.ac-green  { border-color:rgba(0,245,160,.4); }
-  .card.ac-pink   { border-color:rgba(255,101,132,.4); }
-  .card.ac-gold   { border-color:rgba(255,193,7,.35); }
+      /* ——— CARDS ——— */
+      .card {
+        background: var(--glass);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.2rem 1.4rem;
+        backdrop-filter: blur(12px);
+        transition:
+          transform 0.25s,
+          border-color 0.25s;
+      }
+      .card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(108, 99, 255, 0.4);
+      }
+      .card.ac-purple {
+        border-color: rgba(108, 99, 255, 0.4);
+      }
+      .card.ac-cyan {
+        border-color: rgba(67, 203, 255, 0.4);
+      }
+      .card.ac-green {
+        border-color: rgba(0, 245, 160, 0.4);
+      }
+      .card.ac-pink {
+        border-color: rgba(255, 101, 132, 0.4);
+      }
+      .card.ac-gold {
+        border-color: rgba(255, 193, 7, 0.35);
+      }
 
-  /* ——— BADGE ——— */
-  .badge {
-    display:inline-block; font-size:.68rem; font-weight:700;
-    letter-spacing:.1em; text-transform:uppercase;
-    padding:.28rem .65rem; border-radius:99px;
-  }
-  .bp { background:rgba(108,99,255,.2); color:#9D97FF; border:1px solid rgba(108,99,255,.4); }
-  .bc { background:rgba(67,203,255,.2);  color:#7DD8FF; border:1px solid rgba(67,203,255,.4); }
-  .bg-b { background:rgba(0,245,160,.2);  color:#5CFFD1; border:1px solid rgba(0,245,160,.4); }
-  .bpk { background:rgba(255,101,132,.2);color:#FF9DB0; border:1px solid rgba(255,101,132,.4); }
-  .bg-gold { background:rgba(255,193,7,.15); color:#FFD54F; border:1px solid rgba(255,193,7,.35); }
+      /* ——— BADGE ——— */
+      .badge {
+        display: inline-block;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.28rem 0.65rem;
+        border-radius: 99px;
+      }
+      .bp {
+        background: rgba(108, 99, 255, 0.2);
+        color: #9d97ff;
+        border: 1px solid rgba(108, 99, 255, 0.4);
+      }
+      .bc {
+        background: rgba(67, 203, 255, 0.2);
+        color: #7dd8ff;
+        border: 1px solid rgba(67, 203, 255, 0.4);
+      }
+      .bg-b {
+        background: rgba(0, 245, 160, 0.2);
+        color: #5cffd1;
+        border: 1px solid rgba(0, 245, 160, 0.4);
+      }
+      .bpk {
+        background: rgba(255, 101, 132, 0.2);
+        color: #ff9db0;
+        border: 1px solid rgba(255, 101, 132, 0.4);
+      }
+      .bg-gold {
+        background: rgba(255, 193, 7, 0.15);
+        color: #ffd54f;
+        border: 1px solid rgba(255, 193, 7, 0.35);
+      }
 
-  /* ——— FEATURE ROW ——— */
-  .feature-row {
-    display:flex; align-items:flex-start; gap:.9rem;
-    padding:.85rem 1.1rem;
-    background:var(--glass); border:1px solid var(--border);
-    border-radius:12px; margin-bottom:.55rem;
-    backdrop-filter:blur(8px);
-  }
-  .feat-icon { font-size:1.4rem; flex-shrink:0; margin-top:.1rem; }
+      /* ——— FEATURE ROW ——— */
+      .feature-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.9rem;
+        padding: 0.85rem 1.1rem;
+        background: var(--glass);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        margin-bottom: 0.55rem;
+        backdrop-filter: blur(8px);
+      }
+      .feat-icon {
+        font-size: 1.4rem;
+        flex-shrink: 0;
+        margin-top: 0.1rem;
+      }
 
-  /* ——— AGENDA ——— */
-  .agenda-item {
-    display:flex; align-items:center; gap:1rem;
-    padding:.75rem 1.2rem;
-    background:var(--glass); border:1px solid var(--border);
-    border-radius:12px; margin-bottom:.5rem;
-    backdrop-filter:blur(8px);
-    transition:border-color .2s;
-  }
-  .agenda-item:hover { border-color:rgba(108,99,255,.5); }
-  .agenda-num {
-    font-family:'Space Grotesk',sans-serif;
-    font-size:1.4rem; font-weight:800;
-    color:rgba(108,99,255,.3); min-width:2rem; text-align:center;
-  }
-  .agenda-time {
-    font-size:.7rem; font-weight:700; color:var(--c3);
-    text-transform:uppercase; letter-spacing:.08em;
-    min-width:3.5rem;
-  }
-  .agenda-label { font-weight:600; font-size:.9rem; }
-  .agenda-sub   { font-size:.76rem; color:var(--text2); }
+      /* ——— AGENDA ——— */
+      .agenda-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem 1.2rem;
+        background: var(--glass);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        margin-bottom: 0.5rem;
+        backdrop-filter: blur(8px);
+        transition: border-color 0.2s;
+      }
+      .agenda-item:hover {
+        border-color: rgba(108, 99, 255, 0.5);
+      }
+      .agenda-num {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: rgba(108, 99, 255, 0.3);
+        min-width: 2rem;
+        text-align: center;
+      }
+      .agenda-time {
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: var(--c3);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        min-width: 3.5rem;
+      }
+      .agenda-label {
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+      .agenda-sub {
+        font-size: 0.76rem;
+        color: var(--text2);
+      }
 
-  /* ——— TOOL COMPARE CARD ——— */
-  .tool-card {
-    border-radius:16px; padding:1.4rem;
-    background:var(--glass); border:1px solid var(--border);
-    backdrop-filter:blur(12px);
-    display:flex; flex-direction:column; gap:.6rem;
-    transition:transform .25s;
-  }
-  .tool-card:hover { transform:translateY(-4px); }
-  .tool-logo { font-size:2.8rem; margin-bottom:.2rem; }
-  .tool-name { font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.1rem; }
-  .tool-org  { font-size:.72rem; color:var(--text2); margin-bottom:.4rem; }
-  .tool-strong { font-size:.78rem; font-weight:600; padding:.2rem .55rem; border-radius:6px; display:inline-block; margin-bottom:.3rem; }
-  .tool-item { display:flex; align-items:flex-start; gap:.4rem; font-size:.78rem; color:var(--text2); line-height:1.4; margin-bottom:.25rem; }
-  .bullet-dot { width:5px; height:5px; border-radius:50%; flex-shrink:0; margin-top:.45rem; }
+      /* ——— TOOL COMPARE CARD ——— */
+      .tool-card {
+        border-radius: 16px;
+        padding: 1.4rem;
+        background: var(--glass);
+        border: 1px solid var(--border);
+        backdrop-filter: blur(12px);
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        transition: transform 0.25s;
+      }
+      .tool-card:hover {
+        transform: translateY(-4px);
+      }
+      .tool-logo {
+        font-size: 2.8rem;
+        margin-bottom: 0.2rem;
+      }
+      .tool-name {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+      .tool-org {
+        font-size: 0.72rem;
+        color: var(--text2);
+        margin-bottom: 0.4rem;
+      }
+      .tool-strong {
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 0.2rem 0.55rem;
+        border-radius: 6px;
+        display: inline-block;
+        margin-bottom: 0.3rem;
+      }
+      .tool-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.4rem;
+        font-size: 0.78rem;
+        color: var(--text2);
+        line-height: 1.4;
+        margin-bottom: 0.25rem;
+      }
+      .bullet-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        margin-top: 0.45rem;
+      }
 
-  /* ——— PROMPT BOX ——— */
-  .prompt-box {
-    background:#0d0d1a;
-    border:1px solid rgba(108,99,255,.35);
-    border-radius:12px;
-    padding:1.1rem 1.4rem;
-    font-family:'Courier New',monospace;
-    font-size:.82rem; line-height:1.65;
-    color:#c8c8e8; width:100%; position:relative;
-  }
-  .prompt-box::before {
-    content:'⌨ Prompt';
-    position:absolute; top:-.55rem; left:1rem;
-    font-size:.62rem; font-weight:700; letter-spacing:.1em;
-    text-transform:uppercase; background:var(--dark);
-    padding:0 .5rem; color:var(--c1); font-family:'Inter',sans-serif;
-  }
-  .ph { color:#9D97FF; font-weight:600; }
-  .pv { color:#5CFFD1; }
-  .po { color:#FFD54F; }
+      /* ——— PROMPT BOX ——— */
+      .prompt-box {
+        background: #0d0d1a;
+        border: 1px solid rgba(108, 99, 255, 0.35);
+        border-radius: 12px;
+        padding: 1.1rem 1.4rem;
+        font-family: "Courier New", monospace;
+        font-size: 0.82rem;
+        line-height: 1.65;
+        color: #c8c8e8;
+        width: 100%;
+        position: relative;
+      }
+      .prompt-box::before {
+        content: "⌨ Prompt";
+        position: absolute;
+        top: -0.55rem;
+        left: 1rem;
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        background: var(--dark);
+        padding: 0 0.5rem;
+        color: var(--c1);
+        font-family: "Inter", sans-serif;
+      }
+      .ph {
+        color: #9d97ff;
+        font-weight: 600;
+      }
+      .pv {
+        color: #5cffd1;
+      }
+      .po {
+        color: #ffd54f;
+      }
 
-  /* ——— TECHNIQUE CARD ——— */
-  .technique {
-    border-radius:14px; padding:1.1rem 1.3rem;
-    background:var(--glass); border:1px solid var(--border);
-    backdrop-filter:blur(12px);
-  }
-  .tech-badge {
-    font-size:.65rem; font-weight:800; letter-spacing:.12em;
-    text-transform:uppercase; padding:.2rem .6rem;
-    border-radius:6px; display:inline-block; margin-bottom:.6rem;
-  }
-  .tech-name { font-weight:700; font-size:.95rem; margin-bottom:.35rem; }
-  .tech-desc { font-size:.78rem; color:var(--text2); line-height:1.5; margin-bottom:.5rem; }
-  .tech-example { font-size:.74rem; font-family:'Courier New',monospace; color:#9D97FF; background:rgba(108,99,255,.1); padding:.4rem .7rem; border-radius:8px; line-height:1.5; }
+      /* ——— TECHNIQUE CARD ——— */
+      .technique {
+        border-radius: 14px;
+        padding: 1.1rem 1.3rem;
+        background: var(--glass);
+        border: 1px solid var(--border);
+        backdrop-filter: blur(12px);
+      }
+      .tech-badge {
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 0.2rem 0.6rem;
+        border-radius: 6px;
+        display: inline-block;
+        margin-bottom: 0.6rem;
+      }
+      .tech-name {
+        font-weight: 700;
+        font-size: 0.95rem;
+        margin-bottom: 0.35rem;
+      }
+      .tech-desc {
+        font-size: 0.78rem;
+        color: var(--text2);
+        line-height: 1.5;
+        margin-bottom: 0.5rem;
+      }
+      .tech-example {
+        font-size: 0.74rem;
+        font-family: "Courier New", monospace;
+        color: #9d97ff;
+        background: rgba(108, 99, 255, 0.1);
+        padding: 0.4rem 0.7rem;
+        border-radius: 8px;
+        line-height: 1.5;
+      }
 
-  /* ——— STEP FLOW ——— */
-  .step-flow { display:flex; flex-direction:column; gap:.5rem; width:100%; }
-  .step {
-    display:flex; align-items:flex-start; gap:1rem;
-    padding:.8rem 1.1rem;
-    background:var(--glass); border:1px solid var(--border);
-    border-radius:12px; backdrop-filter:blur(8px);
-    position:relative;
-  }
-  .step-num {
-    font-family:'Space Grotesk',sans-serif; font-size:1.3rem; font-weight:800;
-    color:var(--c1); min-width:1.8rem; flex-shrink:0; line-height:1;
-  }
-  .step-title { font-weight:700; font-size:.9rem; margin-bottom:.15rem; }
-  .step-desc  { font-size:.78rem; color:var(--text2); line-height:1.45; }
+      /* ——— STEP FLOW ——— */
+      .step-flow {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+      }
+      .step {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 0.8rem 1.1rem;
+        background: var(--glass);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        backdrop-filter: blur(8px);
+        position: relative;
+      }
+      .step-num {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: var(--c1);
+        min-width: 1.8rem;
+        flex-shrink: 0;
+        line-height: 1;
+      }
+      .step-title {
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-bottom: 0.15rem;
+      }
+      .step-desc {
+        font-size: 0.78rem;
+        color: var(--text2);
+        line-height: 1.45;
+      }
 
-  /* ——— ACTIVITY BOX ——— */
-  .activity-box {
-    border-radius:16px; padding:1.4rem 1.6rem;
-    background:linear-gradient(135deg,rgba(108,99,255,.12),rgba(67,203,255,.08));
-    border:1px solid rgba(108,99,255,.4);
-    width:100%;
-  }
-  .activity-header {
-    display:flex; align-items:center; gap:.8rem; margin-bottom:1rem;
-  }
-  .activity-icon { font-size:2rem; }
-  .activity-title { font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.1rem; }
-  .activity-sub   { font-size:.78rem; color:var(--text2); }
+      /* ——— ACTIVITY BOX ——— */
+      .activity-box {
+        border-radius: 16px;
+        padding: 1.4rem 1.6rem;
+        background: linear-gradient(
+          135deg,
+          rgba(108, 99, 255, 0.12),
+          rgba(67, 203, 255, 0.08)
+        );
+        border: 1px solid rgba(108, 99, 255, 0.4);
+        width: 100%;
+      }
+      .activity-header {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-bottom: 1rem;
+      }
+      .activity-icon {
+        font-size: 2rem;
+      }
+      .activity-title {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+      .activity-sub {
+        font-size: 0.78rem;
+        color: var(--text2);
+      }
 
-  .deliverable {
-    display:flex; align-items:center; gap:.7rem;
-    padding:.6rem .9rem;
-    background:rgba(255,255,255,.05); border-radius:10px;
-    margin-bottom:.45rem; font-size:.82rem; font-weight:500;
-  }
-  .del-icon { font-size:1.1rem; flex-shrink:0; }
-  .del-time { font-size:.68rem; color:var(--c3); font-weight:700; margin-left:auto; white-space:nowrap; }
+      .deliverable {
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        padding: 0.6rem 0.9rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        margin-bottom: 0.45rem;
+        font-size: 0.82rem;
+        font-weight: 500;
+      }
+      .del-icon {
+        font-size: 1.1rem;
+        flex-shrink: 0;
+      }
+      .del-time {
+        font-size: 0.68rem;
+        color: var(--c3);
+        font-weight: 700;
+        margin-left: auto;
+        white-space: nowrap;
+      }
 
-  /* ——— STAT ROW ——— */
-  .stat-mini {
-    text-align:center; padding:1rem;
-    background:var(--glass); border:1px solid var(--border);
-    border-radius:14px; backdrop-filter:blur(12px);
-  }
-  .stat-mini .num {
-    font-family:'Space Grotesk',sans-serif;
-    font-size:2rem; font-weight:800; line-height:1; margin-bottom:.2rem;
-  }
-  .stat-mini .lbl { font-size:.72rem; color:var(--text2); text-transform:uppercase; letter-spacing:.07em; }
+      /* ——— STAT ROW ——— */
+      .stat-mini {
+        text-align: center;
+        padding: 1rem;
+        background: var(--glass);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        backdrop-filter: blur(12px);
+      }
+      .stat-mini .num {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1;
+        margin-bottom: 0.2rem;
+      }
+      .stat-mini .lbl {
+        font-size: 0.72rem;
+        color: var(--text2);
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+      }
 
-  /* ——— RESULT PREVIEW ——— */
-  .result-card {
-    border-radius:14px; padding:1.1rem 1.3rem;
-    background:var(--glass); border:1px solid var(--border);
-    backdrop-filter:blur(12px);
-  }
-  .result-icon { font-size:1.8rem; margin-bottom:.4rem; }
-  .result-name { font-weight:700; font-size:.9rem; margin-bottom:.25rem; }
-  .result-desc { font-size:.76rem; color:var(--text2); line-height:1.5; }
-  .result-sample {
-    margin-top:.5rem; font-size:.72rem; font-family:'Courier New',monospace;
-    color:#9D97FF; background:rgba(108,99,255,.1);
-    padding:.4rem .65rem; border-radius:8px; line-height:1.5;
-  }
+      /* ——— RESULT PREVIEW ——— */
+      .result-card {
+        border-radius: 14px;
+        padding: 1.1rem 1.3rem;
+        background: var(--glass);
+        border: 1px solid var(--border);
+        backdrop-filter: blur(12px);
+      }
+      .result-icon {
+        font-size: 1.8rem;
+        margin-bottom: 0.4rem;
+      }
+      .result-name {
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+      }
+      .result-desc {
+        font-size: 0.76rem;
+        color: var(--text2);
+        line-height: 1.5;
+      }
+      .result-sample {
+        margin-top: 0.5rem;
+        font-size: 0.72rem;
+        font-family: "Courier New", monospace;
+        color: #9d97ff;
+        background: rgba(108, 99, 255, 0.1);
+        padding: 0.4rem 0.65rem;
+        border-radius: 8px;
+        line-height: 1.5;
+      }
 
-  /* ——— NAV ——— */
-  #nav {
-    position:fixed; bottom:1.8rem; left:50%; transform:translateX(-50%);
-    display:flex; align-items:center; gap:.9rem;
-    background:rgba(10,10,20,.88); border:1px solid var(--border);
-    border-radius:99px; padding:.55rem 1.1rem;
-    backdrop-filter:blur(20px); z-index:100;
-  }
-  .nav-btn {
-    background:var(--glass); border:1px solid var(--border);
-    border-radius:50%; width:34px; height:34px;
-    color:var(--text); font-size:.9rem; cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
-    transition:background .2s, border-color .2s;
-  }
-  .nav-btn:hover { background:rgba(108,99,255,.3); border-color:var(--c1); }
-  .nav-btn.home-btn { border-radius:8px; width:auto; padding:0 .8rem; font-size:.72rem; font-weight:600; gap:.3rem; }
-  #slide-counter { font-size:.78rem; font-weight:600; color:var(--text2); min-width:58px; text-align:center; }
+      /* ——— NAV ——— */
+      #nav {
+        position: fixed;
+        bottom: 1.8rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+        background: rgba(10, 10, 20, 0.88);
+        border: 1px solid var(--border);
+        border-radius: 99px;
+        padding: 0.55rem 1.1rem;
+        backdrop-filter: blur(20px);
+        z-index: 100;
+      }
+      .nav-btn {
+        background: var(--glass);
+        border: 1px solid var(--border);
+        border-radius: 50%;
+        width: 34px;
+        height: 34px;
+        color: var(--text);
+        font-size: 0.9rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          background 0.2s,
+          border-color 0.2s;
+      }
+      .nav-btn:hover {
+        background: rgba(108, 99, 255, 0.3);
+        border-color: var(--c1);
+      }
+      .nav-btn.home-btn {
+        border-radius: 8px;
+        width: auto;
+        padding: 0 0.8rem;
+        font-size: 0.72rem;
+        font-weight: 600;
+        gap: 0.3rem;
+      }
+      #slide-counter {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--text2);
+        min-width: 58px;
+        text-align: center;
+      }
 
-  /* ——— DOTS ——— */
-  #dots {
-    position:fixed; right:1.3rem; top:50%; transform:translateY(-50%);
-    display:flex; flex-direction:column; gap:.45rem; z-index:100;
-  }
-  .dot { width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.18); cursor:pointer; transition:background .3s, transform .3s; }
-  .dot.on { background:var(--c1); transform:scale(1.5); }
+      /* ——— DOTS ——— */
+      #dots {
+        position: fixed;
+        right: 1.3rem;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 0.45rem;
+        z-index: 100;
+      }
+      .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.18);
+        cursor: pointer;
+        transition:
+          background 0.3s,
+          transform 0.3s;
+      }
+      .dot.on {
+        background: var(--c1);
+        transform: scale(1.5);
+      }
 
-  /* ——— PROGRESS BAR ——— */
-  #progress-bar {
-    position:fixed; top:0; left:0; height:3px; z-index:200;
-    background:linear-gradient(90deg, var(--c1), var(--c3));
-    transition:width .4s ease;
-  }
+      /* ——— PROGRESS BAR ——— */
+      #progress-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 3px;
+        z-index: 200;
+        background: linear-gradient(90deg, var(--c1), var(--c3));
+        transition: width 0.4s ease;
+      }
 
-  /* ——— COPYRIGHT ——— */
-  #copyright {
-    position:fixed; bottom:1.5rem; left:1.5rem;
-    display:flex; align-items:center; gap:.5rem;
-    font-size:.7rem; color:var(--text2);
-    background:var(--glass); border:1px solid var(--border);
-    border-radius:8px; padding:.38rem .8rem;
-    backdrop-filter:blur(12px); z-index:100;
-  }
-  #copyright span.name {
-    font-weight:700;
-    background:linear-gradient(135deg,var(--c1),var(--c3));
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-  }
+      /* ——— COPYRIGHT ——— */
+      #copyright {
+        position: fixed;
+        bottom: 1.5rem;
+        left: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.7rem;
+        color: var(--text2);
+        background: var(--glass);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.38rem 0.8rem;
+        backdrop-filter: blur(12px);
+        z-index: 100;
+      }
+      #copyright span.name {
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--c1), var(--c3));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
 
-  /* ——— KB HINT ——— */
-  #kb-hint {
-    position:fixed; top:1.3rem; right:1.3rem;
-    font-size:.68rem; color:var(--text2);
-    background:var(--glass); border:1px solid var(--border);
-    border-radius:8px; padding:.38rem .75rem;
-    backdrop-filter:blur(8px); z-index:100;
-  }
-  kbd { display:inline-block; background:rgba(255,255,255,.1); border-radius:4px; padding:0 .32rem; font-family:inherit; font-size:.68rem; }
+      /* ——— KB HINT ——— */
+      #kb-hint {
+        position: fixed;
+        top: 1.3rem;
+        right: 1.3rem;
+        font-size: 0.68rem;
+        color: var(--text2);
+        background: var(--glass);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0.38rem 0.75rem;
+        backdrop-filter: blur(8px);
+        z-index: 100;
+      }
+      kbd {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        padding: 0 0.32rem;
+        font-family: inherit;
+        font-size: 0.68rem;
+      }
 
-  /* ——— CLASS HEADER ——— */
-  .class-banner {
-    display:flex; align-items:center; gap:1.3rem; margin-bottom:1.8rem; width:100%;
-  }
-  .banner-num {
-    font-family:'Space Grotesk',sans-serif; font-size:4.5rem; font-weight:900;
-    line-height:1; opacity:.13; color:var(--c1); flex-shrink:0;
-  }
+      /* ——— CLASS HEADER ——— */
+      .class-banner {
+        display: flex;
+        align-items: center;
+        gap: 1.3rem;
+        margin-bottom: 1.8rem;
+        width: 100%;
+      }
+      .banner-num {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 4.5rem;
+        font-weight: 900;
+        line-height: 1;
+        opacity: 0.13;
+        color: var(--c1);
+        flex-shrink: 0;
+      }
 
-  /* ——— PARTICLES ——— */
-  #particles { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
-  .particle { position:absolute; border-radius:50%; opacity:.12; animation:float linear infinite; }
-  @keyframes float {
-    0%   { transform:translateY(100vh) rotate(0deg); opacity:0; }
-    10%  { opacity:.12; }
-    90%  { opacity:.12; }
-    100% { transform:translateY(-10vh) rotate(720deg); opacity:0; }
-  }
+      /* ——— PARTICLES ——— */
+      #particles {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        overflow: hidden;
+      }
+      .particle {
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.12;
+        animation: float linear infinite;
+      }
+      @keyframes float {
+        0% {
+          transform: translateY(100vh) rotate(0deg);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.12;
+        }
+        90% {
+          opacity: 0.12;
+        }
+        100% {
+          transform: translateY(-10vh) rotate(720deg);
+          opacity: 0;
+        }
+      }
 
-  /* ——— GLOW RING (portada) ——— */
-  .glow-ring {
-    width:180px; height:180px; border-radius:50%;
-    border:1.5px solid rgba(108,99,255,.45);
-    box-shadow:0 0 50px rgba(108,99,255,.25), inset 0 0 40px rgba(108,99,255,.12);
-    display:flex; align-items:center; justify-content:center;
-    font-size:3.5rem; margin-bottom:1.8rem;
-    animation:pulse-ring 3s ease-in-out infinite;
-  }
-  @keyframes pulse-ring {
-    0%,100% { box-shadow:0 0 50px rgba(108,99,255,.25), inset 0 0 40px rgba(108,99,255,.12); }
-    50%      { box-shadow:0 0 80px rgba(108,99,255,.45), inset 0 0 60px rgba(108,99,255,.22); }
-  }
+      /* ——— GLOW RING (portada) ——— */
+      .glow-ring {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(108, 99, 255, 0.45);
+        box-shadow:
+          0 0 50px rgba(108, 99, 255, 0.25),
+          inset 0 0 40px rgba(108, 99, 255, 0.12);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3.5rem;
+        margin-bottom: 1.8rem;
+        animation: pulse-ring 3s ease-in-out infinite;
+      }
+      @keyframes pulse-ring {
+        0%,
+        100% {
+          box-shadow:
+            0 0 50px rgba(108, 99, 255, 0.25),
+            inset 0 0 40px rgba(108, 99, 255, 0.12);
+        }
+        50% {
+          box-shadow:
+            0 0 80px rgba(108, 99, 255, 0.45),
+            inset 0 0 60px rgba(108, 99, 255, 0.22);
+        }
+      }
 
-  /* ——— NOTEBOOKLM FLOW ——— */
-  .flow-arrow {
-    font-size:1.3rem; color:var(--c1); opacity:.6;
-    display:flex; align-items:center; justify-content:center; flex-shrink:0;
-  }
-  .flow-row { display:flex; align-items:center; gap:.5rem; width:100%; }
+      /* ——— NOTEBOOKLM FLOW ——— */
+      .flow-arrow {
+        font-size: 1.3rem;
+        color: var(--c1);
+        opacity: 0.6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .flow-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+      }
 
-  .nlm-card {
-    flex:1; border-radius:12px; padding:1rem 1.1rem;
-    background:var(--glass); border:1px solid var(--border);
-    backdrop-filter:blur(10px); text-align:center;
-  }
-  .nlm-icon  { font-size:1.8rem; margin-bottom:.35rem; }
-  .nlm-label { font-size:.78rem; font-weight:700; margin-bottom:.15rem; }
-  .nlm-sub   { font-size:.7rem; color:var(--text2); line-height:1.4; }
+      .nlm-card {
+        flex: 1;
+        border-radius: 12px;
+        padding: 1rem 1.1rem;
+        background: var(--glass);
+        border: 1px solid var(--border);
+        backdrop-filter: blur(10px);
+        text-align: center;
+      }
+      .nlm-icon {
+        font-size: 1.8rem;
+        margin-bottom: 0.35rem;
+      }
+      .nlm-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        margin-bottom: 0.15rem;
+      }
+      .nlm-sub {
+        font-size: 0.7rem;
+        color: var(--text2);
+        line-height: 1.4;
+      }
 
-  /* ——— CLOSING ——— */
-  .closing-grid {
-    display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; width:100%;
-  }
-  .cl-card {
-    border-radius:14px; padding:1.1rem; text-align:center;
-    background:var(--glass); border:1px solid var(--border);
-    backdrop-filter:blur(12px); transition:transform .25s;
-  }
-  .cl-card:hover { transform:translateY(-3px); }
-  .cl-icon  { font-size:2rem; margin-bottom:.5rem; }
-  .cl-label { font-weight:700; font-size:.85rem; margin-bottom:.2rem; }
-  .cl-sub   { font-size:.72rem; color:var(--text2); line-height:1.45; }
+      /* ——— CLOSING ——— */
+      .closing-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        width: 100%;
+      }
+      .cl-card {
+        border-radius: 14px;
+        padding: 1.1rem;
+        text-align: center;
+        background: var(--glass);
+        border: 1px solid var(--border);
+        backdrop-filter: blur(12px);
+        transition: transform 0.25s;
+      }
+      .cl-card:hover {
+        transform: translateY(-3px);
+      }
+      .cl-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+      }
+      .cl-label {
+        font-weight: 700;
+        font-size: 0.85rem;
+        margin-bottom: 0.2rem;
+      }
+      .cl-sub {
+        font-size: 0.72rem;
+        color: var(--text2);
+        line-height: 1.45;
+      }
 
-  /* ═══════════════════════════════════
+      /* ═══════════════════════════════════
      RESPONSIVE — MÓVIL (max 768px)
   ═══════════════════════════════════ */
-  @media (max-width: 768px) {
-    body { overflow: hidden; }
+      @media (max-width: 768px) {
+        body {
+          overflow: hidden;
+        }
 
-    .slide {
-      padding: 1.4rem 1rem 6.5rem;
-      overflow-y: auto;
-      overflow-x: hidden;
-      justify-content: flex-start;
-      align-items: stretch;
-      -webkit-overflow-scrolling: touch;
-    }
+        .slide {
+          padding: 1.4rem 1rem 6.5rem;
+          overflow-y: auto;
+          overflow-x: hidden;
+          justify-content: flex-start;
+          align-items: stretch;
+          -webkit-overflow-scrolling: touch;
+        }
 
-    /* Grids */
-    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr !important; gap:.9rem; }
+        /* Grids */
+        .grid-2,
+        .grid-3,
+        .grid-4 {
+          grid-template-columns: 1fr !important;
+          gap: 0.9rem;
+        }
 
-    /* Tipografía */
-    h1.hero          { font-size:1.9rem; }
-    h2.section-title { font-size:1.25rem; margin-bottom:.8rem; }
-    p.lead           { font-size:.9rem; margin-bottom:.9rem; }
-    p.body           { font-size:.82rem; }
-    .slide-tag       { font-size:.63rem; }
+        /* Tipografía */
+        h1.hero {
+          font-size: 1.9rem;
+        }
+        h2.section-title {
+          font-size: 1.25rem;
+          margin-bottom: 0.8rem;
+        }
+        p.lead {
+          font-size: 0.9rem;
+          margin-bottom: 0.9rem;
+        }
+        p.body {
+          font-size: 0.82rem;
+        }
+        .slide-tag {
+          font-size: 0.63rem;
+        }
 
-    /* Glow ring */
-    .glow-ring { width:120px; height:120px; font-size:2.3rem; margin-bottom:1.2rem; }
+        /* Glow ring */
+        .glow-ring {
+          width: 120px;
+          height: 120px;
+          font-size: 2.3rem;
+          margin-bottom: 1.2rem;
+        }
 
-    /* Portada: stats 2 columnas */
-    .grid-4[style*="580px"] { grid-template-columns:1fr 1fr !important; }
-    .stat-mini .num { font-size:1.6rem; }
+        /* Portada: stats 2 columnas */
+        .grid-4[style*="580px"] {
+          grid-template-columns: 1fr 1fr !important;
+        }
+        .stat-mini .num {
+          font-size: 1.6rem;
+        }
 
-    /* Class banner */
-    .class-banner { flex-direction:column; gap:.4rem; margin-bottom:1.2rem; }
-    .banner-num   { font-size:2.5rem; }
+        /* Class banner */
+        .class-banner {
+          flex-direction: column;
+          gap: 0.4rem;
+          margin-bottom: 1.2rem;
+        }
+        .banner-num {
+          font-size: 2.5rem;
+        }
 
-    /* Agenda */
-    .agenda-item  { gap:.6rem; padding:.65rem .9rem; flex-wrap:wrap; }
-    .agenda-num   { font-size:1.1rem; min-width:1.6rem; }
-    .agenda-time  { font-size:.62rem; min-width:auto; }
-    .agenda-label { font-size:.82rem; }
-    .agenda-sub   { font-size:.7rem; }
+        /* Agenda */
+        .agenda-item {
+          gap: 0.6rem;
+          padding: 0.65rem 0.9rem;
+          flex-wrap: wrap;
+        }
+        .agenda-num {
+          font-size: 1.1rem;
+          min-width: 1.6rem;
+        }
+        .agenda-time {
+          font-size: 0.62rem;
+          min-width: auto;
+        }
+        .agenda-label {
+          font-size: 0.82rem;
+        }
+        .agenda-sub {
+          font-size: 0.7rem;
+        }
 
-    /* Tool cards */
-    .tool-card   { padding:1.1rem; }
-    .tool-logo   { font-size:2rem; }
-    .tool-name   { font-size:.95rem; }
+        /* Tool cards */
+        .tool-card {
+          padding: 1.1rem;
+        }
+        .tool-logo {
+          font-size: 2rem;
+        }
+        .tool-name {
+          font-size: 0.95rem;
+        }
 
-    /* Prompt box */
-    .prompt-box  { font-size:.73rem; padding:.9rem 1rem; }
+        /* Prompt box */
+        .prompt-box {
+          font-size: 0.73rem;
+          padding: 0.9rem 1rem;
+        }
 
-    /* Feature rows */
-    .feature-row { gap:.6rem; padding:.7rem .85rem; }
-    .feat-icon   { font-size:1.2rem; }
+        /* Feature rows */
+        .feature-row {
+          gap: 0.6rem;
+          padding: 0.7rem 0.85rem;
+        }
+        .feat-icon {
+          font-size: 1.2rem;
+        }
 
-    /* Technique cards */
-    .technique   { padding:.9rem 1rem; }
-    .tech-desc   { font-size:.74rem; }
-    .tech-example{ font-size:.7rem; }
+        /* Technique cards */
+        .technique {
+          padding: 0.9rem 1rem;
+        }
+        .tech-desc {
+          font-size: 0.74rem;
+        }
+        .tech-example {
+          font-size: 0.7rem;
+        }
 
-    /* Steps */
-    .step        { padding:.7rem .9rem; gap:.7rem; }
-    .step-num    { font-size:1.1rem; min-width:1.5rem; }
-    .step-title  { font-size:.83rem; }
-    .step-desc   { font-size:.74rem; }
+        /* Steps */
+        .step {
+          padding: 0.7rem 0.9rem;
+          gap: 0.7rem;
+        }
+        .step-num {
+          font-size: 1.1rem;
+          min-width: 1.5rem;
+        }
+        .step-title {
+          font-size: 0.83rem;
+        }
+        .step-desc {
+          font-size: 0.74rem;
+        }
 
-    /* NotebookLM flow */
-    .flow-row    { flex-direction:column; gap:.7rem; }
-    .flow-arrow  { transform:rotate(90deg); font-size:1rem; justify-content:center; }
-    .nlm-card    { max-width:100% !important; }
+        /* NotebookLM flow */
+        .flow-row {
+          flex-direction: column;
+          gap: 0.7rem;
+        }
+        .flow-arrow {
+          transform: rotate(90deg);
+          font-size: 1rem;
+          justify-content: center;
+        }
+        .nlm-card {
+          max-width: 100% !important;
+        }
 
-    /* Activity box */
-    .activity-box    { padding:1.1rem; }
-    .activity-title  { font-size:.95rem; }
-    .deliverable     { font-size:.76rem; padding:.5rem .7rem; gap:.5rem; }
-    .del-icon        { font-size:1rem; }
+        /* Activity box */
+        .activity-box {
+          padding: 1.1rem;
+        }
+        .activity-title {
+          font-size: 0.95rem;
+        }
+        .deliverable {
+          font-size: 0.76rem;
+          padding: 0.5rem 0.7rem;
+          gap: 0.5rem;
+        }
+        .del-icon {
+          font-size: 1rem;
+        }
 
-    /* Radar / skills */
-    .skill-row  { gap:.7rem; }
-    .skill-name { min-width:110px; font-size:.73rem; }
-    .skill-pct  { font-size:.7rem; }
+        /* Radar / skills */
+        .skill-row {
+          gap: 0.7rem;
+        }
+        .skill-name {
+          min-width: 110px;
+          font-size: 0.73rem;
+        }
+        .skill-pct {
+          font-size: 0.7rem;
+        }
 
-    /* Result cards */
-    .result-card    { padding:.9rem 1rem; }
-    .result-icon    { font-size:1.5rem; }
-    .result-name    { font-size:.85rem; }
-    .result-sample  { font-size:.68rem; }
+        /* Result cards */
+        .result-card {
+          padding: 0.9rem 1rem;
+        }
+        .result-icon {
+          font-size: 1.5rem;
+        }
+        .result-name {
+          font-size: 0.85rem;
+        }
+        .result-sample {
+          font-size: 0.68rem;
+        }
 
-    /* Closing grid → 2 col */
-    .closing-grid { grid-template-columns:1fr 1fr !important; gap:.7rem; }
-    .cl-icon      { font-size:1.6rem; }
+        /* Closing grid → 2 col */
+        .closing-grid {
+          grid-template-columns: 1fr 1fr !important;
+          gap: 0.7rem;
+        }
+        .cl-icon {
+          font-size: 1.6rem;
+        }
 
-    /* Big quote */
-    .big-quote { font-size:.85rem; padding:1rem 1.2rem; }
+        /* Big quote */
+        .big-quote {
+          font-size: 0.85rem;
+          padding: 1rem 1.2rem;
+        }
 
-    /* Nav */
-    #nav           { gap:.5rem; padding:.4rem .9rem; bottom:1rem; }
-    .nav-btn       { width:40px; height:40px; font-size:1rem; }
-    .nav-btn.home-btn { padding:0 .65rem; font-size:.68rem; }
-    #slide-counter { font-size:.7rem; min-width:44px; }
+        /* Nav */
+        #nav {
+          gap: 0.5rem;
+          padding: 0.4rem 0.9rem;
+          bottom: 1rem;
+        }
+        .nav-btn {
+          width: 40px;
+          height: 40px;
+          font-size: 1rem;
+        }
+        .nav-btn.home-btn {
+          padding: 0 0.65rem;
+          font-size: 0.68rem;
+        }
+        #slide-counter {
+          font-size: 0.7rem;
+          min-width: 44px;
+        }
 
-    /* Ocultar en móvil */
-    #dots    { display:none; }
-    #kb-hint { display:none; }
+        /* Ocultar en móvil */
+        #dots {
+          display: none;
+        }
+        #kb-hint {
+          display: none;
+        }
 
-    /* Copyright */
-    #copyright { font-size:.62rem; padding:.3rem .6rem; bottom:4.5rem; }
+        /* Copyright */
+        #copyright {
+          font-size: 0.62rem;
+          padding: 0.3rem 0.6rem;
+          bottom: 4.5rem;
+        }
 
-    /* Cards generales */
-    .card { padding:.95rem 1.1rem; }
-  }
+        /* Cards generales */
+        .card {
+          padding: 0.95rem 1.1rem;
+        }
+      }
 
-  @media (max-width: 480px) {
-    .slide           { padding:1.1rem .8rem 6.5rem; }
-    h1.hero          { font-size:1.6rem; }
-    h2.section-title { font-size:1.1rem; }
-    .closing-grid    { grid-template-columns:1fr !important; }
-    .glow-ring       { width:100px; height:100px; font-size:2rem; }
-    .prompt-box      { font-size:.68rem; }
-  }
+      @media (max-width: 480px) {
+        .slide {
+          padding: 1.1rem 0.8rem 6.5rem;
+        }
+        h1.hero {
+          font-size: 1.6rem;
+        }
+        h2.section-title {
+          font-size: 1.1rem;
+        }
+        .closing-grid {
+          grid-template-columns: 1fr !important;
+        }
+        .glow-ring {
+          width: 100px;
+          height: 100px;
+          font-size: 2rem;
+        }
+        .prompt-box {
+          font-size: 0.68rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="particles"></div>
+    <div id="progress-bar"></div>
+    <div id="kb-hint">
+      <kbd>←</kbd><kbd>→</kbd> navegar · <kbd>F</kbd> fullscreen
+    </div>
+    <div id="dots"></div>
+    <div id="copyright">
+      © 2026 &nbsp;<span class="name">Ing. Robert Farfan</span>&nbsp;· Docente
+    </div>
 
-</style>
-</head>
-<body>
+    <div id="nav">
+      <button
+        class="nav-btn home-btn"
+        onclick="window.location.href = 'index.html'"
+      >
+        🏠 Inicio
+      </button>
+      <button class="nav-btn" id="prev">&#8592;</button>
+      <span id="slide-counter">1 / 16</span>
+      <button class="nav-btn" id="next">&#8594;</button>
+    </div>
 
-<div id="particles"></div>
-<div id="progress-bar"></div>
-<div id="kb-hint"><kbd>←</kbd><kbd>→</kbd> navegar · <kbd>F</kbd> fullscreen</div>
-<div id="dots"></div>
-<div id="copyright">© 2026 &nbsp;<span class="name">Ing. Robert Farfan</span>&nbsp;· Docente</div>
-
-<div id="nav">
-  <button class="nav-btn home-btn" onclick="window.location.href='index.html'">🏠 Inicio</button>
-  <button class="nav-btn" id="prev">&#8592;</button>
-  <span id="slide-counter">1 / 16</span>
-  <button class="nav-btn" id="next">&#8594;</button>
-</div>
-
-<div id="deck">
-
-  <!-- ══════════════════════════════════════════════
+    <div id="deck">
+      <!-- ══════════════════════════════════════════════
        SLIDE 1 — PORTADA CLASE 1
   ══════════════════════════════════════════════ -->
-  <div class="slide bg-class1 active">
-    <div class="glow-ring">🔬</div>
-    <div class="slide-tag">IA Generativa Aplicada · Clase 1 de 3</div>
-    <h1 class="hero">
-      IA para <span class="grad-text">Investigar</span>,<br>
-      Organizar y Crear<br>
-      <span style="color:var(--text2);font-size:.75em">Conocimiento</span>
-    </h1>
-    <p class="lead" style="margin:1.2rem 0 2rem">
-      En esta clase aprenderás a usar la inteligencia artificial como tu asistente
-      personal de investigación, análisis documental y creación de contenido educativo.
-    </p>
-    <div class="grid-4" style="max-width:580px;gap:.8rem">
-      <div class="stat-mini">
-        <div class="num grad-text">2h</div>
-        <div class="lbl">Duración</div>
+      <div class="slide bg-class1 active">
+        <div class="glow-ring">🔬</div>
+        <div class="slide-tag">IA Generativa Aplicada · Clase 1 de 3</div>
+        <h1 class="hero">
+          IA para <span class="grad-text">Investigar</span>,<br />
+          Organizar y Crear<br />
+          <span style="color: var(--text2); font-size: 0.75em"
+            >Conocimiento</span
+          >
+        </h1>
+        <p class="lead" style="margin: 1.2rem 0 2rem">
+          En esta clase aprenderás a usar la inteligencia artificial como tu
+          asistente personal de investigación, análisis documental y creación de
+          contenido educativo.
+        </p>
+        <div class="grid-4" style="max-width: 580px; gap: 0.8rem">
+          <div class="stat-mini">
+            <div class="num grad-text">2h</div>
+            <div class="lbl">Duración</div>
+          </div>
+          <div class="stat-mini">
+            <div
+              class="num"
+              style="
+                background: linear-gradient(135deg, var(--c3), var(--c5));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+              "
+            >
+              3
+            </div>
+            <div class="lbl">Herramientas</div>
+          </div>
+          <div class="stat-mini">
+            <div
+              class="num"
+              style="
+                background: linear-gradient(135deg, var(--c2), #ffb347);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+              "
+            >
+              5
+            </div>
+            <div class="lbl">Entregas</div>
+          </div>
+          <div class="stat-mini">
+            <div class="num grad-green">∞</div>
+            <div class="lbl">Aprendizaje</div>
+          </div>
+        </div>
+        <div
+          style="
+            display: flex;
+            gap: 0.7rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 1.5rem;
+          "
+        >
+          <span class="badge bp">ChatGPT</span>
+          <span class="badge bc">Gemini</span>
+          <span class="badge bp">Claude</span>
+          <span class="badge bg-b">NotebookLM</span>
+          <span class="badge bg-gold">Prompting</span>
+        </div>
       </div>
-      <div class="stat-mini">
-        <div class="num" style="background:linear-gradient(135deg,var(--c3),var(--c5));-webkit-background-clip:text;-webkit-text-fill-color:transparent">3</div>
-        <div class="lbl">Herramientas</div>
-      </div>
-      <div class="stat-mini">
-        <div class="num" style="background:linear-gradient(135deg,var(--c2),#FFB347);-webkit-background-clip:text;-webkit-text-fill-color:transparent">5</div>
-        <div class="lbl">Entregas</div>
-      </div>
-      <div class="stat-mini">
-        <div class="num grad-green">∞</div>
-        <div class="lbl">Aprendizaje</div>
-      </div>
-    </div>
-    <div style="display:flex;gap:.7rem;flex-wrap:wrap;justify-content:center;margin-top:1.5rem">
-      <span class="badge bp">ChatGPT</span>
-      <span class="badge bc">Gemini</span>
-      <span class="badge bp">Claude</span>
-      <span class="badge bg-b">NotebookLM</span>
-      <span class="badge bg-gold">Prompting</span>
-    </div>
-  </div>
 
-  <!-- ══════════════════════════════════════════════
+      <!-- ══════════════════════════════════════════════
        SLIDE 2 — AGENDA
   ══════════════════════════════════════════════ -->
-  <div class="slide bg-dark">
-    <div class="slide-tag">Hoja de Ruta</div>
-    <h2 class="section-title text-center">¿Qué haremos hoy? <span class="grad-text">Agenda</span></h2>
+      <div class="slide bg-dark">
+        <div class="slide-tag">Hoja de Ruta</div>
+        <h2 class="section-title text-center">
+          ¿Qué haremos hoy? <span class="grad-text">Agenda</span>
+        </h2>
 
-    <div class="full-width" style="max-width:850px">
-      <div class="agenda-item" style="border-color:rgba(108,99,255,.4)">
-        <div class="agenda-num">1</div>
-        <div class="agenda-time">0:00–0:20</div>
-        <div>
-          <div class="agenda-label">🧠 Fundamentos de IA Generativa</div>
-          <div class="agenda-sub">Qué es, cómo funciona, aplicaciones actuales y panorama 2026</div>
+        <div class="full-width" style="max-width: 850px">
+          <div
+            class="agenda-item"
+            style="border-color: rgba(108, 99, 255, 0.4)"
+          >
+            <div class="agenda-num">1</div>
+            <div class="agenda-time">0:00–0:20</div>
+            <div>
+              <div class="agenda-label">🧠 Fundamentos de IA Generativa</div>
+              <div class="agenda-sub">
+                Qué es, cómo funciona, aplicaciones actuales y panorama 2026
+              </div>
+            </div>
+          </div>
+          <div
+            class="agenda-item"
+            style="border-color: rgba(67, 203, 255, 0.4)"
+          >
+            <div class="agenda-num">2</div>
+            <div class="agenda-time">0:20–0:40</div>
+            <div>
+              <div class="agenda-label">
+                💬 ChatGPT · Gemini · Claude en acción
+              </div>
+              <div class="agenda-sub">
+                Comparativa práctica de los tres grandes asistentes de IA
+              </div>
+            </div>
+          </div>
+          <div class="agenda-item" style="border-color: rgba(0, 245, 160, 0.4)">
+            <div class="agenda-num">3</div>
+            <div class="agenda-time">0:40–1:00</div>
+            <div>
+              <div class="agenda-label">⌨ El Arte del Prompting</div>
+              <div class="agenda-sub">
+                Técnicas y frameworks para obtener resultados extraordinarios
+              </div>
+            </div>
+          </div>
+          <div class="agenda-item" style="border-color: rgba(0, 245, 160, 0.4)">
+            <div class="agenda-num">4</div>
+            <div class="agenda-time">1:00–1:25</div>
+            <div>
+              <div class="agenda-label">📚 Investigación con NotebookLM</div>
+              <div class="agenda-sub">
+                Análisis de documentos, PDFs y generación de materiales
+                educativos
+              </div>
+            </div>
+          </div>
+          <div
+            class="agenda-item"
+            style="border-color: rgba(255, 101, 132, 0.4)"
+          >
+            <div class="agenda-num">5</div>
+            <div class="agenda-time">1:25–2:00</div>
+            <div>
+              <div class="agenda-label">🎯 Actividad Práctica Integradora</div>
+              <div class="agenda-sub">
+                Resúmenes · Cuestionarios · Mapas conceptuales · Materiales
+                educativos
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="agenda-item" style="border-color:rgba(67,203,255,.4)">
-        <div class="agenda-num">2</div>
-        <div class="agenda-time">0:20–0:40</div>
-        <div>
-          <div class="agenda-label">💬 ChatGPT · Gemini · Claude en acción</div>
-          <div class="agenda-sub">Comparativa práctica de los tres grandes asistentes de IA</div>
-        </div>
-      </div>
-      <div class="agenda-item" style="border-color:rgba(0,245,160,.4)">
-        <div class="agenda-num">3</div>
-        <div class="agenda-time">0:40–1:00</div>
-        <div>
-          <div class="agenda-label">⌨ El Arte del Prompting</div>
-          <div class="agenda-sub">Técnicas y frameworks para obtener resultados extraordinarios</div>
-        </div>
-      </div>
-      <div class="agenda-item" style="border-color:rgba(0,245,160,.4)">
-        <div class="agenda-num">4</div>
-        <div class="agenda-time">1:00–1:25</div>
-        <div>
-          <div class="agenda-label">📚 Investigación con NotebookLM</div>
-          <div class="agenda-sub">Análisis de documentos, PDFs y generación de materiales educativos</div>
-        </div>
-      </div>
-      <div class="agenda-item" style="border-color:rgba(255,101,132,.4)">
-        <div class="agenda-num">5</div>
-        <div class="agenda-time">1:25–2:00</div>
-        <div>
-          <div class="agenda-label">🎯 Actividad Práctica Integradora</div>
-          <div class="agenda-sub">Resúmenes · Cuestionarios · Mapas conceptuales · Materiales educativos</div>
-        </div>
-      </div>
-    </div>
 
-    <div class="card mt-2 full-width" style="max-width:850px;text-align:center;border-color:rgba(255,193,7,.3);padding:.8rem">
-      <span style="color:#FFD54F;font-size:.82rem;font-weight:600">💡 Cada sección incluye demostración en vivo + práctica guiada. ¡Pon a prueba las herramientas mientras avanzamos!</span>
-    </div>
-  </div>
+        <div
+          class="card mt-2 full-width"
+          style="
+            max-width: 850px;
+            text-align: center;
+            border-color: rgba(255, 193, 7, 0.3);
+            padding: 0.8rem;
+          "
+        >
+          <span style="color: #ffd54f; font-size: 0.82rem; font-weight: 600"
+            >💡 Cada sección incluye demostración en vivo + práctica guiada.
+            ¡Pon a prueba las herramientas mientras avanzamos!</span
+          >
+        </div>
+      </div>
 
-  <!-- ══════════════════════════════════════════════
+      <!-- ══════════════════════════════════════════════
        SLIDE 3 — QUÉ ES LA IA GENERATIVA
   ══════════════════════════════════════════════ -->
-  <div class="slide bg-blue">
-    <div class="class-banner">
-      <div class="banner-num">01</div>
-      <div>
-        <div class="slide-tag cyan">Módulo 1 · Fundamentos</div>
-        <h2 class="section-title" style="margin-bottom:.2rem">¿Qué es la <span class="grad-text">IA Generativa</span>?</h2>
-        <p class="body">Inteligencia artificial capaz de crear contenido nuevo a partir de instrucciones en lenguaje natural</p>
-      </div>
-    </div>
+      <div class="slide bg-blue">
+        <div class="class-banner">
+          <div class="banner-num">01</div>
+          <div>
+            <div class="slide-tag cyan">Módulo 1 · Fundamentos</div>
+            <h2 class="section-title" style="margin-bottom: 0.2rem">
+              ¿Qué es la <span class="grad-text">IA Generativa</span>?
+            </h2>
+            <p class="body">
+              Inteligencia artificial capaz de crear contenido nuevo a partir de
+              instrucciones en lenguaje natural
+            </p>
+          </div>
+        </div>
 
-    <div class="grid-2 full-width">
-      <div style="display:flex;flex-direction:column;gap:.6rem">
-        <div class="feature-row" style="border-color:rgba(67,203,255,.3)">
-          <div class="feat-icon">🤖</div>
-          <div>
-            <h3 class="card-title">Modelos de Lenguaje (LLM)</h3>
-            <p class="body">Redes neuronales entrenadas con billones de palabras. Predicen el siguiente token para generar texto coherente y útil.</p>
+        <div class="grid-2 full-width">
+          <div style="display: flex; flex-direction: column; gap: 0.6rem">
+            <div
+              class="feature-row"
+              style="border-color: rgba(67, 203, 255, 0.3)"
+            >
+              <div class="feat-icon">🤖</div>
+              <div>
+                <h3 class="card-title">Modelos de Lenguaje (LLM)</h3>
+                <p class="body">
+                  Redes neuronales entrenadas con billones de palabras. Predicen
+                  el siguiente token para generar texto coherente y útil.
+                </p>
+              </div>
+            </div>
+            <div class="feature-row">
+              <div class="feat-icon">🎓</div>
+              <div>
+                <h3 class="card-title">Entrenamiento con RLHF</h3>
+                <p class="body">
+                  Reinforcement Learning from Human Feedback: los modelos
+                  aprenden qué respuestas los humanos prefieren, mejorando su
+                  calidad y seguridad.
+                </p>
+              </div>
+            </div>
+            <div class="feature-row">
+              <div class="feat-icon">🌐</div>
+              <div>
+                <h3 class="card-title">Multimodalidad</h3>
+                <p class="body">
+                  Los modelos actuales procesan texto, imágenes, audio y video
+                  en un mismo flujo. Ya no son solo "chatbots".
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
-        <div class="feature-row">
-          <div class="feat-icon">🎓</div>
-          <div>
-            <h3 class="card-title">Entrenamiento con RLHF</h3>
-            <p class="body">Reinforcement Learning from Human Feedback: los modelos aprenden qué respuestas los humanos prefieren, mejorando su calidad y seguridad.</p>
-          </div>
-        </div>
-        <div class="feature-row">
-          <div class="feat-icon">🌐</div>
-          <div>
-            <h3 class="card-title">Multimodalidad</h3>
-            <p class="body">Los modelos actuales procesan texto, imágenes, audio y video en un mismo flujo. Ya no son solo "chatbots".</p>
+          <div class="grid-2" style="gap: 0.8rem; align-content: start">
+            <div
+              class="card ac-cyan"
+              style="text-align: center; padding: 1.1rem"
+            >
+              <div style="font-size: 2rem; margin-bottom: 0.4rem">📝</div>
+              <div style="font-weight: 700; font-size: 0.88rem">Texto</div>
+              <div style="font-size: 0.74rem; color: var(--text2)">
+                Redacción, resúmenes, análisis, código
+              </div>
+            </div>
+            <div
+              class="card"
+              style="
+                text-align: center;
+                padding: 1.1rem;
+                border-color: rgba(255, 101, 132, 0.35);
+              "
+            >
+              <div style="font-size: 2rem; margin-bottom: 0.4rem">🎨</div>
+              <div style="font-weight: 700; font-size: 0.88rem">Imágenes</div>
+              <div style="font-size: 0.74rem; color: var(--text2)">
+                Arte, diseño, fotografía IA
+              </div>
+            </div>
+            <div
+              class="card"
+              style="
+                text-align: center;
+                padding: 1.1rem;
+                border-color: rgba(0, 245, 160, 0.35);
+              "
+            >
+              <div style="font-size: 2rem; margin-bottom: 0.4rem">🎵</div>
+              <div style="font-weight: 700; font-size: 0.88rem">Audio</div>
+              <div style="font-size: 0.74rem; color: var(--text2)">
+                Voz, música, narración
+              </div>
+            </div>
+            <div
+              class="card"
+              style="
+                text-align: center;
+                padding: 1.1rem;
+                border-color: rgba(255, 193, 7, 0.35);
+              "
+            >
+              <div style="font-size: 2rem; margin-bottom: 0.4rem">🎬</div>
+              <div style="font-weight: 700; font-size: 0.88rem">Video</div>
+              <div style="font-size: 0.74rem; color: var(--text2)">
+                Clips, reels, animaciones
+              </div>
+            </div>
+            <div
+              class="card"
+              style="
+                text-align: center;
+                padding: 1.1rem;
+                border-color: rgba(151, 8, 204, 0.4);
+                grid-column: span 2;
+              "
+            >
+              <div style="font-size: 2rem; margin-bottom: 0.4rem">💻</div>
+              <div style="font-weight: 700; font-size: 0.88rem">
+                Código & Aplicaciones
+              </div>
+              <div style="font-size: 0.74rem; color: var(--text2)">
+                Apps, sitios web, scripts, automatizaciones sin necesidad de
+                programar
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <div class="grid-2" style="gap:.8rem;align-content:start">
-        <div class="card ac-cyan" style="text-align:center;padding:1.1rem">
-          <div style="font-size:2rem;margin-bottom:.4rem">📝</div>
-          <div style="font-weight:700;font-size:.88rem">Texto</div>
-          <div style="font-size:.74rem;color:var(--text2)">Redacción, resúmenes, análisis, código</div>
-        </div>
-        <div class="card" style="text-align:center;padding:1.1rem;border-color:rgba(255,101,132,.35)">
-          <div style="font-size:2rem;margin-bottom:.4rem">🎨</div>
-          <div style="font-weight:700;font-size:.88rem">Imágenes</div>
-          <div style="font-size:.74rem;color:var(--text2)">Arte, diseño, fotografía IA</div>
-        </div>
-        <div class="card" style="text-align:center;padding:1.1rem;border-color:rgba(0,245,160,.35)">
-          <div style="font-size:2rem;margin-bottom:.4rem">🎵</div>
-          <div style="font-weight:700;font-size:.88rem">Audio</div>
-          <div style="font-size:.74rem;color:var(--text2)">Voz, música, narración</div>
-        </div>
-        <div class="card" style="text-align:center;padding:1.1rem;border-color:rgba(255,193,7,.35)">
-          <div style="font-size:2rem;margin-bottom:.4rem">🎬</div>
-          <div style="font-weight:700;font-size:.88rem">Video</div>
-          <div style="font-size:.74rem;color:var(--text2)">Clips, reels, animaciones</div>
-        </div>
-        <div class="card" style="text-align:center;padding:1.1rem;border-color:rgba(151,8,204,.4);grid-column:span 2">
-          <div style="font-size:2rem;margin-bottom:.4rem">💻</div>
-          <div style="font-weight:700;font-size:.88rem">Código & Aplicaciones</div>
-          <div style="font-size:.74rem;color:var(--text2)">Apps, sitios web, scripts, automatizaciones sin necesidad de programar</div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- ══════════════════════════════════════════════
+      <!-- ══════════════════════════════════════════════
        SLIDE 4 — LOS 3 GRANDES ASISTENTES
   ══════════════════════════════════════════════ -->
-  <div class="slide bg-purple">
-    <div class="slide-tag purple">Módulo 2 · Herramientas</div>
-    <h2 class="section-title text-center">Los <span class="grad-text">3 grandes</span> asistentes de IA</h2>
+      <div class="slide bg-purple">
+        <div class="slide-tag purple">Módulo 2 · Herramientas</div>
+        <h2 class="section-title text-center">
+          Los <span class="grad-text">3 grandes</span> asistentes de IA
+        </h2>
 
-    <div class="grid-3 full-width">
-      <!-- ChatGPT -->
-      <div class="tool-card" style="border-color:rgba(16,163,127,.45)">
-        <div class="tool-logo">🤖</div>
-        <div class="tool-name">ChatGPT</div>
-        <div class="tool-org">OpenAI · GPT-4.5 / o3</div>
-        <div class="tool-strong" style="background:rgba(16,163,127,.15);color:#5EC9A0">⚡ Mejor en...</div>
-        <div class="tool-item"><div class="bullet-dot" style="background:#5EC9A0"></div>Redacción creativa y análisis de texto</div>
-        <div class="tool-item"><div class="bullet-dot" style="background:#5EC9A0"></div>Generación y depuración de código</div>
-        <div class="tool-item"><div class="bullet-dot" style="background:#5EC9A0"></div>Razonamiento con modelos o3 y o4-mini</div>
-        <div class="tool-item"><div class="bullet-dot" style="background:#5EC9A0"></div>Integración con plugins y herramientas</div>
-        <div style="margin-top:.5rem;padding:.5rem .7rem;background:rgba(16,163,127,.1);border-radius:8px;font-size:.72rem;color:#5EC9A0">
-          💡 Ideal para: escritura, código, análisis, búsqueda web integrada
+        <div class="grid-3 full-width">
+          <!-- ChatGPT -->
+          <div class="tool-card" style="border-color: rgba(16, 163, 127, 0.45)">
+            <div class="tool-logo">🤖</div>
+            <div class="tool-name">ChatGPT</div>
+            <div class="tool-org">OpenAI · GPT-4.5 / o3</div>
+            <div
+              class="tool-strong"
+              style="background: rgba(16, 163, 127, 0.15); color: #5ec9a0"
+            >
+              ⚡ Mejor en...
+            </div>
+            <div class="tool-item">
+              <div class="bullet-dot" style="background: #5ec9a0"></div>
+              Redacción creativa y análisis de texto
+            </div>
+            <div class="tool-item">
+              <div class="bullet-dot" style="background: #5ec9a0"></div>
+              Generación y depuración de código
+            </div>
+            <div class="tool-item">
+              <div class="bullet-dot" style="background: #5ec9a0"></div>
+              Razonamiento con modelos o3 y o4-mini
+            </div>
+            <div class="tool-item">
+              <div class="bullet-dot" style="background: #5ec9a0"></div>
+              Integración con plugins y herramientas
+            </div>
+            <div
+              style="
+                margin-top: 0.5rem;
+                padding: 0.5rem 0.7rem;
+                background: rgba(16, 163, 127, 0.1);
+                border-radius: 8px;
+                font-size: 0.72rem;
+                color: #5ec9a0;
+              "
+            >
+              💡 Ideal para: escritura, código, análisis, búsqueda web integrada
+            </div>
+          </div>
+
+          <!-- Gemini -->
+          <div class="tool-card" style="border-color: rgba(67, 203, 255, 0.45)">
+            <div class="tool-logo">💎</div>
+            <div class="tool-name">Gemini</div>
+            <div class="tool-org">Google · Gemini 2.5 Pro</div>
+            <div
+              class="tool-strong"
+              style="background: rgba(67, 203, 255, 0.15); color: #7dd8ff"
+            >
+              ⚡ Mejor en...
+            </div>
+            <div class="tool-item">
+              <div class="bullet-dot" style="background: #7dd8ff"></div>
+              Integración con Google Workspace (Docs, Drive)
+            </div>
+            <div class="tool-item">
+              <div class="bullet-dot" style="background: #7dd8ff"></div>
+              Contexto muy largo (1M+ tokens)
+            </div>
+            <div class="tool-item">
+              <div class="bullet-dot" style="background: #7dd8ff"></div>
+              Análisis de imágenes y video en tiempo real
+            </div>
+            <div class="tool-item">
+              <div class="bullet-dot" style="background: #7dd8ff"></div>
+              Búsqueda Google + IA integrada
+            </div>
+            <div
+              style="
+                margin-top: 0.5rem;
+                padding: 0.5rem 0.7rem;
+                background: rgba(67, 203, 255, 0.1);
+                border-radius: 8px;
+                font-size: 0.72rem;
+                color: #7dd8ff;
+              "
+            >
+              💡 Ideal para: investigación, análisis de documentos largos,
+              productividad Google
+            </div>
+          </div>
+
+          <!-- Claude -->
+          <div class="tool-card" style="border-color: rgba(255, 159, 67, 0.45)">
+            <div class="tool-logo">⚡</div>
+            <div class="tool-name">Claude</div>
+            <div class="tool-org">Anthropic · Claude Sonnet 4.6</div>
+            <div
+              class="tool-strong"
+              style="background: rgba(255, 159, 67, 0.15); color: #ffb347"
+            >
+              ⚡ Mejor en...
+            </div>
+            <div class="tool-item">
+              <div class="bullet-dot" style="background: #ffb347"></div>
+              Redacción larga y análisis profundo
+            </div>
+            <div class="tool-item">
+              <div class="bullet-dot" style="background: #ffb347"></div>
+              Seguimiento de instrucciones complejas
+            </div>
+            <div class="tool-item">
+              <div class="bullet-dot" style="background: #ffb347"></div>
+              Respuestas éticas y matizadas
+            </div>
+            <div class="tool-item">
+              <div class="bullet-dot" style="background: #ffb347"></div>
+              Generación de código y HTML interactivo
+            </div>
+            <div
+              style="
+                margin-top: 0.5rem;
+                padding: 0.5rem 0.7rem;
+                background: rgba(255, 159, 67, 0.1);
+                border-radius: 8px;
+                font-size: 0.72rem;
+                color: #ffb347;
+              "
+            >
+              💡 Ideal para: análisis, escritura académica, presentaciones,
+              proyectos complejos
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="card mt-2 full-width"
+          style="
+            text-align: center;
+            border-color: rgba(255, 193, 7, 0.3);
+            padding: 0.9rem;
+          "
+        >
+          <span style="color: #ffd54f; font-size: 0.82rem; font-weight: 600"
+            >🎯 Estrategia pro: usa las 3 herramientas en paralelo y compara
+            resultados. Cada una tiene fortalezas únicas según la tarea.</span
+          >
         </div>
       </div>
 
-      <!-- Gemini -->
-      <div class="tool-card" style="border-color:rgba(67,203,255,.45)">
-        <div class="tool-logo">💎</div>
-        <div class="tool-name">Gemini</div>
-        <div class="tool-org">Google · Gemini 2.5 Pro</div>
-        <div class="tool-strong" style="background:rgba(67,203,255,.15);color:#7DD8FF">⚡ Mejor en...</div>
-        <div class="tool-item"><div class="bullet-dot" style="background:#7DD8FF"></div>Integración con Google Workspace (Docs, Drive)</div>
-        <div class="tool-item"><div class="bullet-dot" style="background:#7DD8FF"></div>Contexto muy largo (1M+ tokens)</div>
-        <div class="tool-item"><div class="bullet-dot" style="background:#7DD8FF"></div>Análisis de imágenes y video en tiempo real</div>
-        <div class="tool-item"><div class="bullet-dot" style="background:#7DD8FF"></div>Búsqueda Google + IA integrada</div>
-        <div style="margin-top:.5rem;padding:.5rem .7rem;background:rgba(67,203,255,.1);border-radius:8px;font-size:.72rem;color:#7DD8FF">
-          💡 Ideal para: investigación, análisis de documentos largos, productividad Google
-        </div>
-      </div>
-
-      <!-- Claude -->
-      <div class="tool-card" style="border-color:rgba(255,159,67,.45)">
-        <div class="tool-logo">⚡</div>
-        <div class="tool-name">Claude</div>
-        <div class="tool-org">Anthropic · Claude Sonnet 4.6</div>
-        <div class="tool-strong" style="background:rgba(255,159,67,.15);color:#FFB347">⚡ Mejor en...</div>
-        <div class="tool-item"><div class="bullet-dot" style="background:#FFB347"></div>Redacción larga y análisis profundo</div>
-        <div class="tool-item"><div class="bullet-dot" style="background:#FFB347"></div>Seguimiento de instrucciones complejas</div>
-        <div class="tool-item"><div class="bullet-dot" style="background:#FFB347"></div>Respuestas éticas y matizadas</div>
-        <div class="tool-item"><div class="bullet-dot" style="background:#FFB347"></div>Generación de código y HTML interactivo</div>
-        <div style="margin-top:.5rem;padding:.5rem .7rem;background:rgba(255,159,67,.1);border-radius:8px;font-size:.72rem;color:#FFB347">
-          💡 Ideal para: análisis, escritura académica, presentaciones, proyectos complejos
-        </div>
-      </div>
-    </div>
-
-    <div class="card mt-2 full-width" style="text-align:center;border-color:rgba(255,193,7,.3);padding:.9rem">
-      <span style="color:#FFD54F;font-size:.82rem;font-weight:600">🎯 Estrategia pro: usa las 3 herramientas en paralelo y compara resultados. Cada una tiene fortalezas únicas según la tarea.</span>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════
+      <!-- ══════════════════════════════════════════════
        SLIDE 5 — DEMO EN VIVO: COMPARATIVA
   ══════════════════════════════════════════════ -->
-  <div class="slide bg-dark">
-    <div class="slide-tag">Actividad Guiada · Paso 1</div>
-    <h2 class="section-title text-center">Demo en vivo: <span class="grad-text">mismo prompt, 3 modelos</span></h2>
-    <p class="lead" style="font-size:.95rem;margin-bottom:1.5rem">Vamos a enviar exactamente el mismo prompt a ChatGPT, Gemini y Claude, y analizaremos las diferencias en las respuestas</p>
+      <div class="slide bg-dark">
+        <div class="slide-tag">Actividad Guiada · Paso 1</div>
+        <h2 class="section-title text-center">
+          Demo en vivo: <span class="grad-text">mismo prompt, 3 modelos</span>
+        </h2>
+        <p class="lead" style="font-size: 0.95rem; margin-bottom: 1.5rem">
+          Vamos a enviar exactamente el mismo prompt a ChatGPT, Gemini y Claude,
+          y analizaremos las diferencias en las respuestas
+        </p>
 
-    <div class="grid-2 full-width">
-      <div>
-        <div class="prompt-box" style="margin-bottom:1rem">
-          <span class="ph">Eres un experto en pedagogía</span> universitaria<br>latinoamericana.<br><br>
-          Escribe una <span class="pv">introducción motivadora</span> de 100 palabras<br>
-          para una clase sobre <span class="po">Inteligencia Artificial Generativa</span><br>
-          dirigida a <span class="pv">docentes universitarios</span> de primer contacto.<br><br>
-          El tono debe ser <span class="ph">inspirador, accesible y profesional</span>.
-        </div>
+        <div class="grid-2 full-width">
+          <div>
+            <div class="prompt-box" style="margin-bottom: 1rem">
+              <span class="ph">Eres un experto en pedagogía</span>
+              universitaria<br />latinoamericana.<br /><br />
+              Escribe una <span class="pv">introducción motivadora</span> de 100
+              palabras<br />
+              para una clase sobre
+              <span class="po">Inteligencia Artificial Generativa</span><br />
+              dirigida a <span class="pv">docentes universitarios</span> de
+              primer contacto.<br /><br />
+              El tono debe ser
+              <span class="ph">inspirador, accesible y profesional</span>.
+            </div>
 
-        <div class="card ac-gold" style="padding:.9rem">
-          <div style="font-size:.72rem;font-weight:700;color:#FFD54F;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">🔍 Qué observar en las respuestas</div>
-          <div class="tool-item" style="margin-bottom:.3rem"><div class="bullet-dot" style="background:#FFD54F"></div>Longitud y estructura de cada respuesta</div>
-          <div class="tool-item" style="margin-bottom:.3rem"><div class="bullet-dot" style="background:#FFD54F"></div>Tono: ¿formal, coloquial, académico?</div>
-          <div class="tool-item" style="margin-bottom:.3rem"><div class="bullet-dot" style="background:#FFD54F"></div>¿Siguió exactamente las instrucciones?</div>
-          <div class="tool-item"><div class="bullet-dot" style="background:#FFD54F"></div>Creatividad vs. precisión factual</div>
+            <div class="card ac-gold" style="padding: 0.9rem">
+              <div
+                style="
+                  font-size: 0.72rem;
+                  font-weight: 700;
+                  color: #ffd54f;
+                  text-transform: uppercase;
+                  letter-spacing: 0.1em;
+                  margin-bottom: 0.5rem;
+                "
+              >
+                🔍 Qué observar en las respuestas
+              </div>
+              <div class="tool-item" style="margin-bottom: 0.3rem">
+                <div class="bullet-dot" style="background: #ffd54f"></div>
+                Longitud y estructura de cada respuesta
+              </div>
+              <div class="tool-item" style="margin-bottom: 0.3rem">
+                <div class="bullet-dot" style="background: #ffd54f"></div>
+                Tono: ¿formal, coloquial, académico?
+              </div>
+              <div class="tool-item" style="margin-bottom: 0.3rem">
+                <div class="bullet-dot" style="background: #ffd54f"></div>
+                ¿Siguió exactamente las instrucciones?
+              </div>
+              <div class="tool-item">
+                <div class="bullet-dot" style="background: #ffd54f"></div>
+                Creatividad vs. precisión factual
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.7rem">
+            <div class="step-flow">
+              <div class="step" style="border-color: rgba(108, 99, 255, 0.4)">
+                <div class="step-num">1</div>
+                <div>
+                  <div class="step-title">Abrir las 3 herramientas</div>
+                  <div class="step-desc">
+                    chatgpt.com · gemini.google.com · claude.ai (usar pestañas
+                    del navegador)
+                  </div>
+                </div>
+              </div>
+              <div class="step" style="border-color: rgba(67, 203, 255, 0.4)">
+                <div class="step-num">2</div>
+                <div>
+                  <div class="step-title">Copiar y pegar el prompt exacto</div>
+                  <div class="step-desc">
+                    Sin modificaciones — queremos resultados comparables
+                  </div>
+                </div>
+              </div>
+              <div class="step" style="border-color: rgba(0, 245, 160, 0.4)">
+                <div class="step-num">3</div>
+                <div>
+                  <div class="step-title">Comparar y votar</div>
+                  <div class="step-desc">
+                    ¿Cuál fue mejor? ¿Por qué? Discusión grupal de 5 minutos
+                  </div>
+                </div>
+              </div>
+              <div class="step" style="border-color: rgba(255, 193, 7, 0.35)">
+                <div class="step-num">4</div>
+                <div>
+                  <div class="step-title">Iterar el prompt</div>
+                  <div class="step-desc">
+                    Modificar una variable y ver cómo cambia el resultado
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:.7rem">
-        <div class="step-flow">
-          <div class="step" style="border-color:rgba(108,99,255,.4)">
-            <div class="step-num">1</div>
-            <div>
-              <div class="step-title">Abrir las 3 herramientas</div>
-              <div class="step-desc">chatgpt.com · gemini.google.com · claude.ai (usar pestañas del navegador)</div>
-            </div>
-          </div>
-          <div class="step" style="border-color:rgba(67,203,255,.4)">
-            <div class="step-num">2</div>
-            <div>
-              <div class="step-title">Copiar y pegar el prompt exacto</div>
-              <div class="step-desc">Sin modificaciones — queremos resultados comparables</div>
-            </div>
-          </div>
-          <div class="step" style="border-color:rgba(0,245,160,.4)">
-            <div class="step-num">3</div>
-            <div>
-              <div class="step-title">Comparar y votar</div>
-              <div class="step-desc">¿Cuál fue mejor? ¿Por qué? Discusión grupal de 5 minutos</div>
-            </div>
-          </div>
-          <div class="step" style="border-color:rgba(255,193,7,.35)">
-            <div class="step-num">4</div>
-            <div>
-              <div class="step-title">Iterar el prompt</div>
-              <div class="step-desc">Modificar una variable y ver cómo cambia el resultado</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════
+      <!-- ══════════════════════════════════════════════
        SLIDE 6 — QUÉ ES UN PROMPT
   ══════════════════════════════════════════════ -->
-  <div class="slide bg-multi">
-    <div class="class-banner">
-      <div class="banner-num">03</div>
-      <div>
-        <div class="slide-tag green">Módulo 3 · Prompting</div>
-        <h2 class="section-title" style="margin-bottom:.2rem">¿Qué es un <span class="grad-green">Prompt</span>?</h2>
-        <p class="body">La instrucción que le das a la IA — el lenguaje que habla</p>
+      <div class="slide bg-multi">
+        <div class="class-banner">
+          <div class="banner-num">03</div>
+          <div>
+            <div class="slide-tag green">Módulo 3 · Prompting</div>
+            <h2 class="section-title" style="margin-bottom: 0.2rem">
+              ¿Qué es un <span class="grad-green">Prompt</span>?
+            </h2>
+            <p class="body">
+              La instrucción que le das a la IA — el lenguaje que habla
+            </p>
+          </div>
+        </div>
+
+        <div class="grid-2 full-width">
+          <div style="display: flex; flex-direction: column; gap: 0.7rem">
+            <div class="card ac-purple" style="padding: 1.1rem">
+              <h3 class="card-title grad-text">Definición</h3>
+              <p class="body">
+                Un <strong style="color: var(--text)">prompt</strong> es
+                cualquier instrucción, pregunta o contexto que le das a un
+                modelo de IA para obtener una respuesta. Es literalmente la
+                <strong style="color: var(--text)"
+                  >interfaz entre tu mente y la IA</strong
+                >.
+              </p>
+            </div>
+
+            <div
+              class="card"
+              style="padding: 1rem; border-color: rgba(255, 101, 132, 0.35)"
+            >
+              <div
+                style="
+                  font-size: 0.72rem;
+                  font-weight: 700;
+                  color: var(--c2);
+                  text-transform: uppercase;
+                  letter-spacing: 0.1em;
+                  margin-bottom: 0.5rem;
+                "
+              >
+                ❌ Prompt débil
+              </div>
+              <div
+                style="
+                  font-family: &quot;Courier New&quot;, monospace;
+                  font-size: 0.82rem;
+                  color: var(--text2);
+                "
+              >
+                "Hazme algo sobre educación"
+              </div>
+              <div
+                style="font-size: 0.72rem; color: var(--c2); margin-top: 0.4rem"
+              >
+                ⚠ Ambiguo · Sin contexto · Resultados genéricos
+              </div>
+            </div>
+
+            <div
+              class="card"
+              style="padding: 1rem; border-color: rgba(0, 245, 160, 0.4)"
+            >
+              <div
+                style="
+                  font-size: 0.72rem;
+                  font-weight: 700;
+                  color: var(--c5);
+                  text-transform: uppercase;
+                  letter-spacing: 0.1em;
+                  margin-bottom: 0.5rem;
+                "
+              >
+                ✅ Prompt poderoso
+              </div>
+              <div
+                style="
+                  font-family: &quot;Courier New&quot;, monospace;
+                  font-size: 0.75rem;
+                  color: #c8c8e8;
+                  line-height: 1.6;
+                "
+              >
+                "Eres un diseñador instruccional. Crea una guía de estudio de 3
+                páginas sobre IA Generativa para docentes universitarios sin
+                experiencia técnica, usando analogías cotidianas y ejemplos
+                educativos."
+              </div>
+              <div
+                style="font-size: 0.72rem; color: var(--c5); margin-top: 0.4rem"
+              >
+                ✅ Rol + Tarea + Contexto + Formato
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div
+              style="
+                font-size: 0.72rem;
+                font-weight: 700;
+                color: var(--c1);
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                margin-bottom: 0.8rem;
+              "
+            >
+              🏗 Anatomía del prompt perfecto
+            </div>
+            <div class="step-flow">
+              <div
+                class="step"
+                style="
+                  border-color: rgba(108, 99, 255, 0.5);
+                  padding: 0.7rem 1rem;
+                "
+              >
+                <div style="font-size: 1.1rem">🎭</div>
+                <div>
+                  <div class="step-title" style="font-size: 0.85rem">
+                    ROL — Asigna una identidad
+                  </div>
+                  <div class="step-desc">
+                    "Actúa como un experto en..." · "Eres un docente
+                    universitario que..."
+                  </div>
+                </div>
+              </div>
+              <div
+                class="step"
+                style="
+                  border-color: rgba(67, 203, 255, 0.45);
+                  padding: 0.7rem 1rem;
+                "
+              >
+                <div style="font-size: 1.1rem">🎯</div>
+                <div>
+                  <div class="step-title" style="font-size: 0.85rem">
+                    TAREA — Define qué hacer
+                  </div>
+                  <div class="step-desc">
+                    "Crea" · "Analiza" · "Resume" · "Compara" · "Explica"
+                  </div>
+                </div>
+              </div>
+              <div
+                class="step"
+                style="
+                  border-color: rgba(0, 245, 160, 0.4);
+                  padding: 0.7rem 1rem;
+                "
+              >
+                <div style="font-size: 1.1rem">📋</div>
+                <div>
+                  <div class="step-title" style="font-size: 0.85rem">
+                    CONTEXTO — Da el marco
+                  </div>
+                  <div class="step-desc">
+                    Audiencia, propósito, restricciones, nivel de conocimiento
+                  </div>
+                </div>
+              </div>
+              <div
+                class="step"
+                style="
+                  border-color: rgba(255, 193, 7, 0.35);
+                  padding: 0.7rem 1rem;
+                "
+              >
+                <div style="font-size: 1.1rem">📐</div>
+                <div>
+                  <div class="step-title" style="font-size: 0.85rem">
+                    FORMATO — Especifica la salida
+                  </div>
+                  <div class="step-desc">
+                    "En 5 puntos" · "En tabla" · "En 200 palabras" · "Con
+                    ejemplos"
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <div class="grid-2 full-width">
-      <div style="display:flex;flex-direction:column;gap:.7rem">
-        <div class="card ac-purple" style="padding:1.1rem">
-          <h3 class="card-title grad-text">Definición</h3>
-          <p class="body">Un <strong style="color:var(--text)">prompt</strong> es cualquier instrucción, pregunta o contexto que le das a un modelo de IA para obtener una respuesta. Es literalmente la <strong style="color:var(--text)">interfaz entre tu mente y la IA</strong>.</p>
-        </div>
-
-        <div class="card" style="padding:1rem;border-color:rgba(255,101,132,.35)">
-          <div style="font-size:.72rem;font-weight:700;color:var(--c2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">❌ Prompt débil</div>
-          <div style="font-family:'Courier New',monospace;font-size:.82rem;color:var(--text2)">"Hazme algo sobre educación"</div>
-          <div style="font-size:.72rem;color:var(--c2);margin-top:.4rem">⚠ Ambiguo · Sin contexto · Resultados genéricos</div>
-        </div>
-
-        <div class="card" style="padding:1rem;border-color:rgba(0,245,160,.4)">
-          <div style="font-size:.72rem;font-weight:700;color:var(--c5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">✅ Prompt poderoso</div>
-          <div style="font-family:'Courier New',monospace;font-size:.75rem;color:#c8c8e8;line-height:1.6">"Eres un diseñador instruccional. Crea una guía de estudio de 3 páginas sobre IA Generativa para docentes universitarios sin experiencia técnica, usando analogías cotidianas y ejemplos educativos."</div>
-          <div style="font-size:.72rem;color:var(--c5);margin-top:.4rem">✅ Rol + Tarea + Contexto + Formato + Audiencia</div>
-        </div>
-      </div>
-
-      <div>
-        <div style="font-size:.72rem;font-weight:700;color:var(--c1);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.8rem">🏗 Anatomía del prompt perfecto</div>
-        <div class="step-flow">
-          <div class="step" style="border-color:rgba(108,99,255,.5);padding:.7rem 1rem">
-            <div style="font-size:1.1rem">🎭</div>
-            <div>
-              <div class="step-title" style="font-size:.85rem">ROL — Asigna una identidad</div>
-              <div class="step-desc">"Actúa como un experto en..." · "Eres un docente universitario que..."</div>
-            </div>
-          </div>
-          <div class="step" style="border-color:rgba(67,203,255,.45);padding:.7rem 1rem">
-            <div style="font-size:1.1rem">🎯</div>
-            <div>
-              <div class="step-title" style="font-size:.85rem">TAREA — Define qué hacer</div>
-              <div class="step-desc">"Crea" · "Analiza" · "Resume" · "Compara" · "Explica"</div>
-            </div>
-          </div>
-          <div class="step" style="border-color:rgba(0,245,160,.4);padding:.7rem 1rem">
-            <div style="font-size:1.1rem">📋</div>
-            <div>
-              <div class="step-title" style="font-size:.85rem">CONTEXTO — Da el marco</div>
-              <div class="step-desc">Audiencia, propósito, restricciones, nivel de conocimiento</div>
-            </div>
-          </div>
-          <div class="step" style="border-color:rgba(255,193,7,.35);padding:.7rem 1rem">
-            <div style="font-size:1.1rem">📐</div>
-            <div>
-              <div class="step-title" style="font-size:.85rem">FORMATO — Especifica la salida</div>
-              <div class="step-desc">"En 5 puntos" · "En tabla" · "En 200 palabras" · "Con ejemplos"</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════
+      <!-- ══════════════════════════════════════════════
        SLIDE 7 — TÉCNICAS DE PROMPTING
   ══════════════════════════════════════════════ -->
-  <div class="slide bg-purple">
-    <div class="slide-tag purple">Prompting Avanzado</div>
-    <h2 class="section-title text-center">Técnicas que <span class="grad-text">multiplican</span> los resultados</h2>
+      <div class="slide bg-purple">
+        <div class="slide-tag purple">Prompting Avanzado</div>
+        <h2 class="section-title text-center">
+          Técnicas que <span class="grad-text">multiplican</span> los resultados
+        </h2>
 
-    <div class="grid-2 full-width">
-      <div class="technique" style="border-color:rgba(108,99,255,.5)">
-        <div class="tech-badge" style="background:rgba(108,99,255,.2);color:#9D97FF">Zero-shot</div>
-        <div class="tech-name">Sin ejemplos previos</div>
-        <div class="tech-desc">La forma más común. Simplemente describes lo que quieres. Funciona bien para tareas simples y claras.</div>
-        <div class="tech-example">"Resume este artículo en 3 puntos clave"</div>
+        <div class="grid-2 full-width">
+          <div class="technique" style="border-color: rgba(108, 99, 255, 0.5)">
+            <div
+              class="tech-badge"
+              style="background: rgba(108, 99, 255, 0.2); color: #9d97ff"
+            >
+              Zero-shot
+            </div>
+            <div class="tech-name">Sin ejemplos previos</div>
+            <div class="tech-desc">
+              La forma más común. Simplemente describes lo que quieres. Funciona
+              bien para tareas simples y claras.
+            </div>
+            <div class="tech-example">
+              "Resume este artículo en 3 puntos clave"
+            </div>
+          </div>
+
+          <div class="technique" style="border-color: rgba(67, 203, 255, 0.45)">
+            <div
+              class="tech-badge"
+              style="background: rgba(67, 203, 255, 0.2); color: #7dd8ff"
+            >
+              Few-shot
+            </div>
+            <div class="tech-name">Con ejemplos de guía</div>
+            <div class="tech-desc">
+              Le das 2-3 ejemplos del resultado esperado. La IA aprende el
+              patrón y lo aplica. Muy poderoso para formatos específicos.
+            </div>
+            <div class="tech-example">
+              "Ejemplo 1: [entrada] → [salida esperada]<br />Ejemplo 2:
+              [entrada] → [salida esperada]<br />Ahora haz lo mismo con: [tu
+              texto]"
+            </div>
+          </div>
+
+          <div class="technique" style="border-color: rgba(0, 245, 160, 0.4)">
+            <div
+              class="tech-badge"
+              style="background: rgba(0, 245, 160, 0.2); color: #5cffd1"
+            >
+              Chain of Thought
+            </div>
+            <div class="tech-name">Razonamiento paso a paso</div>
+            <div class="tech-desc">
+              Pides que razone antes de responder. Mejora drásticamente la
+              calidad en problemas complejos de análisis o lógica.
+            </div>
+            <div class="tech-example">
+              "Piensa paso a paso antes de responder.<br />Analiza el argumento
+              del texto y luego<br />dame tu conclusión fundamentada."
+            </div>
+          </div>
+
+          <div class="technique" style="border-color: rgba(255, 101, 132, 0.4)">
+            <div
+              class="tech-badge"
+              style="background: rgba(255, 101, 132, 0.2); color: #ff9db0"
+            >
+              Role Prompting
+            </div>
+            <div class="tech-name">Asignación de rol experto</div>
+            <div class="tech-desc">
+              Le asignas una identidad específica. La IA adopta ese punto de
+              vista, vocabulario y nivel de expertise.
+            </div>
+            <div class="tech-example">
+              "Actúa como un evaluador externo del<br />Ministerio de Educación
+              revisando este<br />programa de estudios universitario."
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="card mt-2 full-width"
+          style="
+            text-align: center;
+            border-color: rgba(255, 193, 7, 0.3);
+            padding: 0.85rem;
+          "
+        >
+          <span style="color: #ffd54f; font-size: 0.82rem; font-weight: 600"
+            >⚡ Combinar técnicas = resultados extraordinarios. Rol + Chain of
+            Thought + Few-shot es la combinación más poderosa.</span
+          >
+        </div>
       </div>
 
-      <div class="technique" style="border-color:rgba(67,203,255,.45)">
-        <div class="tech-badge" style="background:rgba(67,203,255,.2);color:#7DD8FF">Few-shot</div>
-        <div class="tech-name">Con ejemplos de guía</div>
-        <div class="tech-desc">Le das 2-3 ejemplos del resultado esperado. La IA aprende el patrón y lo aplica. Muy poderoso para formatos específicos.</div>
-        <div class="tech-example">"Ejemplo 1: [entrada] → [salida esperada]<br>Ejemplo 2: [entrada] → [salida esperada]<br>Ahora haz lo mismo con: [tu texto]"</div>
-      </div>
-
-      <div class="technique" style="border-color:rgba(0,245,160,.4)">
-        <div class="tech-badge" style="background:rgba(0,245,160,.2);color:#5CFFD1">Chain of Thought</div>
-        <div class="tech-name">Razonamiento paso a paso</div>
-        <div class="tech-desc">Pides que razone antes de responder. Mejora drásticamente la calidad en problemas complejos de análisis o lógica.</div>
-        <div class="tech-example">"Piensa paso a paso antes de responder.<br>Analiza el argumento del texto y luego<br>dame tu conclusión fundamentada."</div>
-      </div>
-
-      <div class="technique" style="border-color:rgba(255,101,132,.4)">
-        <div class="tech-badge" style="background:rgba(255,101,132,.2);color:#FF9DB0">Role Prompting</div>
-        <div class="tech-name">Asignación de rol experto</div>
-        <div class="tech-desc">Le asignas una identidad específica. La IA adopta ese punto de vista, vocabulario y nivel de expertise.</div>
-        <div class="tech-example">"Actúa como un evaluador externo del<br>Ministerio de Educación revisando este<br>programa de estudios universitario."</div>
-      </div>
-    </div>
-
-    <div class="card mt-2 full-width" style="text-align:center;border-color:rgba(255,193,7,.3);padding:.85rem">
-      <span style="color:#FFD54F;font-size:.82rem;font-weight:600">⚡ Combinar técnicas = resultados extraordinarios. Rol + Chain of Thought + Few-shot es la combinación más poderosa.</span>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════
+      <!-- ══════════════════════════════════════════════
        SLIDE 8 — PRÁCTICA PROMPTING
   ══════════════════════════════════════════════ -->
-  <div class="slide bg-dark">
-    <div class="slide-tag">Actividad Guiada · Paso 2</div>
-    <h2 class="section-title text-center">Práctica: <span class="grad-text">construye tu prompt</span></h2>
-    <p class="lead" style="font-size:.93rem;margin-bottom:1.5rem">Diseña un prompt poderoso usando las técnicas aprendidas. Usaremos ChatGPT o Claude.</p>
+      <div class="slide bg-dark">
+        <div class="slide-tag">Actividad Guiada · Paso 2</div>
+        <h2 class="section-title text-center">
+          Práctica: <span class="grad-text">construye tu prompt</span>
+        </h2>
+        <p class="lead" style="font-size: 0.93rem; margin-bottom: 1.5rem">
+          Diseña un prompt poderoso usando las técnicas aprendidas. Usaremos
+          ChatGPT o Claude.
+        </p>
 
-    <div class="grid-2 full-width">
-      <div>
-        <div style="font-size:.72rem;font-weight:700;color:var(--c5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem">🏋 Ejercicio: construye este prompt complejo</div>
-        <div class="prompt-box">
-          <span class="ph">Rol:</span> <span class="pv">Eres un docente universitario</span> con 15 años de<br>
-          experiencia en metodologías activas de enseñanza.<br><br>
-          <span class="ph">Tarea:</span> Diseña un plan de clase de <span class="po">45 minutos</span><br>
-          sobre el tema: <span class="pv">[escribe tu tema aquí]</span><br><br>
-          <span class="ph">Incluye:</span><br>
-          · Objetivo de aprendizaje (1 oración)<br>
-          · 3 actividades cronometradas<br>
-          · Recursos sugeridos (con IA)<br>
-          · Evaluación formativa de cierre<br><br>
-          <span class="ph">Formato:</span> <span class="pv">tabla Markdown</span> organizada por tiempo<br>
-          <span class="ph">Tono:</span> profesional y práctico
+        <div class="grid-2 full-width">
+          <div>
+            <div
+              style="
+                font-size: 0.72rem;
+                font-weight: 700;
+                color: var(--c5);
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                margin-bottom: 0.7rem;
+              "
+            >
+              🏋 Ejercicio: construye este prompt complejo
+            </div>
+            <div class="prompt-box">
+              <span class="ph">Rol:</span>
+              <span class="pv">Eres un docente universitario</span> con 15 años
+              de<br />
+              experiencia en metodologías activas de enseñanza.<br /><br />
+              <span class="ph">Tarea:</span> Diseña un plan de clase de
+              <span class="po">45 minutos</span><br />
+              sobre el tema: <span class="pv">[escribe tu tema aquí]</span
+              ><br /><br />
+              <span class="ph">Incluye:</span><br />
+              · Objetivo de aprendizaje (1 oración)<br />
+              · 3 actividades cronometradas<br />
+              · Recursos sugeridos (con IA)<br />
+              · Evaluación formativa de cierre<br /><br />
+              <span class="ph">Formato:</span>
+              <span class="pv">tabla Markdown</span> organizada por tiempo<br />
+              <span class="ph">Tono:</span> profesional y práctico
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.7rem">
+            <div
+              style="
+                font-size: 0.72rem;
+                font-weight: 700;
+                color: var(--c1);
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                margin-bottom: 0.2rem;
+              "
+            >
+              📋 Rúbrica de evaluación del prompt
+            </div>
+            <div
+              class="feature-row"
+              style="
+                border-color: rgba(0, 245, 160, 0.35);
+                padding: 0.7rem 1rem;
+              "
+            >
+              <div style="font-size: 1.2rem">✅</div>
+              <div>
+                <div style="font-weight: 600; font-size: 0.85rem">
+                  ¿Tiene un rol asignado?
+                </div>
+                <div class="step-desc">
+                  El modelo sabe desde qué perspectiva hablar
+                </div>
+              </div>
+            </div>
+            <div
+              class="feature-row"
+              style="
+                border-color: rgba(67, 203, 255, 0.35);
+                padding: 0.7rem 1rem;
+              "
+            >
+              <div style="font-size: 1.2rem">✅</div>
+              <div>
+                <div style="font-weight: 600; font-size: 0.85rem">
+                  ¿La tarea es específica?
+                </div>
+                <div class="step-desc">Verbo de acción + entregable claro</div>
+              </div>
+            </div>
+            <div
+              class="feature-row"
+              style="
+                border-color: rgba(255, 101, 132, 0.35);
+                padding: 0.7rem 1rem;
+              "
+            >
+              <div style="font-size: 1.2rem">✅</div>
+              <div>
+                <div style="font-weight: 600; font-size: 0.85rem">
+                  ¿Especifica el formato?
+                </div>
+                <div class="step-desc">
+                  Longitud, estructura, estilo de salida
+                </div>
+              </div>
+            </div>
+            <div
+              class="feature-row"
+              style="
+                border-color: rgba(255, 193, 7, 0.35);
+                padding: 0.7rem 1rem;
+              "
+            >
+              <div style="font-size: 1.2rem">✅</div>
+              <div>
+                <div style="font-weight: 600; font-size: 0.85rem">
+                  ¿Identifica la audiencia?
+                </div>
+                <div class="step-desc">Para quién es el contenido generado</div>
+              </div>
+            </div>
+            <div
+              class="card ac-gold"
+              style="text-align: center; padding: 0.8rem"
+            >
+              <span style="font-size: 0.8rem; color: #ffd54f; font-weight: 600"
+                >⏱ 10 minutos · Comparte tu resultado con el grupo</span
+              >
+            </div>
+          </div>
         </div>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:.7rem">
-        <div style="font-size:.72rem;font-weight:700;color:var(--c1);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.2rem">📋 Rúbrica de evaluación del prompt</div>
-        <div class="feature-row" style="border-color:rgba(0,245,160,.35);padding:.7rem 1rem">
-          <div style="font-size:1.2rem">✅</div>
-          <div><div style="font-weight:600;font-size:.85rem">¿Tiene un rol asignado?</div><div class="step-desc">El modelo sabe desde qué perspectiva hablar</div></div>
-        </div>
-        <div class="feature-row" style="border-color:rgba(67,203,255,.35);padding:.7rem 1rem">
-          <div style="font-size:1.2rem">✅</div>
-          <div><div style="font-weight:600;font-size:.85rem">¿La tarea es específica?</div><div class="step-desc">Verbo de acción + entregable claro</div></div>
-        </div>
-        <div class="feature-row" style="border-color:rgba(255,101,132,.35);padding:.7rem 1rem">
-          <div style="font-size:1.2rem">✅</div>
-          <div><div style="font-weight:600;font-size:.85rem">¿Especifica el formato?</div><div class="step-desc">Longitud, estructura, estilo de salida</div></div>
-        </div>
-        <div class="feature-row" style="border-color:rgba(255,193,7,.35);padding:.7rem 1rem">
-          <div style="font-size:1.2rem">✅</div>
-          <div><div style="font-weight:600;font-size:.85rem">¿Identifica la audiencia?</div><div class="step-desc">Para quién es el contenido generado</div></div>
-        </div>
-        <div class="card ac-gold" style="text-align:center;padding:.8rem">
-          <span style="font-size:.8rem;color:#FFD54F;font-weight:600">⏱ 10 minutos · Comparte tu resultado con el grupo</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════
+      <!-- ══════════════════════════════════════════════
        SLIDE 9 — NOTEBOOKLM ¿QUÉ ES?
   ══════════════════════════════════════════════ -->
-  <div class="slide bg-green">
-    <div class="class-banner">
-      <div class="banner-num" style="color:var(--c5)">04</div>
-      <div>
-        <div class="slide-tag green">Módulo 4 · Investigación</div>
-        <h2 class="section-title" style="margin-bottom:.2rem"><span class="grad-green">NotebookLM</span>: tu investigador personal con IA</h2>
-        <p class="body">La herramienta de Google para analizar, sintetizar y aprender de tus propios documentos</p>
+      <div class="slide bg-green">
+        <div class="class-banner">
+          <div class="banner-num" style="color: var(--c5)">04</div>
+          <div>
+            <div class="slide-tag green">Módulo 4 · Investigación</div>
+            <h2 class="section-title" style="margin-bottom: 0.2rem">
+              <span class="grad-green">NotebookLM</span>: tu investigador
+              personal con IA
+            </h2>
+            <p class="body">
+              La herramienta de Google para analizar, sintetizar y aprender de
+              tus propios documentos
+            </p>
+          </div>
+        </div>
+
+        <div class="grid-2 full-width">
+          <div style="display: flex; flex-direction: column; gap: 0.6rem">
+            <div
+              class="feature-row"
+              style="border-color: rgba(0, 245, 160, 0.4)"
+            >
+              <div class="feat-icon">📁</div>
+              <div>
+                <h3 class="card-title" style="color: #5cffd1">
+                  Sube tus propios documentos
+                </h3>
+                <p class="body">
+                  PDFs, Google Docs, páginas web, videos de YouTube, grabaciones
+                  de audio. NotebookLM solo analiza LO QUE TÚ LE DAS.
+                </p>
+              </div>
+            </div>
+            <div
+              class="feature-row"
+              style="border-color: rgba(67, 203, 255, 0.35)"
+            >
+              <div class="feat-icon">🧠</div>
+              <div>
+                <h3 class="card-title" style="color: #7dd8ff">
+                  Comprende el contenido
+                </h3>
+                <p class="body">
+                  Usa Gemini para indexar y entender el contenido. Puede
+                  responder preguntas con citas exactas del documento original.
+                </p>
+              </div>
+            </div>
+            <div
+              class="feature-row"
+              style="border-color: rgba(108, 99, 255, 0.4)"
+            >
+              <div class="feat-icon">🎙️</div>
+              <div>
+                <h3 class="card-title" style="color: #9d97ff">
+                  Audio Overviews (podcast)
+                </h3>
+                <p class="body">
+                  Genera un podcast conversacional sobre tus documentos. Dos
+                  voces discuten el contenido como si fuera un programa de
+                  radio.
+                </p>
+              </div>
+            </div>
+            <div
+              class="feature-row"
+              style="border-color: rgba(255, 193, 7, 0.35)"
+            >
+              <div class="feat-icon">📋</div>
+              <div>
+                <h3 class="card-title" style="color: #ffd54f">
+                  Genera materiales automáticamente
+                </h3>
+                <p class="body">
+                  Guías de estudio, cuestionarios, cronologías, resúmenes
+                  ejecutivos y mapas conceptuales desde un solo clic.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div
+              style="
+                font-size: 0.72rem;
+                font-weight: 700;
+                color: var(--c5);
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                margin-bottom: 0.8rem;
+              "
+            >
+              ⚡ Ventaja clave vs. ChatGPT
+            </div>
+            <div
+              class="card ac-green"
+              style="margin-bottom: 0.7rem; padding: 1.1rem"
+            >
+              <p class="body">
+                ChatGPT responde basado en su entrenamiento (puede
+                <span style="color: var(--c2)">alucinar</span>).<br /><br />
+                NotebookLM
+                <strong style="color: var(--c5)"
+                  >SOLO usa tus documentos</strong
+                >
+                y cita la fuente exacta.<br />
+                Ideal para investigación académica y análisis documental
+                confiable.
+              </p>
+            </div>
+
+            <div
+              style="
+                font-size: 0.72rem;
+                font-weight: 700;
+                color: var(--c3);
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                margin-bottom: 0.6rem;
+              "
+            >
+              🔗 Acceso gratuito
+            </div>
+            <div class="card ac-cyan" style="padding: 1rem; text-align: center">
+              <div style="font-size: 1.5rem; margin-bottom: 0.3rem">🌐</div>
+              <div
+                style="
+                  font-weight: 700;
+                  font-size: 0.9rem;
+                  margin-bottom: 0.2rem;
+                "
+              >
+                notebooklm.google.com
+              </div>
+              <div style="font-size: 0.75rem; color: var(--text2)">
+                Solo necesitas una cuenta Google gratuita.<br />Soporta hasta 50
+                fuentes por notebook.
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <div class="grid-2 full-width">
-      <div style="display:flex;flex-direction:column;gap:.6rem">
-        <div class="feature-row" style="border-color:rgba(0,245,160,.4)">
-          <div class="feat-icon">📁</div>
-          <div>
-            <h3 class="card-title" style="color:#5CFFD1">Sube tus propios documentos</h3>
-            <p class="body">PDFs, Google Docs, páginas web, videos de YouTube, grabaciones de audio. NotebookLM solo analiza LO QUE TÚ LE DAS.</p>
-          </div>
-        </div>
-        <div class="feature-row" style="border-color:rgba(67,203,255,.35)">
-          <div class="feat-icon">🧠</div>
-          <div>
-            <h3 class="card-title" style="color:#7DD8FF">Comprende el contenido</h3>
-            <p class="body">Usa Gemini para indexar y entender el contenido. Puede responder preguntas con citas exactas del documento original.</p>
-          </div>
-        </div>
-        <div class="feature-row" style="border-color:rgba(108,99,255,.4)">
-          <div class="feat-icon">🎙️</div>
-          <div>
-            <h3 class="card-title" style="color:#9D97FF">Audio Overviews (podcast)</h3>
-            <p class="body">Genera un podcast conversacional sobre tus documentos. Dos voces discuten el contenido como si fuera un programa de radio.</p>
-          </div>
-        </div>
-        <div class="feature-row" style="border-color:rgba(255,193,7,.35)">
-          <div class="feat-icon">📋</div>
-          <div>
-            <h3 class="card-title" style="color:#FFD54F">Genera materiales automáticamente</h3>
-            <p class="body">Guías de estudio, cuestionarios, cronologías, resúmenes ejecutivos y mapas conceptuales desde un solo clic.</p>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <div style="font-size:.72rem;font-weight:700;color:var(--c5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.8rem">⚡ Ventaja clave vs. ChatGPT</div>
-        <div class="card ac-green" style="margin-bottom:.7rem;padding:1.1rem">
-          <p class="body">ChatGPT responde basado en su entrenamiento (puede <span style="color:var(--c2)">alucinar</span>).<br><br>
-          NotebookLM <strong style="color:var(--c5)">SOLO usa tus documentos</strong> y cita la fuente exacta.<br>
-          Ideal para investigación académica y análisis documental confiable.</p>
-        </div>
-
-        <div style="font-size:.72rem;font-weight:700;color:var(--c3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.6rem">🔗 Acceso gratuito</div>
-        <div class="card ac-cyan" style="padding:1rem;text-align:center">
-          <div style="font-size:1.5rem;margin-bottom:.3rem">🌐</div>
-          <div style="font-weight:700;font-size:.9rem;margin-bottom:.2rem">notebooklm.google.com</div>
-          <div style="font-size:.75rem;color:var(--text2)">Solo necesitas una cuenta Google gratuita.<br>Soporta hasta 50 fuentes por notebook.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════
+      <!-- ══════════════════════════════════════════════
        SLIDE 10 — FLUJO DE TRABAJO CON NOTEBOOKLM
   ══════════════════════════════════════════════ -->
-  <div class="slide bg-dark">
-    <div class="slide-tag green">Paso a paso</div>
-    <h2 class="section-title text-center">Cómo usar <span class="grad-green">NotebookLM</span> en 5 pasos</h2>
+      <div class="slide bg-dark">
+        <div class="slide-tag green">Paso a paso</div>
+        <h2 class="section-title text-center">
+          Cómo usar <span class="grad-green">NotebookLM</span> en 5 pasos
+        </h2>
 
-    <div class="full-width" style="max-width:880px">
-      <div class="flow-row" style="margin-bottom:1rem">
-        <div class="nlm-card" style="border-color:rgba(108,99,255,.45)">
-          <div class="nlm-icon">1️⃣</div>
-          <div class="nlm-label grad-text">Crear Notebook</div>
-          <div class="nlm-sub">Ir a notebooklm.google.com → "Nuevo Notebook" → Dale un nombre descriptivo</div>
+        <div class="full-width" style="max-width: 880px">
+          <div class="flow-row" style="margin-bottom: 1rem">
+            <div
+              class="nlm-card"
+              style="border-color: rgba(108, 99, 255, 0.45)"
+            >
+              <div class="nlm-icon">1️⃣</div>
+              <div class="nlm-label grad-text">Crear Notebook</div>
+              <div class="nlm-sub">
+                Ir a notebooklm.google.com → "Nuevo Notebook" → Dale un nombre
+                descriptivo
+              </div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div
+              class="nlm-card"
+              style="border-color: rgba(67, 203, 255, 0.45)"
+            >
+              <div class="nlm-icon">2️⃣</div>
+              <div class="nlm-label" style="color: #7dd8ff">Subir Fuentes</div>
+              <div class="nlm-sub">
+                PDF, URL, Google Doc, YouTube, audio. Hasta 50 fuentes por
+                notebook.
+              </div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="nlm-card" style="border-color: rgba(0, 245, 160, 0.45)">
+              <div class="nlm-icon">3️⃣</div>
+              <div class="nlm-label grad-green">Explorar</div>
+              <div class="nlm-sub">
+                Leer el resumen automático y las preguntas sugeridas por la IA
+              </div>
+            </div>
+          </div>
+
+          <div class="flow-row" style="justify-content: center; gap: 1.5rem">
+            <div
+              class="nlm-card"
+              style="border-color: rgba(255, 193, 7, 0.45); max-width: 220px"
+            >
+              <div class="nlm-icon">4️⃣</div>
+              <div class="nlm-label" style="color: #ffd54f">
+                Preguntar & Analizar
+              </div>
+              <div class="nlm-sub">
+                Chat con tus documentos. Cada respuesta incluye cita de fuente
+                exacta.
+              </div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div
+              class="nlm-card"
+              style="border-color: rgba(255, 101, 132, 0.45); max-width: 220px"
+            >
+              <div class="nlm-icon">5️⃣</div>
+              <div class="nlm-label" style="color: #ff9db0">
+                Generar Materiales
+              </div>
+              <div class="nlm-sub">
+                Guía de estudio · Cuestionario · Cronología · Resumen · Podcast
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="flow-arrow">→</div>
-        <div class="nlm-card" style="border-color:rgba(67,203,255,.45)">
-          <div class="nlm-icon">2️⃣</div>
-          <div class="nlm-label" style="color:#7DD8FF">Subir Fuentes</div>
-          <div class="nlm-sub">PDF, URL, Google Doc, YouTube, audio. Hasta 50 fuentes por notebook.</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="nlm-card" style="border-color:rgba(0,245,160,.45)">
-          <div class="nlm-icon">3️⃣</div>
-          <div class="nlm-label grad-green">Explorar</div>
-          <div class="nlm-sub">Leer el resumen automático y las preguntas sugeridas por la IA</div>
+
+        <div class="grid-3 full-width mt-3" style="max-width: 880px">
+          <div
+            class="card ac-purple"
+            style="padding: 0.9rem; text-align: center"
+          >
+            <div style="font-size: 1.5rem; margin-bottom: 0.3rem">❓</div>
+            <div
+              style="
+                font-weight: 700;
+                font-size: 0.82rem;
+                margin-bottom: 0.2rem;
+              "
+            >
+              Preguntas inteligentes
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text2)">
+              "¿Cuáles son las limitaciones del método propuesto en la sección
+              3?"
+            </div>
+          </div>
+          <div class="card ac-cyan" style="padding: 0.9rem; text-align: center">
+            <div style="font-size: 1.5rem; margin-bottom: 0.3rem">📊</div>
+            <div
+              style="
+                font-weight: 700;
+                font-size: 0.82rem;
+                margin-bottom: 0.2rem;
+              "
+            >
+              Comparación de fuentes
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text2)">
+              "Compara los enfoques del documento A con el documento B"
+            </div>
+          </div>
+          <div
+            class="card ac-green"
+            style="padding: 0.9rem; text-align: center"
+          >
+            <div style="font-size: 1.5rem; margin-bottom: 0.3rem">🎙️</div>
+            <div
+              style="
+                font-weight: 700;
+                font-size: 0.82rem;
+                margin-bottom: 0.2rem;
+              "
+            >
+              Audio Overview
+            </div>
+            <div style="font-size: 0.72rem; color: var(--text2)">
+              Podcast de 10 min sobre el contenido de tus documentos —
+              automático
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="flow-row" style="justify-content:center;gap:1.5rem">
-        <div class="nlm-card" style="border-color:rgba(255,193,7,.45);max-width:220px">
-          <div class="nlm-icon">4️⃣</div>
-          <div class="nlm-label" style="color:#FFD54F">Preguntar & Analizar</div>
-          <div class="nlm-sub">Chat con tus documentos. Cada respuesta incluye cita de fuente exacta.</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="nlm-card" style="border-color:rgba(255,101,132,.45);max-width:220px">
-          <div class="nlm-icon">5️⃣</div>
-          <div class="nlm-label" style="color:#FF9DB0">Generar Materiales</div>
-          <div class="nlm-sub">Guía de estudio · Cuestionario · Cronología · Resumen · Podcast</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="grid-3 full-width mt-3" style="max-width:880px">
-      <div class="card ac-purple" style="padding:.9rem;text-align:center">
-        <div style="font-size:1.5rem;margin-bottom:.3rem">❓</div>
-        <div style="font-weight:700;font-size:.82rem;margin-bottom:.2rem">Preguntas inteligentes</div>
-        <div style="font-size:.72rem;color:var(--text2)">"¿Cuáles son las limitaciones del método propuesto en la sección 3?"</div>
-      </div>
-      <div class="card ac-cyan" style="padding:.9rem;text-align:center">
-        <div style="font-size:1.5rem;margin-bottom:.3rem">📊</div>
-        <div style="font-weight:700;font-size:.82rem;margin-bottom:.2rem">Comparación de fuentes</div>
-        <div style="font-size:.72rem;color:var(--text2)">"Compara los enfoques del documento A con el documento B"</div>
-      </div>
-      <div class="card ac-green" style="padding:.9rem;text-align:center">
-        <div style="font-size:1.5rem;margin-bottom:.3rem">🎙️</div>
-        <div style="font-weight:700;font-size:.82rem;margin-bottom:.2rem">Audio Overview</div>
-        <div style="font-size:.72rem;color:var(--text2)">Podcast de 10 min sobre el contenido de tus documentos — automático</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════
+      <!-- ══════════════════════════════════════════════
        SLIDE 11 — GENERACIÓN DE MATERIALES EDUCATIVOS
   ══════════════════════════════════════════════ -->
-  <div class="slide bg-blue">
-    <div class="slide-tag cyan">Aplicación Pedagógica</div>
-    <h2 class="section-title text-center">Generación de <span class="grad-text">materiales educativos</span></h2>
-    <p class="lead" style="font-size:.93rem;margin-bottom:1.5rem">Lo que antes tomaba días, ahora se hace en minutos. Con calidad profesional.</p>
+      <div class="slide bg-blue">
+        <div class="slide-tag cyan">Aplicación Pedagógica</div>
+        <h2 class="section-title text-center">
+          Generación de <span class="grad-text">materiales educativos</span>
+        </h2>
+        <p class="lead" style="font-size: 0.93rem; margin-bottom: 1.5rem">
+          Lo que antes tomaba días, ahora se hace en minutos. Con calidad
+          profesional.
+        </p>
 
-    <div class="grid-3 full-width">
-      <div class="result-card ac-purple">
-        <div class="result-icon">📄</div>
-        <div class="result-name">Resumen ejecutivo</div>
-        <div class="result-desc">Síntesis de los puntos clave de cualquier documento. Con jerarquía de ideas y conceptos esenciales destacados.</div>
-        <div class="result-sample">Prompt: "Resume este PDF en 300 palabras destacando las 5 ideas principales y su impacto en la educación superior"</div>
+        <div class="grid-3 full-width">
+          <div class="result-card ac-purple">
+            <div class="result-icon">📄</div>
+            <div class="result-name">Resumen ejecutivo</div>
+            <div class="result-desc">
+              Síntesis de los puntos clave de cualquier documento. Con jerarquía
+              de ideas y conceptos esenciales destacados.
+            </div>
+            <div class="result-sample">
+              Prompt: "Resume este PDF en 300 palabras destacando las 5 ideas
+              principales y su impacto en la educación superior"
+            </div>
+          </div>
+
+          <div class="result-card ac-cyan">
+            <div class="result-icon">❓</div>
+            <div class="result-name">Cuestionario de análisis</div>
+            <div class="result-desc">
+              Preguntas de comprensión, análisis y pensamiento crítico. Taxonomy
+              de Bloom aplicada automáticamente.
+            </div>
+            <div class="result-sample">
+              Prompt: "Crea 10 preguntas: 3 de comprensión, 4 de análisis y 3 de
+              evaluación crítica según Bloom"
+            </div>
+          </div>
+
+          <div class="result-card ac-green">
+            <div class="result-icon">🗺️</div>
+            <div class="result-name">Mapa conceptual</div>
+            <div class="result-desc">
+              Estructura jerárquica de ideas, relaciones entre conceptos y
+              vocabulario clave del tema.
+            </div>
+            <div class="result-sample">
+              Prompt: "Genera un mapa conceptual en texto con el concepto
+              central, 4 ramas y 3 sub-ideas por rama"
+            </div>
+          </div>
+
+          <div
+            class="result-card"
+            style="border-color: rgba(255, 101, 132, 0.4)"
+          >
+            <div class="result-icon">🎓</div>
+            <div class="result-name">Plan de clase</div>
+            <div class="result-desc">
+              Secuencia didáctica con objetivos, actividades cronometradas,
+              materiales y evaluación formativa.
+            </div>
+            <div class="result-sample">
+              Prompt: "Diseña una clase de 90 min sobre este tema con inicio,
+              desarrollo y cierre, incluyendo actividades colaborativas"
+            </div>
+          </div>
+
+          <div class="result-card" style="border-color: rgba(255, 193, 7, 0.4)">
+            <div class="result-icon">📋</div>
+            <div class="result-name">Guía de estudio</div>
+            <div class="result-desc">
+              Material de autoestudio con términos clave, puntos para recordar y
+              preguntas de autoevaluación.
+            </div>
+            <div class="result-sample">
+              Prompt: "Crea una guía de estudio de 2 páginas con glosario de 10
+              términos y ejercicios de práctica"
+            </div>
+          </div>
+
+          <div class="result-card" style="border-color: rgba(151, 8, 204, 0.4)">
+            <div class="result-icon">🎙️</div>
+            <div class="result-name">Podcast educativo</div>
+            <div class="result-desc">
+              NotebookLM genera automáticamente una conversación entre dos
+              "hosts" que discuten el contenido.
+            </div>
+            <div class="result-sample">
+              Clic en "Audio Overview" → NotebookLM genera el podcast en
+              segundos. Descargable en MP3.
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="result-card ac-cyan">
-        <div class="result-icon">❓</div>
-        <div class="result-name">Cuestionario de análisis</div>
-        <div class="result-desc">Preguntas de comprensión, análisis y pensamiento crítico. Taxonomy de Bloom aplicada automáticamente.</div>
-        <div class="result-sample">Prompt: "Crea 10 preguntas: 3 de comprensión, 4 de análisis y 3 de evaluación crítica según Bloom"</div>
-      </div>
-
-      <div class="result-card ac-green">
-        <div class="result-icon">🗺️</div>
-        <div class="result-name">Mapa conceptual</div>
-        <div class="result-desc">Estructura jerárquica de ideas, relaciones entre conceptos y vocabulario clave del tema.</div>
-        <div class="result-sample">Prompt: "Genera un mapa conceptual en texto con el concepto central, 4 ramas y 3 sub-ideas por rama"</div>
-      </div>
-
-      <div class="result-card" style="border-color:rgba(255,101,132,.4)">
-        <div class="result-icon">🎓</div>
-        <div class="result-name">Plan de clase</div>
-        <div class="result-desc">Secuencia didáctica con objetivos, actividades cronometradas, materiales y evaluación formativa.</div>
-        <div class="result-sample">Prompt: "Diseña una clase de 90 min sobre este tema con inicio, desarrollo y cierre, incluyendo actividades colaborativas"</div>
-      </div>
-
-      <div class="result-card" style="border-color:rgba(255,193,7,.4)">
-        <div class="result-icon">📋</div>
-        <div class="result-name">Guía de estudio</div>
-        <div class="result-desc">Material de autoestudio con términos clave, puntos para recordar y preguntas de autoevaluación.</div>
-        <div class="result-sample">Prompt: "Crea una guía de estudio de 2 páginas con glosario de 10 términos y ejercicios de práctica"</div>
-      </div>
-
-      <div class="result-card" style="border-color:rgba(151,8,204,.4)">
-        <div class="result-icon">🎙️</div>
-        <div class="result-name">Podcast educativo</div>
-        <div class="result-desc">NotebookLM genera automáticamente una conversación entre dos "hosts" que discuten el contenido.</div>
-        <div class="result-sample">Clic en "Audio Overview" → NotebookLM genera el podcast en segundos. Descargable en MP3.</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════
+      <!-- ══════════════════════════════════════════════
        SLIDE 12 — DEMO NOTEBOOKLM EN VIVO
   ══════════════════════════════════════════════ -->
-  <div class="slide bg-dark">
-    <div class="slide-tag green">Demo en Vivo · NotebookLM</div>
-    <h2 class="section-title text-center">Analizando un <span class="grad-green">documento real</span> con IA</h2>
+      <div class="slide bg-dark">
+        <div class="slide-tag green">Demo en Vivo · NotebookLM</div>
+        <h2 class="section-title text-center">
+          Analizando un <span class="grad-green">documento real</span> con IA
+        </h2>
 
-    <div class="grid-2 full-width">
-      <div>
-        <div style="font-size:.72rem;font-weight:700;color:var(--c5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem">📋 Paso a paso — Demo 15 minutos</div>
-        <div class="step-flow">
-          <div class="step" style="border-color:rgba(0,245,160,.45);padding:.75rem 1rem">
-            <div class="step-num" style="color:var(--c5)">1</div>
-            <div>
-              <div class="step-title">Abrir NotebookLM y crear notebook</div>
-              <div class="step-desc">notebooklm.google.com → "Crear nuevo notebook" → Nombre: "Clase IA Generativa"</div>
+        <div class="grid-2 full-width">
+          <div>
+            <div
+              style="
+                font-size: 0.72rem;
+                font-weight: 700;
+                color: var(--c5);
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                margin-bottom: 0.7rem;
+              "
+            >
+              📋 Paso a paso — Demo 15 minutos
+            </div>
+            <div class="step-flow">
+              <div
+                class="step"
+                style="
+                  border-color: rgba(0, 245, 160, 0.45);
+                  padding: 0.75rem 1rem;
+                "
+              >
+                <div class="step-num" style="color: var(--c5)">1</div>
+                <div>
+                  <div class="step-title">
+                    Abrir NotebookLM y crear notebook
+                  </div>
+                  <div class="step-desc">
+                    notebooklm.google.com → "Crear nuevo notebook" → Nombre:
+                    "Clase IA Generativa"
+                  </div>
+                </div>
+              </div>
+              <div
+                class="step"
+                style="
+                  border-color: rgba(0, 245, 160, 0.35);
+                  padding: 0.75rem 1rem;
+                "
+              >
+                <div class="step-num" style="color: var(--c5)">2</div>
+                <div>
+                  <div class="step-title">Subir el documento de práctica</div>
+                  <div class="step-desc">
+                    PDF del artículo académico proporcionado por el docente (o
+                    uno propio)
+                  </div>
+                </div>
+              </div>
+              <div
+                class="step"
+                style="
+                  border-color: rgba(67, 203, 255, 0.35);
+                  padding: 0.75rem 1rem;
+                "
+              >
+                <div class="step-num" style="color: var(--c3)">3</div>
+                <div>
+                  <div class="step-title">Explorar el resumen automático</div>
+                  <div class="step-desc">
+                    NotebookLM genera un resumen y preguntas clave. ¿Qué capturó
+                    bien? ¿Qué omitió?
+                  </div>
+                </div>
+              </div>
+              <div
+                class="step"
+                style="
+                  border-color: rgba(108, 99, 255, 0.45);
+                  padding: 0.75rem 1rem;
+                "
+              >
+                <div class="step-num">4</div>
+                <div>
+                  <div class="step-title">
+                    Hacer preguntas de análisis profundo
+                  </div>
+                  <div class="step-desc">
+                    "¿Cuáles son las limitaciones del estudio?" · "¿Qué
+                    evidencia respalda la hipótesis principal?"
+                  </div>
+                </div>
+              </div>
+              <div
+                class="step"
+                style="
+                  border-color: rgba(255, 193, 7, 0.35);
+                  padding: 0.75rem 1rem;
+                "
+              >
+                <div class="step-num" style="color: #ffd54f">5</div>
+                <div>
+                  <div class="step-title">Generar materiales con un clic</div>
+                  <div class="step-desc">
+                    Guía de estudio → Cuestionario → Audio Overview. Observar
+                    tiempos vs. trabajo manual.
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="step" style="border-color:rgba(0,245,160,.35);padding:.75rem 1rem">
-            <div class="step-num" style="color:var(--c5)">2</div>
-            <div>
-              <div class="step-title">Subir el documento de práctica</div>
-              <div class="step-desc">PDF del artículo académico proporcionado por el docente (o uno propio)</div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.8rem">
+            <div
+              class="activity-box"
+              style="
+                background: linear-gradient(
+                  135deg,
+                  rgba(0, 245, 160, 0.1),
+                  rgba(67, 203, 255, 0.06)
+                );
+              "
+            >
+              <div class="activity-header">
+                <div class="activity-icon">⏱️</div>
+                <div>
+                  <div class="activity-title" style="color: var(--c5)">
+                    Cronómetro mental
+                  </div>
+                  <div class="activity-sub">
+                    Anota cuánto tiempo tomaría hacer esto manualmente
+                  </div>
+                </div>
+              </div>
+              <div class="deliverable">
+                <div class="del-icon">📄</div>
+                Leer y comprender el documento
+                <div class="del-time">30–60 min</div>
+              </div>
+              <div class="deliverable">
+                <div class="del-icon">✍️</div>
+                Escribir un resumen
+                <div class="del-time">20–30 min</div>
+              </div>
+              <div class="deliverable">
+                <div class="del-icon">❓</div>
+                Crear 10 preguntas de análisis
+                <div class="del-time">30–45 min</div>
+              </div>
+              <div class="deliverable">
+                <div class="del-icon">🗺️</div>
+                Elaborar mapa conceptual
+                <div class="del-time">20–30 min</div>
+              </div>
+              <div
+                style="
+                  margin-top: 0.7rem;
+                  padding: 0.6rem 0.8rem;
+                  background: rgba(255, 193, 7, 0.12);
+                  border-radius: 8px;
+                "
+              >
+                <div
+                  style="font-size: 0.8rem; font-weight: 700; color: #ffd54f"
+                >
+                  Con NotebookLM: ~3 minutos total
+                </div>
+                <div style="font-size: 0.72rem; color: var(--text2)">
+                  Ahorro estimado: 1.5 a 3 horas de trabajo
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="step" style="border-color:rgba(67,203,255,.35);padding:.75rem 1rem">
-            <div class="step-num" style="color:var(--c3)">3</div>
-            <div>
-              <div class="step-title">Explorar el resumen automático</div>
-              <div class="step-desc">NotebookLM genera un resumen y preguntas clave. ¿Qué capturó bien? ¿Qué omitió?</div>
-            </div>
-          </div>
-          <div class="step" style="border-color:rgba(108,99,255,.45);padding:.75rem 1rem">
-            <div class="step-num">4</div>
-            <div>
-              <div class="step-title">Hacer preguntas de análisis profundo</div>
-              <div class="step-desc">"¿Cuáles son las limitaciones del estudio?" · "¿Qué evidencia respalda la hipótesis principal?"</div>
-            </div>
-          </div>
-          <div class="step" style="border-color:rgba(255,193,7,.35);padding:.75rem 1rem">
-            <div class="step-num" style="color:#FFD54F">5</div>
-            <div>
-              <div class="step-title">Generar materiales con un clic</div>
-              <div class="step-desc">Guía de estudio → Cuestionario → Audio Overview. Observar tiempos vs. trabajo manual.</div>
+
+            <div
+              class="card"
+              style="border-color: rgba(255, 101, 132, 0.35); padding: 1rem"
+            >
+              <div
+                style="
+                  font-size: 0.72rem;
+                  font-weight: 700;
+                  color: var(--c2);
+                  text-transform: uppercase;
+                  letter-spacing: 0.1em;
+                  margin-bottom: 0.5rem;
+                "
+              >
+                ⚠ Limitación importante
+              </div>
+              <p class="body" style="font-size: 0.8rem">
+                NotebookLM puede
+                <strong style="color: var(--text)">malinterpretar</strong>
+                documentos complejos o con tablas/gráficas. Siempre
+                <strong style="color: var(--text)">verifica</strong> las
+                respuestas con el documento original. La IA como asistente, no
+                como autoridad.
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:.8rem">
-        <div class="activity-box" style="background:linear-gradient(135deg,rgba(0,245,160,.1),rgba(67,203,255,.06))">
-          <div class="activity-header">
-            <div class="activity-icon">⏱️</div>
-            <div>
-              <div class="activity-title" style="color:var(--c5)">Cronómetro mental</div>
-              <div class="activity-sub">Anota cuánto tiempo tomaría hacer esto manualmente</div>
-            </div>
-          </div>
-          <div class="deliverable"><div class="del-icon">📄</div>Leer y comprender el documento<div class="del-time">30–60 min</div></div>
-          <div class="deliverable"><div class="del-icon">✍️</div>Escribir un resumen<div class="del-time">20–30 min</div></div>
-          <div class="deliverable"><div class="del-icon">❓</div>Crear 10 preguntas de análisis<div class="del-time">30–45 min</div></div>
-          <div class="deliverable"><div class="del-icon">🗺️</div>Elaborar mapa conceptual<div class="del-time">20–30 min</div></div>
-          <div style="margin-top:.7rem;padding:.6rem .8rem;background:rgba(255,193,7,.12);border-radius:8px">
-            <div style="font-size:.8rem;font-weight:700;color:#FFD54F">Con NotebookLM: ~3 minutos total</div>
-            <div style="font-size:.72rem;color:var(--text2)">Ahorro estimado: 1.5 a 3 horas de trabajo</div>
-          </div>
-        </div>
-
-        <div class="card" style="border-color:rgba(255,101,132,.35);padding:1rem">
-          <div style="font-size:.72rem;font-weight:700;color:var(--c2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">⚠ Limitación importante</div>
-          <p class="body" style="font-size:.8rem">NotebookLM puede <strong style="color:var(--text)">malinterpretar</strong> documentos complejos o con tablas/gráficas. Siempre <strong style="color:var(--text)">verifica</strong> las respuestas con el documento original. La IA como asistente, no como autoridad.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════
+      <!-- ══════════════════════════════════════════════
        SLIDE 13 — ACTIVIDAD PRÁCTICA INTEGRADORA
   ══════════════════════════════════════════════ -->
-  <div class="slide bg-pink">
-    <div class="slide-tag pink">Actividad Central · 35 minutos</div>
-    <h2 class="section-title text-center">🎯 Actividad <span class="grad-pink">Práctica Integradora</span></h2>
-    <p class="lead" style="font-size:.93rem;margin-bottom:1.5rem">Usarás ChatGPT/Claude + NotebookLM para transformar un documento en un paquete educativo completo</p>
+      <div class="slide bg-pink">
+        <div class="slide-tag pink">Actividad Central · 35 minutos</div>
+        <h2 class="section-title text-center">
+          🎯 Actividad <span class="grad-pink">Práctica Integradora</span>
+        </h2>
+        <p class="lead" style="font-size: 0.93rem; margin-bottom: 1.5rem">
+          Usarás ChatGPT/Claude + NotebookLM para transformar un documento en un
+          paquete educativo completo
+        </p>
 
-    <div class="grid-2 full-width">
-      <div>
-        <div class="activity-box" style="background:linear-gradient(135deg,rgba(255,101,132,.1),rgba(108,99,255,.08));border-color:rgba(255,101,132,.45)">
-          <div class="activity-header">
-            <div class="activity-icon">📚</div>
-            <div>
-              <div class="activity-title" style="color:#FF9DB0">Material de trabajo</div>
-              <div class="activity-sub">Elige UNO de los siguientes documentos</div>
+        <div class="grid-2 full-width">
+          <div>
+            <div
+              class="activity-box"
+              style="
+                background: linear-gradient(
+                  135deg,
+                  rgba(255, 101, 132, 0.1),
+                  rgba(108, 99, 255, 0.08)
+                );
+                border-color: rgba(255, 101, 132, 0.45);
+              "
+            >
+              <div class="activity-header">
+                <div class="activity-icon">📚</div>
+                <div>
+                  <div class="activity-title" style="color: #ff9db0">
+                    Material de trabajo
+                  </div>
+                  <div class="activity-sub">
+                    Elige UNO de los siguientes documentos
+                  </div>
+                </div>
+              </div>
+              <div
+                class="deliverable"
+                style="background: rgba(255, 101, 132, 0.1)"
+              >
+                <div class="del-icon">📰</div>
+                Un artículo académico de tu área de enseñanza
+              </div>
+              <div
+                class="deliverable"
+                style="background: rgba(255, 101, 132, 0.1)"
+              >
+                <div class="del-icon">📖</div>
+                Un capítulo de libro de texto universitario
+              </div>
+              <div
+                class="deliverable"
+                style="background: rgba(255, 101, 132, 0.1)"
+              >
+                <div class="del-icon">📋</div>
+                El programa de una materia que dictas
+              </div>
+              <div
+                class="deliverable"
+                style="background: rgba(255, 101, 132, 0.1)"
+              >
+                <div class="del-icon">🌐</div>
+                Un artículo de divulgación científica (URL)
+              </div>
             </div>
           </div>
-          <div class="deliverable" style="background:rgba(255,101,132,.1)">
-            <div class="del-icon">📰</div>Un artículo académico de tu área de enseñanza
-          </div>
-          <div class="deliverable" style="background:rgba(255,101,132,.1)">
-            <div class="del-icon">📖</div>Un capítulo de libro de texto universitario
-          </div>
-          <div class="deliverable" style="background:rgba(255,101,132,.1)">
-            <div class="del-icon">📋</div>El programa de una materia que dictas
-          </div>
-          <div class="deliverable" style="background:rgba(255,101,132,.1)">
-            <div class="del-icon">🌐</div>Un artículo de divulgación científica (URL)
+
+          <div>
+            <div
+              style="
+                font-size: 0.72rem;
+                font-weight: 700;
+                color: var(--c2);
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                margin-bottom: 0.7rem;
+              "
+            >
+              📦 Entregas requeridas (5 ítems)
+            </div>
+            <div
+              class="deliverable"
+              style="
+                background: rgba(108, 99, 255, 0.1);
+                border: 1px solid rgba(108, 99, 255, 0.3);
+                border-radius: 10px;
+                margin-bottom: 0.45rem;
+              "
+            >
+              <div class="del-icon">📄</div>
+              <div>
+                <strong style="font-size: 0.83rem">Resumen automático</strong
+                ><br /><span style="font-size: 0.72rem; color: var(--text2)"
+                  >300 palabras · ideas principales destacadas</span
+                >
+              </div>
+              <div class="del-time">5 min</div>
+            </div>
+            <div
+              class="deliverable"
+              style="
+                background: rgba(67, 203, 255, 0.08);
+                border: 1px solid rgba(67, 203, 255, 0.3);
+                border-radius: 10px;
+                margin-bottom: 0.45rem;
+              "
+            >
+              <div class="del-icon">❓</div>
+              <div>
+                <strong style="font-size: 0.83rem"
+                  >Cuestionario de análisis</strong
+                ><br /><span style="font-size: 0.72rem; color: var(--text2)"
+                  >10 preguntas · 3 niveles Bloom</span
+                >
+              </div>
+              <div class="del-time">7 min</div>
+            </div>
+            <div
+              class="deliverable"
+              style="
+                background: rgba(0, 245, 160, 0.08);
+                border: 1px solid rgba(0, 245, 160, 0.3);
+                border-radius: 10px;
+                margin-bottom: 0.45rem;
+              "
+            >
+              <div class="del-icon">🗺️</div>
+              <div>
+                <strong style="font-size: 0.83rem">Mapa conceptual</strong
+                ><br /><span style="font-size: 0.72rem; color: var(--text2)"
+                  >Concepto central + 4 ramas + sub-ideas</span
+                >
+              </div>
+              <div class="del-time">5 min</div>
+            </div>
+            <div
+              class="deliverable"
+              style="
+                background: rgba(255, 193, 7, 0.08);
+                border: 1px solid rgba(255, 193, 7, 0.3);
+                border-radius: 10px;
+                margin-bottom: 0.45rem;
+              "
+            >
+              <div class="del-icon">💡</div>
+              <div>
+                <strong style="font-size: 0.83rem"
+                  >3 ideas de actividades de clase</strong
+                ><br /><span style="font-size: 0.72rem; color: var(--text2)"
+                  >Basadas en el contenido del documento</span
+                >
+              </div>
+              <div class="del-time">5 min</div>
+            </div>
+            <div
+              class="deliverable"
+              style="
+                background: rgba(151, 8, 204, 0.1);
+                border: 1px solid rgba(151, 8, 204, 0.35);
+                border-radius: 10px;
+                margin-bottom: 0.45rem;
+              "
+            >
+              <div class="del-icon">🎙️</div>
+              <div>
+                <strong style="font-size: 0.83rem"
+                  >Audio Overview (podcast IA)</strong
+                ><br /><span style="font-size: 0.72rem; color: var(--text2)"
+                  >Generado por NotebookLM · compartir enlace</span
+                >
+              </div>
+              <div class="del-time">2 min</div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div>
-        <div style="font-size:.72rem;font-weight:700;color:var(--c2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.7rem">📦 Entregas requeridas (5 ítems)</div>
-        <div class="deliverable" style="background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.3);border-radius:10px;margin-bottom:.45rem">
-          <div class="del-icon">📄</div>
-          <div><strong style="font-size:.83rem">Resumen automático</strong><br><span style="font-size:.72rem;color:var(--text2)">300 palabras · ideas principales destacadas</span></div>
-          <div class="del-time">5 min</div>
-        </div>
-        <div class="deliverable" style="background:rgba(67,203,255,.08);border:1px solid rgba(67,203,255,.3);border-radius:10px;margin-bottom:.45rem">
-          <div class="del-icon">❓</div>
-          <div><strong style="font-size:.83rem">Cuestionario de análisis</strong><br><span style="font-size:.72rem;color:var(--text2)">10 preguntas · 3 niveles Bloom</span></div>
-          <div class="del-time">7 min</div>
-        </div>
-        <div class="deliverable" style="background:rgba(0,245,160,.08);border:1px solid rgba(0,245,160,.3);border-radius:10px;margin-bottom:.45rem">
-          <div class="del-icon">🗺️</div>
-          <div><strong style="font-size:.83rem">Mapa conceptual</strong><br><span style="font-size:.72rem;color:var(--text2)">Concepto central + 4 ramas + sub-ideas</span></div>
-          <div class="del-time">5 min</div>
-        </div>
-        <div class="deliverable" style="background:rgba(255,193,7,.08);border:1px solid rgba(255,193,7,.3);border-radius:10px;margin-bottom:.45rem">
-          <div class="del-icon">💡</div>
-          <div><strong style="font-size:.83rem">3 ideas de actividades de clase</strong><br><span style="font-size:.72rem;color:var(--text2)">Basadas en el contenido del documento</span></div>
-          <div class="del-time">5 min</div>
-        </div>
-        <div class="deliverable" style="background:rgba(151,8,204,.1);border:1px solid rgba(151,8,204,.35);border-radius:10px;margin-bottom:.45rem">
-          <div class="del-icon">🎙️</div>
-          <div><strong style="font-size:.83rem">Audio Overview (podcast IA)</strong><br><span style="font-size:.72rem;color:var(--text2)">Generado por NotebookLM · compartir enlace</span></div>
-          <div class="del-time">2 min</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════
+      <!-- ══════════════════════════════════════════════
        SLIDE 14 — FLUJOS DE TRABAJO AVANZADOS
   ══════════════════════════════════════════════ -->
-  <div class="slide bg-multi">
-    <div class="slide-tag">Productividad Avanzada</div>
-    <h2 class="section-title text-center">Flujos de trabajo <span class="grad-text">educativos con IA</span></h2>
-    <p class="lead" style="font-size:.9rem;margin-bottom:1.3rem">Más allá de la actividad práctica — cómo integrar la IA en tu trabajo diario</p>
+      <div class="slide bg-multi">
+        <div class="slide-tag">Productividad Avanzada</div>
+        <h2 class="section-title text-center">
+          Flujos de trabajo <span class="grad-text">educativos con IA</span>
+        </h2>
+        <p class="lead" style="font-size: 0.9rem; margin-bottom: 1.3rem">
+          Más allá de la actividad práctica — cómo integrar la IA en tu trabajo
+          diario
+        </p>
 
-    <div class="grid-3 full-width">
-      <div class="card ac-purple">
-        <div style="font-size:1.8rem;margin-bottom:.5rem">🔬</div>
-        <h3 class="card-title grad-text">Investigación académica</h3>
-        <p class="body" style="font-size:.8rem;margin-bottom:.6rem">NotebookLM para analizar bibliografía. ChatGPT para redactar borradores. Claude para revisar argumentación y coherencia.</p>
-        <div style="font-size:.72rem;color:var(--c1);font-weight:600">📚 Artículos → Síntesis → Borrador → Revisión</div>
+        <div class="grid-3 full-width">
+          <div class="card ac-purple">
+            <div style="font-size: 1.8rem; margin-bottom: 0.5rem">🔬</div>
+            <h3 class="card-title grad-text">Investigación académica</h3>
+            <p class="body" style="font-size: 0.8rem; margin-bottom: 0.6rem">
+              NotebookLM para analizar bibliografía. ChatGPT para redactar
+              borradores. Claude para revisar argumentación y coherencia.
+            </p>
+            <div style="font-size: 0.72rem; color: var(--c1); font-weight: 600">
+              📚 Artículos → Síntesis → Borrador → Revisión
+            </div>
+          </div>
+
+          <div class="card ac-cyan">
+            <div style="font-size: 1.8rem; margin-bottom: 0.5rem">🎓</div>
+            <h3 class="card-title grad-text">Diseño instruccional</h3>
+            <p class="body" style="font-size: 0.8rem; margin-bottom: 0.6rem">
+              Gemini para estructurar objetivos de aprendizaje. Claude para
+              crear actividades didácticas. NotebookLM para material de apoyo.
+            </p>
+            <div style="font-size: 0.72rem; color: var(--c3); font-weight: 600">
+              🎯 Objetivos → Actividades → Evaluación
+            </div>
+          </div>
+
+          <div class="card ac-green">
+            <div style="font-size: 1.8rem; margin-bottom: 0.5rem">✅</div>
+            <h3 class="card-title grad-green">
+              Evaluación y retroalimentación
+            </h3>
+            <p class="body" style="font-size: 0.8rem; margin-bottom: 0.6rem">
+              Diseño de rúbricas, generación de borradores de corrección,
+              retroalimentación personalizada basada en criterios.
+            </p>
+            <div style="font-size: 0.72rem; color: var(--c5); font-weight: 600">
+              📊 Rúbrica → Corrección → Feedback
+            </div>
+          </div>
+
+          <div class="card ac-pink">
+            <div style="font-size: 1.8rem; margin-bottom: 0.5rem">🗓️</div>
+            <h3 class="card-title grad-pink">Planificación curricular</h3>
+            <p class="body" style="font-size: 0.8rem; margin-bottom: 0.6rem">
+              Analizar programas existentes, detectar vacíos, sugerir
+              actualizaciones, generar cronogramas y distribuir contenidos.
+            </p>
+            <div style="font-size: 0.72rem; color: var(--c2); font-weight: 600">
+              📋 Programa → Análisis → Mejoras
+            </div>
+          </div>
+
+          <div class="card" style="border-color: rgba(255, 193, 7, 0.4)">
+            <div style="font-size: 1.8rem; margin-bottom: 0.5rem">💬</div>
+            <h3 class="card-title" style="color: #ffd54f">
+              Comunicación académica
+            </h3>
+            <p class="body" style="font-size: 0.8rem; margin-bottom: 0.6rem">
+              Redactar emails, informes, actas, comunicados y documentos
+              institucionales con el tono y formato correcto.
+            </p>
+            <div style="font-size: 0.72rem; color: #ffd54f; font-weight: 600">
+              📧 Borrador → Revisión → Envío
+            </div>
+          </div>
+
+          <div class="card" style="border-color: rgba(151, 8, 204, 0.4)">
+            <div style="font-size: 1.8rem; margin-bottom: 0.5rem">🌐</div>
+            <h3 class="card-title" style="color: #c084fc">
+              Traducción y adaptación
+            </h3>
+            <p class="body" style="font-size: 0.8rem; margin-bottom: 0.6rem">
+              Traducir materiales académicos, adaptar nivel de complejidad según
+              audiencia, versiones simplificadas para estudiantes.
+            </p>
+            <div style="font-size: 0.72rem; color: #c084fc; font-weight: 600">
+              🔄 Original → Traducción → Adaptación
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="card ac-cyan">
-        <div style="font-size:1.8rem;margin-bottom:.5rem">🎓</div>
-        <h3 class="card-title grad-text">Diseño instruccional</h3>
-        <p class="body" style="font-size:.8rem;margin-bottom:.6rem">Gemini para estructurar objetivos de aprendizaje. Claude para crear actividades didácticas. NotebookLM para material de apoyo.</p>
-        <div style="font-size:.72rem;color:var(--c3);font-weight:600">🎯 Objetivos → Actividades → Evaluación</div>
-      </div>
-
-      <div class="card ac-green">
-        <div style="font-size:1.8rem;margin-bottom:.5rem">✅</div>
-        <h3 class="card-title grad-green">Evaluación y retroalimentación</h3>
-        <p class="body" style="font-size:.8rem;margin-bottom:.6rem">Diseño de rúbricas, generación de borradores de corrección, retroalimentación personalizada basada en criterios.</p>
-        <div style="font-size:.72rem;color:var(--c5);font-weight:600">📊 Rúbrica → Corrección → Feedback</div>
-      </div>
-
-      <div class="card ac-pink">
-        <div style="font-size:1.8rem;margin-bottom:.5rem">🗓️</div>
-        <h3 class="card-title grad-pink">Planificación curricular</h3>
-        <p class="body" style="font-size:.8rem;margin-bottom:.6rem">Analizar programas existentes, detectar vacíos, sugerir actualizaciones, generar cronogramas y distribuir contenidos.</p>
-        <div style="font-size:.72rem;color:var(--c2);font-weight:600">📋 Programa → Análisis → Mejoras</div>
-      </div>
-
-      <div class="card" style="border-color:rgba(255,193,7,.4)">
-        <div style="font-size:1.8rem;margin-bottom:.5rem">💬</div>
-        <h3 class="card-title" style="color:#FFD54F">Comunicación académica</h3>
-        <p class="body" style="font-size:.8rem;margin-bottom:.6rem">Redactar emails, informes, actas, comunicados y documentos institucionales con el tono y formato correcto.</p>
-        <div style="font-size:.72rem;color:#FFD54F;font-weight:600">📧 Borrador → Revisión → Envío</div>
-      </div>
-
-      <div class="card" style="border-color:rgba(151,8,204,.4)">
-        <div style="font-size:1.8rem;margin-bottom:.5rem">🌐</div>
-        <h3 class="card-title" style="color:#C084FC">Traducción y adaptación</h3>
-        <p class="body" style="font-size:.8rem;margin-bottom:.6rem">Traducir materiales académicos, adaptar nivel de complejidad según audiencia, versiones simplificadas para estudiantes.</p>
-        <div style="font-size:.72rem;color:#C084FC;font-weight:600">🔄 Original → Traducción → Adaptación</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════
+      <!-- ══════════════════════════════════════════════
        SLIDE 15 — BUENAS PRÁCTICAS Y ÉTICA
   ══════════════════════════════════════════════ -->
-  <div class="slide bg-purple">
-    <div class="slide-tag purple">Uso Responsable</div>
-    <h2 class="section-title text-center">Buenas prácticas para el <span class="grad-text">uso educativo de la IA</span></h2>
+      <div class="slide bg-purple">
+        <div class="slide-tag purple">Uso Responsable</div>
+        <h2 class="section-title text-center">
+          Buenas prácticas para el
+          <span class="grad-text">uso educativo de la IA</span>
+        </h2>
 
-    <div class="grid-2 full-width">
-      <div style="display:flex;flex-direction:column;gap:.6rem">
-        <div style="font-size:.72rem;font-weight:700;color:var(--c5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.3rem">✅ Hacer siempre</div>
-        <div class="feature-row" style="border-color:rgba(0,245,160,.4);padding:.75rem 1rem">
-          <div style="font-size:1.2rem">✅</div>
-          <div><h3 class="card-title" style="font-size:.88rem;color:#5CFFD1">Verificar la información generada</h3><p class="body" style="font-size:.77rem">La IA puede equivocarse. Siempre contrasta con fuentes originales, especialmente en datos, fechas y afirmaciones técnicas.</p></div>
+        <div class="grid-2 full-width">
+          <div style="display: flex; flex-direction: column; gap: 0.6rem">
+            <div
+              style="
+                font-size: 0.72rem;
+                font-weight: 700;
+                color: var(--c5);
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                margin-bottom: 0.3rem;
+              "
+            >
+              ✅ Hacer siempre
+            </div>
+            <div
+              class="feature-row"
+              style="
+                border-color: rgba(0, 245, 160, 0.4);
+                padding: 0.75rem 1rem;
+              "
+            >
+              <div style="font-size: 1.2rem">✅</div>
+              <div>
+                <h3
+                  class="card-title"
+                  style="font-size: 0.88rem; color: #5cffd1"
+                >
+                  Verificar la información generada
+                </h3>
+                <p class="body" style="font-size: 0.77rem">
+                  La IA puede equivocarse. Siempre contrasta con fuentes
+                  originales, especialmente en datos, fechas y afirmaciones
+                  técnicas.
+                </p>
+              </div>
+            </div>
+            <div
+              class="feature-row"
+              style="
+                border-color: rgba(0, 245, 160, 0.35);
+                padding: 0.75rem 1rem;
+              "
+            >
+              <div style="font-size: 1.2rem">✅</div>
+              <div>
+                <h3
+                  class="card-title"
+                  style="font-size: 0.88rem; color: #5cffd1"
+                >
+                  Declarar el uso de IA
+                </h3>
+                <p class="body" style="font-size: 0.77rem">
+                  En trabajos académicos y publicaciones, indica qué
+                  herramientas de IA usaste y cómo. La transparencia construye
+                  confianza.
+                </p>
+              </div>
+            </div>
+            <div
+              class="feature-row"
+              style="
+                border-color: rgba(0, 245, 160, 0.35);
+                padding: 0.75rem 1rem;
+              "
+            >
+              <div style="font-size: 1.2rem">✅</div>
+              <div>
+                <h3
+                  class="card-title"
+                  style="font-size: 0.88rem; color: #5cffd1"
+                >
+                  Usar la IA como punto de partida
+                </h3>
+                <p class="body" style="font-size: 0.77rem">
+                  El output de la IA es un borrador. Tu criterio experto, tu
+                  contexto local y tu experiencia son insustituibles.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 0.6rem">
+            <div
+              style="
+                font-size: 0.72rem;
+                font-weight: 700;
+                color: var(--c2);
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                margin-bottom: 0.3rem;
+              "
+            >
+              ⚠ Evitar siempre
+            </div>
+            <div
+              class="feature-row"
+              style="
+                border-color: rgba(255, 101, 132, 0.4);
+                padding: 0.75rem 1rem;
+              "
+            >
+              <div style="font-size: 1.2rem">⚠️</div>
+              <div>
+                <h3
+                  class="card-title"
+                  style="font-size: 0.88rem; color: #ff9db0"
+                >
+                  Datos personales de estudiantes
+                </h3>
+                <p class="body" style="font-size: 0.77rem">
+                  Nunca ingreses nombres, calificaciones, situaciones personales
+                  o información sensible de estudiantes a modelos de IA pública.
+                </p>
+              </div>
+            </div>
+            <div
+              class="feature-row"
+              style="
+                border-color: rgba(255, 101, 132, 0.35);
+                padding: 0.75rem 1rem;
+              "
+            >
+              <div style="font-size: 1.2rem">⚠️</div>
+              <div>
+                <h3
+                  class="card-title"
+                  style="font-size: 0.88rem; color: #ff9db0"
+                >
+                  Presentar IA como trabajo propio
+                </h3>
+                <p class="body" style="font-size: 0.77rem">
+                  El plagio con IA existe. Usar IA para hacer el trabajo de
+                  alguien más sin declararlo va en contra de la integridad
+                  académica.
+                </p>
+              </div>
+            </div>
+            <div
+              class="feature-row"
+              style="
+                border-color: rgba(255, 101, 132, 0.35);
+                padding: 0.75rem 1rem;
+              "
+            >
+              <div style="font-size: 1.2rem">⚠️</div>
+              <div>
+                <h3
+                  class="card-title"
+                  style="font-size: 0.88rem; color: #ff9db0"
+                >
+                  Confiar ciegamente en las respuestas
+                </h3>
+                <p class="body" style="font-size: 0.77rem">
+                  Los LLMs "alucinan" — pueden inventar citas, estadísticas y
+                  datos con total confianza. El pensamiento crítico es tu
+                  herramienta más importante.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="feature-row" style="border-color:rgba(0,245,160,.35);padding:.75rem 1rem">
-          <div style="font-size:1.2rem">✅</div>
-          <div><h3 class="card-title" style="font-size:.88rem;color:#5CFFD1">Declarar el uso de IA</h3><p class="body" style="font-size:.77rem">En trabajos académicos y publicaciones, indica qué herramientas de IA usaste y cómo. La transparencia construye confianza.</p></div>
-        </div>
-        <div class="feature-row" style="border-color:rgba(0,245,160,.35);padding:.75rem 1rem">
-          <div style="font-size:1.2rem">✅</div>
-          <div><h3 class="card-title" style="font-size:.88rem;color:#5CFFD1">Usar la IA como punto de partida</h3><p class="body" style="font-size:.77rem">El output de la IA es un borrador. Tu criterio experto, tu contexto local y tu experiencia son insustituibles.</p></div>
+
+        <div
+          class="card mt-2 full-width"
+          style="
+            text-align: center;
+            border-color: rgba(255, 193, 7, 0.35);
+            padding: 0.85rem;
+          "
+        >
+          <span style="color: #ffd54f; font-size: 0.83rem; font-weight: 600"
+            >💡 La IA no reemplaza al docente. Amplifica su capacidad de crear,
+            investigar e impactar a sus estudiantes.</span
+          >
         </div>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:.6rem">
-        <div style="font-size:.72rem;font-weight:700;color:var(--c2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.3rem">⚠ Evitar siempre</div>
-        <div class="feature-row" style="border-color:rgba(255,101,132,.4);padding:.75rem 1rem">
-          <div style="font-size:1.2rem">⚠️</div>
-          <div><h3 class="card-title" style="font-size:.88rem;color:#FF9DB0">Datos personales de estudiantes</h3><p class="body" style="font-size:.77rem">Nunca ingreses nombres, calificaciones, situaciones personales o información sensible de estudiantes a modelos de IA pública.</p></div>
-        </div>
-        <div class="feature-row" style="border-color:rgba(255,101,132,.35);padding:.75rem 1rem">
-          <div style="font-size:1.2rem">⚠️</div>
-          <div><h3 class="card-title" style="font-size:.88rem;color:#FF9DB0">Presentar IA como trabajo propio</h3><p class="body" style="font-size:.77rem">El plagio con IA existe. Usar IA para hacer el trabajo de alguien más sin declararlo va en contra de la integridad académica.</p></div>
-        </div>
-        <div class="feature-row" style="border-color:rgba(255,101,132,.35);padding:.75rem 1rem">
-          <div style="font-size:1.2rem">⚠️</div>
-          <div><h3 class="card-title" style="font-size:.88rem;color:#FF9DB0">Confiar ciegamente en las respuestas</h3><p class="body" style="font-size:.77rem">Los LLMs "alucinan" — pueden inventar citas, estadísticas y datos con total confianza. El pensamiento crítico es tu herramienta más importante.</p></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card mt-2 full-width" style="text-align:center;border-color:rgba(255,193,7,.35);padding:.85rem">
-      <span style="color:#FFD54F;font-size:.83rem;font-weight:600">💡 La IA no reemplaza al docente. Amplifica su capacidad de crear, investigar e impactar a sus estudiantes.</span>
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════════
+      <!-- ══════════════════════════════════════════════
        SLIDE 16 — CIERRE Y PRÓXIMA CLASE
   ══════════════════════════════════════════════ -->
-  <div class="slide bg-class1">
-    <div class="slide-tag">Cierre · Clase 1</div>
-    <h2 class="section-title text-center" style="margin-bottom:1rem">¡Lo que <span class="grad-text">lograste hoy</span>!</h2>
+      <div class="slide bg-class1">
+        <div class="slide-tag">Cierre · Clase 1</div>
+        <h2 class="section-title text-center" style="margin-bottom: 1rem">
+          ¡Lo que <span class="grad-text">lograste hoy</span>!
+        </h2>
 
-    <div class="closing-grid">
-      <div class="cl-card" style="border-color:rgba(108,99,255,.45)">
-        <div class="cl-icon">🧠</div>
-        <div class="cl-label grad-text">Fundamentos</div>
-        <div class="cl-sub">Entiendes cómo funciona la IA Generativa y por qué cambia todo</div>
-      </div>
-      <div class="cl-card" style="border-color:rgba(67,203,255,.45)">
-        <div class="cl-icon">💬</div>
-        <div class="cl-label" style="color:#7DD8FF">3 Herramientas</div>
-        <div class="cl-sub">ChatGPT, Gemini y Claude: cuándo y cómo usar cada una</div>
-      </div>
-      <div class="cl-card" style="border-color:rgba(0,245,160,.45)">
-        <div class="cl-icon">⌨</div>
-        <div class="cl-label grad-green">Prompting</div>
-        <div class="cl-sub">Técnicas para obtener resultados extraordinarios</div>
-      </div>
-      <div class="cl-card" style="border-color:rgba(255,101,132,.45)">
-        <div class="cl-icon">📚</div>
-        <div class="cl-label grad-pink">NotebookLM</div>
-        <div class="cl-sub">Investigación y análisis documental inteligente</div>
-      </div>
-    </div>
-
-    <div class="card mt-3 full-width" style="border-color:rgba(255,193,7,.4);padding:1.2rem">
-      <div style="display:flex;align-items:center;gap:1rem">
-        <div style="font-size:2.5rem">🚀</div>
-        <div>
-          <div style="font-weight:700;font-size:1rem;color:#FFD54F;margin-bottom:.3rem">Próxima Clase — Creación Multimedia con IA</div>
-          <div style="display:flex;gap:.7rem;flex-wrap:wrap">
-            <span class="badge bp">DALL·E</span>
-            <span class="badge bc">Nano Banana</span>
-            <span class="badge bg-b">ElevenLabs</span>
-            <span class="badge bg-gold">Suno AI</span>
-            <span class="badge bpk">Veo 3 / Flow</span>
+        <div class="closing-grid">
+          <div class="cl-card" style="border-color: rgba(108, 99, 255, 0.45)">
+            <div class="cl-icon">🧠</div>
+            <div class="cl-label grad-text">Fundamentos</div>
+            <div class="cl-sub">
+              Entiendes cómo funciona la IA Generativa y por qué cambia todo
+            </div>
           </div>
-          <div style="font-size:.78rem;color:var(--text2);margin-top:.5rem">Trae una idea de proyecto multimedia: tema, audiencia y objetivo. ¡La construiremos desde cero con IA!</div>
+          <div class="cl-card" style="border-color: rgba(67, 203, 255, 0.45)">
+            <div class="cl-icon">💬</div>
+            <div class="cl-label" style="color: #7dd8ff">3 Herramientas</div>
+            <div class="cl-sub">
+              ChatGPT, Gemini y Claude: cuándo y cómo usar cada una
+            </div>
+          </div>
+          <div class="cl-card" style="border-color: rgba(0, 245, 160, 0.45)">
+            <div class="cl-icon">⌨</div>
+            <div class="cl-label grad-green">Prompting</div>
+            <div class="cl-sub">
+              Técnicas para obtener resultados extraordinarios
+            </div>
+          </div>
+          <div class="cl-card" style="border-color: rgba(255, 101, 132, 0.45)">
+            <div class="cl-icon">📚</div>
+            <div class="cl-label grad-pink">NotebookLM</div>
+            <div class="cl-sub">
+              Investigación y análisis documental inteligente
+            </div>
+          </div>
         </div>
+
+        <div
+          class="card mt-3 full-width"
+          style="border-color: rgba(255, 193, 7, 0.4); padding: 1.2rem"
+        >
+          <div style="display: flex; align-items: center; gap: 1rem">
+            <div style="font-size: 2.5rem">🚀</div>
+            <div>
+              <div
+                style="
+                  font-weight: 700;
+                  font-size: 1rem;
+                  color: #ffd54f;
+                  margin-bottom: 0.3rem;
+                "
+              >
+                Próxima Clase — Creación Multimedia con IA
+              </div>
+              <div style="display: flex; gap: 0.7rem; flex-wrap: wrap">
+                <span class="badge bp">DALL·E</span>
+                <span class="badge bc">Nano Banana</span>
+                <span class="badge bg-b">ElevenLabs</span>
+                <span class="badge bg-gold">Suno AI</span>
+                <span class="badge bpk">Veo 3 / Flow</span>
+              </div>
+              <div
+                style="
+                  font-size: 0.78rem;
+                  color: var(--text2);
+                  margin-top: 0.5rem;
+                "
+              >
+                Trae una idea de proyecto multimedia: tema, audiencia y
+                objetivo. ¡La construiremos desde cero con IA!
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          style="
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.3rem;
+            flex-wrap: wrap;
+            justify-content: center;
+          "
+        >
+          <div
+            class="card"
+            style="
+              padding: 0.7rem 1.2rem;
+              text-align: center;
+              border-color: rgba(108, 99, 255, 0.4);
+            "
+          >
+            <div style="font-size: 0.75rem; color: var(--text2)">
+              Tarea opcional
+            </div>
+            <div
+              style="font-size: 0.85rem; font-weight: 600; margin-top: 0.2rem"
+            >
+              Analizar un documento propio con NotebookLM y compartir en el foro
+            </div>
+          </div>
+        </div>
+
+        <button
+          onclick="window.location.href = 'index.html'"
+          style="
+            margin-top: 1.2rem;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.6rem 1.4rem;
+            color: var(--text);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: border-color 0.2s;
+          "
+          onmouseover="this.style.borderColor = 'rgba(108,99,255,.6)'"
+          onmouseout="this.style.borderColor = 'var(--border)'"
+        >
+          ← Volver al curso principal
+        </button>
       </div>
     </div>
+    <!-- end deck -->
 
-    <div style="display:flex;gap:1rem;margin-top:1.3rem;flex-wrap:wrap;justify-content:center">
-      <div class="card" style="padding:.7rem 1.2rem;text-align:center;border-color:rgba(108,99,255,.4)">
-        <div style="font-size:.75rem;color:var(--text2)">Tarea opcional</div>
-        <div style="font-size:.85rem;font-weight:600;margin-top:.2rem">Analizar un documento propio con NotebookLM y compartir en el foro</div>
-      </div>
-    </div>
+    <script>
+      // Particles
+      (function () {
+        const el = document.getElementById("particles");
+        const cols = ["#6C63FF", "#43CBFF", "#00F5A0", "#FF6584"];
+        for (let i = 0; i < 20; i++) {
+          const p = document.createElement("div");
+          p.className = "particle";
+          const size = 3 + Math.random() * 7;
+          p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random() * 100}%;background:${cols[Math.floor(Math.random() * cols.length)]};animation-duration:${14 + Math.random() * 18}s;animation-delay:${-Math.random() * 20}s;`;
+          el.appendChild(p);
+        }
+      })();
 
-    <button onclick="window.location.href='index.html'" style="margin-top:1.2rem;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:.6rem 1.4rem;color:var(--text);font-size:.82rem;font-weight:600;cursor:pointer;backdrop-filter:blur(10px);transition:border-color .2s" onmouseover="this.style.borderColor='rgba(108,99,255,.6)'" onmouseout="this.style.borderColor='var(--border)'">
-      ← Volver al curso principal
-    </button>
-  </div>
+      // Slide engine
+      const slides = Array.from(document.querySelectorAll(".slide"));
+      const total = slides.length;
+      let current = 0;
 
-</div><!-- end deck -->
+      const counter = document.getElementById("slide-counter");
+      const dotsEl = document.getElementById("dots");
+      const progBar = document.getElementById("progress-bar");
 
-<script>
-  // Particles
-  (function() {
-    const el = document.getElementById('particles');
-    const cols = ['#6C63FF','#43CBFF','#00F5A0','#FF6584'];
-    for (let i = 0; i < 20; i++) {
-      const p = document.createElement('div');
-      p.className = 'particle';
-      const size = 3 + Math.random() * 7;
-      p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;background:${cols[Math.floor(Math.random()*cols.length)]};animation-duration:${14+Math.random()*18}s;animation-delay:${-Math.random()*20}s;`;
-      el.appendChild(p);
-    }
-  })();
+      slides.forEach((_, i) => {
+        const d = document.createElement("div");
+        d.className = "dot" + (i === 0 ? " on" : "");
+        d.addEventListener("click", () => goTo(i));
+        dotsEl.appendChild(d);
+      });
 
-  // Slide engine
-  const slides  = Array.from(document.querySelectorAll('.slide'));
-  const total   = slides.length;
-  let   current = 0;
+      function updateUI() {
+        document
+          .querySelectorAll(".dot")
+          .forEach((d, i) => d.classList.toggle("on", i === current));
+        counter.textContent = `${current + 1} / ${total}`;
+        progBar.style.width = `${((current + 1) / total) * 100}%`;
+      }
 
-  const counter  = document.getElementById('slide-counter');
-  const dotsEl   = document.getElementById('dots');
-  const progBar  = document.getElementById('progress-bar');
+      function goTo(idx) {
+        if (idx < 0 || idx >= total || idx === current) return;
+        slides[current].classList.remove("active");
+        slides[current].classList.add("exit");
+        const prev = current;
+        current = idx;
+        setTimeout(() => slides[prev].classList.remove("exit"), 450);
+        slides[current].classList.add("active");
+        updateUI();
+      }
 
-  slides.forEach((_, i) => {
-    const d = document.createElement('div');
-    d.className = 'dot' + (i === 0 ? ' on' : '');
-    d.addEventListener('click', () => goTo(i));
-    dotsEl.appendChild(d);
-  });
+      document
+        .getElementById("next")
+        .addEventListener("click", () => goTo(current + 1));
+      document
+        .getElementById("prev")
+        .addEventListener("click", () => goTo(current - 1));
 
-  function updateUI() {
-    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('on', i === current));
-    counter.textContent = `${current + 1} / ${total}`;
-    progBar.style.width = `${((current + 1) / total) * 100}%`;
-  }
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === " ") {
+          e.preventDefault();
+          goTo(current + 1);
+        }
+        if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+          e.preventDefault();
+          goTo(current - 1);
+        }
+        if (e.key === "f" || e.key === "F") {
+          if (!document.fullscreenElement)
+            document.documentElement.requestFullscreen();
+          else document.exitFullscreen();
+        }
+      });
 
-  function goTo(idx) {
-    if (idx < 0 || idx >= total || idx === current) return;
-    slides[current].classList.remove('active');
-    slides[current].classList.add('exit');
-    const prev = current;
-    current = idx;
-    setTimeout(() => slides[prev].classList.remove('exit'), 450);
-    slides[current].classList.add('active');
-    updateUI();
-  }
+      let touchX = 0;
+      document.addEventListener("touchstart", (e) => {
+        touchX = e.touches[0].clientX;
+      });
+      document.addEventListener("touchend", (e) => {
+        const dx = touchX - e.changedTouches[0].clientX;
+        if (Math.abs(dx) > 50) goTo(current + (dx > 0 ? 1 : -1));
+      });
 
-  document.getElementById('next').addEventListener('click', () => goTo(current + 1));
-  document.getElementById('prev').addEventListener('click', () => goTo(current - 1));
-
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); goTo(current + 1); }
-    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                    { e.preventDefault(); goTo(current - 1); }
-    if (e.key === 'f' || e.key === 'F') {
-      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-      else document.exitFullscreen();
-    }
-  });
-
-  let touchX = 0;
-  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; });
-  document.addEventListener('touchend',   e => {
-    const dx = touchX - e.changedTouches[0].clientX;
-    if (Math.abs(dx) > 50) goTo(current + (dx > 0 ? 1 : -1));
-  });
-
-  updateUI();
-</script>
-</body>
+      updateUI();
+    </script>
+  </body>
 </html>
